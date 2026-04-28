@@ -1,0 +1,45 @@
+# Rust / Cargo
+/target
+**/*.rs.bk
+Cargo.lock
+*.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+
+# OS / Editor
+**/.DS_Store
+**/Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Logs & Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Output / Build
+dist/
+build/
+public/assets/compiled/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Documentation build (if using mdBook)
+book/
