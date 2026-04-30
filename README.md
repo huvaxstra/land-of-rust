@@ -3,8 +3,8 @@
 > A gentle, story-driven introduction to Rust programming for children (ages 9+) and absolute beginners.
 
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
-[![Rust Edition](https://img.shields.io/badge/rust-2021%2B-blue)](https://doc.rust-lang.org/edition-guide/)
-[![Rust Version](https://img.shields.io/badge/rust-1.75%2B-blue)](https://www.rust-lang.org/)
+[![Rust Edition](https://img.shields.io/badge/rust-2024%2B-blue)](https://doc.rust-lang.org/edition-guide/)
+[![Rust Version](https://img.shields.io/badge/rust-1.85%2B-blue)](https://www.rust-lang.org/)
 [![Status: In Development](https://img.shields.io/badge/status-in%20development-yellow)](#)
 
 ---
