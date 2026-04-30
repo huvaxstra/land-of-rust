@@ -45,9 +45,8 @@ If you're reviewing this project (especially Rust Edu team), we'd especially app
 🔹 **Cultural adaptability**: Are examples globally relatable, or too region-specific?
 
 👉 Preferred feedback channels:  
-- 💬 Zulip thread (for quick discussion)  
-- 🐛 GitHub Issues (for structured feedback)  
-- ✉️ Email (for detailed pedagogical input)
+- 🐛 GitHub Issues (for structured feedback[https://github.com/huvaxstra/land-of-rust/issues])  
+- ✉️ Email (for detailed pedagogical input **jgh.rust@gmail.com**)
 
 ---
 
