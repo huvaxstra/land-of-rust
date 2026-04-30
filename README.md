@@ -1,8 +1,3 @@
-# 📄 فایل `README.md` (نسخه‌ی به‌روزرسانی‌شده)
-
-در این نسخه، بخش‌های **Book Structure** و **For Rust Edu Reviewers** دقیقاً بر اساس پیشرفت پروژه (آماده‌شدن فصل‌های ۵ و ۶) و ساختار جدید ریپازیتوری اصلاح شدند. لحن، فرمت و سایر بخش‌ها حفظ شده‌اند.
-
-```markdown
 # 🦀 The Land of Rust – Ferris the Crab's Space Adventures
 
 > A gentle, story-driven introduction to Rust programming for children (ages 9+) and absolute beginners.
