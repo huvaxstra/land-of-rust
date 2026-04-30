@@ -22,7 +22,7 @@ This project welcomes contributions from educators, developers, parents, and esp
 - Avoid assuming prior programming knowledge
 - Prefer **concrete metaphors** over abstract explanations
 - Code examples must:
-  - Compile with **Rust 1.75+** and **edition 2021**
+  - Compile with **Rust 1.85+** and **edition 2024**
   - Include comments for non-obvious lines
   - Avoid unsafe code unless explicitly teaching it (Ch 19)
 
@@ -71,7 +71,7 @@ Key principles:
 ## ❓ Questions?
 
 - 💬 Chat: [Rust Edu Zulip](https://rust-lang.zulipchat.com/#narrow/stream/416462-t-community.2Frust-edu)
-- 🐛 Issues: [GitHub Issues](#)
-- ✉️ Email: [your contact]
+- 🐛 Issues: [GitHub Issues](https://github.com/huvaxstra/land-of-rust/issues)
+- ✉️ Email: [jgh.rust@gmail.com]
 
 Thank you for helping more young people discover the joy of safe, creative programming with Rust! 🚀
