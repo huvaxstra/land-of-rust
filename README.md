@@ -90,7 +90,7 @@ A dedicated **Teacher's Guide** ([teacher-guide.md](./teacher-guide.md)) include
 
 If you're from the Rust Edu team reviewing this proposal:
 
-- 📂 **Chapters 1–6 (English)**: `/en/chapter-[1-4].md/`
+- 📂 **Chapters 1–6 (English)**: `/en/chapter-[1-6].md/`
 - 🎯 **Focus areas for feedback**:
   - Age-appropriateness of metaphors (e.g., toy tractor = ownership in Ch4, enum wardrobe = states in Ch6)
   - Pacing of ownership introduction (Ch4) to structs/enums (Ch5–6)
