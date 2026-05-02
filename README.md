@@ -3,7 +3,7 @@
 > A gentle, story-driven introduction to Rust programming for children (ages 9+) and absolute beginners.
 
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
-[![Rust Edition](https://img.shields.io/badge/rust-2024-blue)](https://doc.rust-lang.org/edition-guide/)
+[![Rust Edition](https://img.shields.io/badge/rust-2024%2B-blue)](https://doc.rust-lang.org/edition-guide/)
 [![Rust Version](https://img.shields.io/badge/rust-1.85%2B-blue)](https://www.rust-lang.org/)
 [![Status: In Development](https://img.shields.io/badge/status-in%20development-yellow)](#)
 
@@ -49,20 +49,21 @@ No prior coding experience is required – just curiosity, a computer, and a wil
 
 ```
 🌱 Beginner Level (Ages 9–11)
-├── Ch 1: Ferris and the Lost Toolbox → Hello World, cargo, println!
-├── Ch 2: The Missing Star Game → Variables, input, if/else, loops
-├── Ch 3: The Space Chocolate Cake → Functions, data types, parameters
-└── Ch 4: Ferris's Borrowing Club → Ownership, borrowing, slices
+├── ✅ Ch 1: Ferris and the Lost Toolbox → Hello World, cargo, println!
+├── ✅ Ch 2: The Missing Star Game → Variables, input, if/else, loops
+├── ✅ Ch 3: The Space Chocolate Cake → Functions, data types, parameters
+└── ✅ Ch 4: Ferris's Borrowing Club → Ownership, borrowing, slices
 
 🌟 Intermediate Level (Ages 12–14)
-├── Ch 5–7: Structs, Enums, Modules → Monster cards, smart wardrobe
-├── Ch 8–9: Collections & Errors → Phonebook, resilient calculator
-├── Ch 10–11: Generics, Traits, Testing → Shape library, test suite
+├── ✅ Ch 5: Monster ID Cards → Structs, methods, associated functions
+├── ✅ Ch 6: The Smart Wardrobe → Enums, Option, match, if let
+├── 🔜 Ch 7–9: Modules, Collections, Errors → Phonebook, resilient calculator *(In progress)*
+└── 🔜 Ch 10–11: Generics, Traits, Testing → Shape library, test suite *(In progress)*
 
 🚀 Advanced Level (Ages 14+)
 ├── Ch 12–14: CLI, Iterators, Crates → minigrep, Fibonacci, pig_latin
 ├── Ch 15–17: Smart Pointers, Concurrency, OOP → Graph, counter, RPG battle
-├── Ch 18–20: Macros, Unsafe, Networking → Command parser, repeat! macro, group chat
+└── Ch 18–20: Macros, Unsafe, Networking → Command parser, repeat! macro, group chat
 ```
 
 👉 Full detailed outline: [OUTLINE.md](./OUTLINE.md)
@@ -89,10 +90,10 @@ A dedicated **Teacher's Guide** ([teacher-guide.md](./teacher-guide.md)) include
 
 If you're from the Rust Edu team reviewing this proposal:
 
-- 📂 **Chapters 1–4 (English)**: `/en/chapter[1-4].md`
+- 📂 **Chapters 1–6 (English)**: `/en/chapter-[1-6].md/`
 - 🎯 **Focus areas for feedback**:
-  - Age-appropriateness of metaphors (e.g., yogurt = lifetimes in Ch3)
-  - Pacing of ownership introduction (Ch4 preview available)
+  - Age-appropriateness of metaphors (e.g., toy tractor = ownership in Ch4, enum wardrobe = states in Ch6)
+  - Pacing of ownership introduction (Ch4) to structs/enums (Ch5–6)
   - Project complexity alignment with target age groups
 - 💬 **Preferred feedback channels**: GitHub Issues / Email
 
@@ -132,4 +133,3 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) – especially important
 ---
 
 > 🦀 **Let's learn Rust – one space adventure at a time!** 🚀
-```
