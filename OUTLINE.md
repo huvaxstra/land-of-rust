@@ -23,8 +23,8 @@
 |----|-------|--------------|----------------------|---------------|--------|
 | 5 | Monster ID Cards | Structs, methods, associated functions | Creating ID cards for space monsters Ferris meets | Monster roster with display methods | ✅ Ready |
 | 6 | The Smart Wardrobe | Enums, `Option`, `match`, `if let` | Ferris picks outfits based on weather (enum variants) | Weather-based clothing recommender | ✅ Ready |
-| 7 | The Big City Library | Modules, files, `pub`, `use`, visibility | Organizing Ferris's knowledge in a library system | Refactor guess-the-number into modules | 🔜 Coming Soon |
-| 8 | The Magic Backpack (Collections) | `Vec`, `HashMap`, `HashSet`, iteration | Ferris's backpack holds different items with labels | Interactive alien phonebook | 🔜 Coming Soon |
+| 7 | The Big City Library | Modules, files, `pub`, `use`, visibility | Organizing Ferris's knowledge in a library system | Refactor guess-the-number into modules | ✅ Ready |
+| 8 | The Magic Backpack (Collections) | `Vec`, `HashMap`, `HashSet`, iteration | Ferris's backpack holds different items with labels | Interactive alien phonebook | ✅ Ready |
 | 9 | When the Spaceship Breaks | `panic!`, `Result`, `?`, error propagation | Fixing spaceship parts that might fail | Resilient calculator with error messages | 🔜 Coming Soon |
 | 10 | The Toy Factory | Generics, traits, `impl Trait`, trait objects | A mold (trait) that shapes different toys (types) | Shape library: calculate area/perimeter | 🔜 Coming Soon |
 | 11 | Test the Self-Destruct Button! | Unit tests, `#[test]`, `assert!`, integration tests | Testing Ferris's gadgets before launch | Write tests for the Monster struct | 🔜 Coming Soon |

@@ -6,18 +6,18 @@
 
 ## ✅ Completed & Ready for Review
 
-- [x] **Chapters 1–4 (English translation):** Installation, Variables, Functions, Ownership.
-- [x] **Chapters 5–6 (English translation):** Structs, Enums, Option, Match. 🆕
+- [x] **Chapters 1–8 (English translation):** Installation, Variables, Functions, Ownership, Structs, Enums, Modules, Collections.
 - [x] **Teacher's Guide (v1.1):** Updated illustration descriptions & structural improvements.
 - [x] **Project Infrastructure:** README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT.
+- [x] **Folder Structure:** Optimized for multi-language support.
 
 ---
 
 ## 🚧 Currently In Progress
 
-- [ ] Translating **Chapters 7–9** (Persian → English): Modules, Collections, Error Handling.
-- [ ] Developing **illustration description pack** for artists (replacing raw AI prompts).
-- [ ] Creating **interactive code playground** integration plan for web version.
+- [ ] Translating **Chapters 9–11** (Persian → English): Error Handling, Generics & Traits, Testing.
+- [ ] Refining `entry()` and `HashMap` exercises for younger age groups.
+- [ ] Preparing interactive code playground integration for web version.
 
 ---
 

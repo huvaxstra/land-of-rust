@@ -57,8 +57,9 @@ No prior coding experience is required – just curiosity, a computer, and a wil
 🌟 Intermediate Level (Ages 12–14)
 ├── ✅ Ch 5: Monster ID Cards → Structs, methods, associated functions
 ├── ✅ Ch 6: The Smart Wardrobe → Enums, Option, match, if let
-├── 🔜 Ch 7–9: Modules, Collections, Errors → Phonebook, resilient calculator *(In progress)*
-└── 🔜 Ch 10–11: Generics, Traits, Testing → Shape library, test suite *(In progress)*
+├── ✅ Ch 7: The Big City Library → Modules, files, pub, use
+├── ✅ Ch 8: The Magic Backpack → Vec, HashMap, HashSet, iteration
+└── 🔜 Ch 9–11: Errors, Generics, Testing → Resilient calculator, shape library *(In progress)*
 
 🚀 Advanced Level (Ages 14+)
 ├── Ch 12–14: CLI, Iterators, Crates → minigrep, Fibonacci, pig_latin
@@ -90,7 +91,7 @@ A dedicated **Teacher's Guide** ([teacher-guide.md](./teacher-guide.md)) include
 
 If you're from the Rust Edu team reviewing this proposal:
 
-- 📂 **Chapters 1–6 (English)**: `/en/chapter-[1-6].md/`
+- 📂 **Chapters 1–8 (English)**: `/en/chapter-[1-8].md/`
 - 🎯 **Focus areas for feedback**:
   - Age-appropriateness of metaphors (e.g., toy tractor = ownership in Ch4, enum wardrobe = states in Ch6)
   - Pacing of ownership introduction (Ch4) to structs/enums (Ch5–6)
