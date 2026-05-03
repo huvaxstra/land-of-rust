@@ -59,12 +59,14 @@ No prior coding experience is required – just curiosity, a computer, and a wil
 ├── ✅ Ch 6: The Smart Wardrobe → Enums, Option, match, if let
 ├── ✅ Ch 7: The Big City Library → Modules, files, pub, use
 ├── ✅ Ch 8: The Magic Backpack → Vec, HashMap, HashSet, iteration
-└── 🔜 Ch 9–11: Errors, Generics, Testing → Resilient calculator, shape library *(In progress)*
+├── ✅ Ch 9: When the Spaceship Breaks → panic!, Result, ?, map_err
+├── ✅ Ch 10: The Toy Factory → Generics, Traits, impl Trait, Box<dyn Trait>
+└── 🔜 Ch 11–13: Tests, CLI, Iterators → Monster tests, minigrep, Fibonacci (In progress)
 
 🚀 Advanced Level (Ages 14+)
-├── Ch 12–14: CLI, Iterators, Crates → minigrep, Fibonacci, pig_latin
-├── Ch 15–17: Smart Pointers, Concurrency, OOP → Graph, counter, RPG battle
-└── Ch 18–20: Macros, Unsafe, Networking → Command parser, repeat! macro, group chat
+├── Ch 14–16: Crates, Smart Pointers, Concurrency → pig_latin, graph, counter
+├── Ch 17–19: OOP Patterns, Macros, Unsafe → RPG battle, repeat! macro, engine room
+└── Ch 20: FerrisNet → Multi-client group chat room
 ```
 
 👉 Full detailed outline: [OUTLINE.md](./OUTLINE.md)

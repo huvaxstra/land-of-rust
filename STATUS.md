@@ -6,7 +6,7 @@
 
 ## ✅ Completed & Ready for Review
 
-- [x] **Chapters 1–8 (English translation):** Installation, Variables, Functions, Ownership, Structs, Enums, Modules, Collections.
+- [x] **Chapters 1–10 (English translation):** Installation, Variables, Functions, Ownership, Structs, Enums, Modules, Collections, Error Handling, Generics & Traits.
 - [x] **Teacher's Guide (v1.1):** Updated illustration descriptions & structural improvements.
 - [x] **Project Infrastructure:** README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT.
 - [x] **Folder Structure:** Optimized for multi-language support.
@@ -15,8 +15,8 @@
 
 ## 🚧 Currently In Progress
 
-- [ ] Translating **Chapters 9–11** (Persian → English): Error Handling, Generics & Traits, Testing.
-- [ ] Refining `entry()` and `HashMap` exercises for younger age groups.
+- [ ] Translating **Chapters 11–13** (Persian → English): Testing, CLI/minigrep, Iterators & Closures.
+- [ ] Refining `Box<dyn Trait>` and `?` operator exercises for younger age groups.
 - [ ] Preparing interactive code playground integration for web version.
 
 ---
