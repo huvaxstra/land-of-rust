@@ -6,14 +6,29 @@
 [![Rust Edition](https://img.shields.io/badge/rust-2024%2B-blue)](https://doc.rust-lang.org/edition-guide/)
 [![Rust Version](https://img.shields.io/badge/rust-1.85%2B-blue)](https://www.rust-lang.org/)
 [![Status: In Development](https://img.shields.io/badge/status-in%20development-yellow)](#)
+[![Chapters Ready](https://img.shields.io/badge/chapters-12%2F20-brightgreen)](#)
+
+---
+
+## ✨ What’s New (May 2026)
+
+Based on valuable feedback from the Rust community forum, **chapters 1–10 have been completely rewritten** with major improvements:
+
+- ✅ **Parent/educator sidebars** in every chapter – plain‑English explanations + links to the official Rust book.
+- ✅ **“Normalizing complexity” notes** – friendly warnings that hard topics (ownership, lifetimes) are okay to struggle with.
+- ✅ **Repositioned messaging** – from “first programming language” to **“become a computer wizard who understands how computers really work”**.
+- ✅ **Strengthened metaphors** – a consistent “Toy Town” world for ownership, borrowing, and lifetimes.
+- ✅ **All existing code examples, exercises, and illustration prompts preserved** – only explanations improved.
 
 ---
 
 ## 🌟 Why Rust as a First Language?
 
-> "Why should kids learn Rust first? Because it teaches you to think like an engineer – safely, creatively, and with a friendly crab by your side."
+> *“Why should kids learn Rust first? Because it teaches you to think like an engineer – safely, creatively, and with a friendly crab by your side.”*
 
-Most introductory programming books start with Python or Scratch. **The Land of Rust** takes a different path: we believe that Rust's emphasis on safety, clarity, and explicit reasoning can actually make it an *excellent* first language – when taught through the right metaphors, stories, and pacing.
+Most introductory programming books start with Python or Scratch. **The Land of Rust** takes a different path: we believe that Rust’s emphasis on safety, clarity, and explicit reasoning can actually make it an *excellent* first language – when taught through the right metaphors, stories, and pacing.
+
+---
 
 ## 📖 About This Book
 
@@ -21,31 +36,26 @@ Most introductory programming books start with Python or Scratch. **The Land of 
 
 Through playful adventures, readers learn programming concepts alongside Ferris:
 - 🎒 **Ownership** = A toy borrowing club with clear rules
-- ⏰ **Lifetimes** = Yogurt expiration dates – nothing lasts forever!
+- ⏰ **Lifetimes** = Yogurt expiration dates – nothing lasts forever! (See Appendix A)
 - 🧩 **Traits** = Clay molds that shape different objects the same way
 - 🔐 **Safety** = Wearing a helmet while riding your space scooter
 
 No prior coding experience is required – just curiosity, a computer, and a willingness to explore.
+
+---
 
 ## 🎯 Target Audience
 
 | Group | Details |
 |-------|---------|
 | 👧 Children 9–11 | With parent/teacher guidance; focus on concepts & simple projects |
-| 👦 Teens 12–14 | Can work more independently; tackle intermediate projects |
-| 👨‍🏫 Educators & Parents | Non-programmers welcome – teacher's guide included |
+| 👦 Teens 12–13 | Can work more independently; tackle intermediate projects |
+| 👨‍🏫 Educators & Parents | Non-programmers welcome – teacher’s guide included |
 | 🧑‍💻 Adult Beginners | Zero experience? Perfect. Start your Rust journey here. |
 
-## ✨ Key Features
+---
 
-- 🎨 **Story-driven curriculum**: Every concept emerges naturally from Ferris's adventures
-- ✍️ **No copy-paste culture**: Readers type every example to build muscle memory
-- 🛠️ **Project-based learning**: Each chapter ends with a runnable mini-project
-- 🧠 **Metaphors for hard topics**: Abstract concepts made concrete through everyday analogies
-- 📚 **Comprehensive Teacher's Guide**: Session plans, troubleshooting, certificate template, FAQs
-- ♿ **Accessible design**: Clear typography, RTL/LTR support, color-blind friendly examples
-
-## 📚 Book Structure (20 Chapters + Teacher's Guide)
+## 📚 Book Structure (12 Completed Chapters + Appendices)
 
 ```
 🌱 Beginner Level (Ages 9–11)
@@ -55,52 +65,62 @@ No prior coding experience is required – just curiosity, a computer, and a wil
 └── ✅ Ch 4: Ferris's Borrowing Club → Ownership, borrowing, slices
 
 🌟 Intermediate Level (Ages 12–14)
-├── ✅ Ch 5: Monster ID Cards → Structs, methods, associated functions
+├── ✅ Ch 5: Monster ID Cards → Structs, methods
 ├── ✅ Ch 6: The Smart Wardrobe → Enums, Option, match, if let
 ├── ✅ Ch 7: The Big City Library → Modules, files, pub, use
-├── ✅ Ch 8: The Magic Backpack → Vec, HashMap, HashSet, iteration
+├── ✅ Ch 8: The Magic Backpack → Vec, HashMap, HashSet
 ├── ✅ Ch 9: When the Spaceship Breaks → panic!, Result, ?, map_err
 ├── ✅ Ch 10: The Toy Factory → Generics, Traits, impl Trait, Box<dyn Trait>
-└── 🔜 Ch 11–13: Tests, CLI, Iterators → Monster tests, minigrep, Fibonacci (In progress)
+├── ✅ Ch 11: Test the Self‑Destruct Button! → Unit & integration tests
+└── ✅ Ch 12: Mini‑robot Searcher (minigrep) → CLI args, file I/O, env vars
 
-🚀 Advanced Level (Ages 14+)
-├── Ch 14–16: Crates, Smart Pointers, Concurrency → pig_latin, graph, counter
-├── Ch 17–19: OOP Patterns, Macros, Unsafe → RPG battle, repeat! macro, engine room
-└── Ch 20: FerrisNet → Multi-client group chat room
+🚀 Advanced Level (Ages 14+) – coming soon
+├── Ch 13–20: Iterators, closures, crates.io, smart pointers, concurrency, OOP, macros, networking
+├── 📎 Appendix A: The Story of Colored Stickers – Lifetimes Deep Dive
+└── 🎁 Bonus Chapter: Ferris’s Pearl Farm – Async Programming Made Simple
 ```
 
 👉 Full detailed outline: [OUTLINE.md](./OUTLINE.md)
 
+---
+
 ## 🚀 Getting Started (For Readers)
 
-1. **Install Rust**: Follow the guided setup in Chapter 1 (`rustup`)
-2. **Choose your path**: 
-   - 📖 Read online via GitHub
-   - 💻 Clone the repo and run examples locally
-3. **Follow Ferris**: Type every example, solve exercises, build projects
-4. **Ask for help**: Stuck? Check the Teacher's Guide or ask in Rust communities
+1. **Install Rust** – follow the guided setup in Chapter 1 (`rustup`)
+2. **Choose your path** – read online via GitHub or clone the repo
+3. **Follow Ferris** – type every example, solve exercises, build projects
+4. **Ask for help** – stuck? Check the Teacher’s Guide or ask in Rust communities
+
+---
 
 ## 👩‍🏫 For Teachers & Parents
 
-A dedicated **Teacher's Guide** ([teacher-guide.md](./teacher-guide.md)) includes:
-- 🎯 Age-appropriate pacing recommendations (3 skill levels)
-- ⏱️ Sample 90-minute session structure
+A dedicated **Teacher’s Guide** ([teacher-guide.md](./teacher-guide.md)) includes:
+- 🎯 Age‑appropriate pacing recommendations (3 skill levels)
+- ⏱️ Sample 90‑minute session structure
 - 🔧 Troubleshooting common setup & conceptual hurdles
 - 🎓 Printable completion certificate template
-- ❓ FAQs for non-programmer adults supporting young learners
+- ❓ FAQs for non‑programmer adults supporting young learners
+
+---
 
 ## 🔍 For Rust Edu Reviewers
 
-If you're from the Rust Edu team reviewing this proposal:
+If you’re from the Rust Edu team reviewing this proposal:
 
-- 📂 **Chapters 1–8 (English)**: `/en/chapter-[1-8].md/`
-- 🎯 **Focus areas for feedback**:
-  - Age-appropriateness of metaphors (e.g., toy tractor = ownership in Ch4, enum wardrobe = states in Ch6)
-  - Pacing of ownership introduction (Ch4) to structs/enums (Ch5–6)
+- 📂 **Chapters 1–12 (English)** are fully rewritten based on your feedback.
+- 🎯 **Focus areas for feedback** (already addressed):
+  - Age‑appropriateness of metaphors (Toy Town ownership)
+  - Pacing of ownership introduction
   - Project complexity alignment with target age groups
+- 📝 **Key improvements made**:
+  - Parent/educator sidebars with links to official Rust book
+  - Normalizing complexity notes
+  - Repositioned messaging: “become a computer wizard”
+  - Strengthened “Toy Town” metaphor
 - 💬 **Preferred feedback channels**: GitHub Issues / Email
 
-We're committed to adapting the structure based on your expert guidance!
+---
 
 ## 📝 Licensing
 
@@ -110,15 +130,19 @@ We're committed to adapting the structure based on your expert guidance!
 | Code examples within chapters | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Public domain – use freely |
 | Rust logo / Ferris crab | Trademark of Rust Foundation | Used with respect; not covered by CC license |
 
+---
+
 ## 🤝 Contributing
 
 Feedback, corrections, translations, and teaching experiences are warmly welcomed!
 
-- 🐛 Found a typo or unclear explanation? → [Please mail me](mailto:jgh.rust@gmail.com)
-- 💡 Have a better metaphor or example? → [Please mail me](mailto:jgh.rust@gmail.com)
+- 🐛 Found a typo or unclear explanation? → [Open an issue](mailto:jgh.rust@gmail.com)
+- 💡 Have a better metaphor or example? → [Email me](mailto:jgh.rust@gmail.com)
 - 🌍 Want to translate to another language? → [Check CONTRIBUTING.md](./CONTRIBUTING.md)
 
-Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) – especially important as this content is designed for children.
+Please read our [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+---
 
 ## 🌐 Community & Resources
 
@@ -126,6 +150,8 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) – especially important
 - [Rust Users Forum](https://users.rust-lang.org/)
 - [The Rust Programming Language Book](https://doc.rust-lang.org/book/)
 - [Rust by Example](https://doc.rust-lang.org/rust-by-example/)
+
+---
 
 ## 💌 Acknowledgments
 
@@ -135,4 +161,4 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) – especially important
 
 ---
 
-> 🦀 **Let's learn Rust – one space adventure at a time!** 🚀
+> 🦀 **Let’s learn Rust – one space adventure at a time!** 🚀
