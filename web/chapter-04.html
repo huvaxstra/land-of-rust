@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land of Rust: Chapter 4</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0f172a; /* Slate 900 */
+            --crt-bg: #020617; /* Slate 950 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(rgba(56, 189, 248, 0.1) 2px, transparent 40px),
+                radial-gradient(rgba(250, 204, 21, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+
+        /* Spaceship Dashboard UI - Security Club Edition */
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid #3b82f6; /* Blue 500 */
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* CRT Screen Effect */
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #1e3a8a; /* Blue 900 */
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Dialog Box */
+        .dialog-box {
+            background: rgba(240, 249, 255, 0.95); /* Sky 50 */
+            color: #0f172a;
+            border-radius: 15px;
+            border: 3px solid #3b82f6;
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 249, 255, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 249, 255, 0.95) transparent transparent transparent;
+        }
+
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #eff6ff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid #3b82f6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Interactive Elements */
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed #fbbf24; margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: #fbbf24; background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.2); color: #bae6fd; }
+
+        .code-option {
+            background: #1e3a8a; border: 2px solid #3b82f6;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none;
+        }
+        .code-option:hover { background: #2563eb; transform: scale(1.05); }
+        .code-option.selected { background: #38bdf8; border-color: #e0f2fe; color: #0f172a; font-weight: bold; }
+
+        /* Animations */
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lang-fa { display: block; }
+        .lang-en { display: none; }
+        html[dir="ltr"] .lang-fa { display: none; }
+        html[dir="ltr"] .lang-en { display: block; }
+
+        .terminal-block {
+            background: rgba(0,0,0,0.5); border-radius: 8px; padding: 12px; border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* Card Styles for Mini-game */
+        .borrow-card {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 50px; height: 70px; border-radius: 8px; margin: 4px;
+            font-weight: bold; font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        .card-blue { background: linear-gradient(135deg, #2563eb, #1e3a8a); color: white; border: 2px solid #60a5fa; }
+        .card-gold { background: linear-gradient(135deg, #eab308, #a16207); color: #2e1065; border: 2px solid #fef08a; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
+
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
+
+        <!-- Language Toggle -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
+            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
+            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-blue-600 text-white">فارسی</button>
+        </div>
+
+        <!-- Top HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-blue-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-sky-400"><i class="fa-solid fa-tractor"></i> <span class="lang-fa">مالک تراکتور:</span><span class="lang-en">Tractor Owner:</span> <span id="tractor-owner">فریس (Ferris)</span></div>
+                <div class="text-emerald-400" id="guard-status-hud"><i class="fa-solid fa-shield-halved"></i> <span class="lang-fa">وضعیت نگهبان:</span><span class="lang-en">Guard Status:</span> <span id="guard-status"><span class="lang-fa">آرام</span><span class="lang-en">Relaxed</span> 🛡️</span></div>
+            </div>
+            <div class="text-blue-300 code-font text-sm opacity-70">SECURITY-OS v4.0 (Borrow Checker)</div>
+        </div>
+
+        <!-- Story Section -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
+
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-blue-500">
+                <h3 class="font-bold text-blue-600 mb-2 lang-fa">فریس خرچنگ:</h3>
+                <h3 class="font-bold text-blue-600 mb-2 lang-en">Ferris the Crab:</h3>
+
+                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold"></p>
+
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
+                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Screen -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-blue-300 code-font min-h-[400px] flex flex-col">
+
+                <!-- Mission 1: The Move Concept -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-blue-900 pb-2">
+                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۴: کلوب امانت‌داری فریس 🛡️</h2>
+                        <h2 class="text-xl font-bold text-white lang-en">Chapter 4: Ferris's Borrowing Club 🛡️</h2>
+                    </div>
+
+                    <div class="lang-fa leading-relaxed space-y-3">
+                        <p class="text-sky-300">> قانون شماره ۱: هر مقدار در راست فقط <strong>یک مالک (Owner)</strong> دارد.</p>
+                        <p class="text-slate-300">> اگر فریس تراکتورش را به دوستش «بیل» بدهد، دیگر خودش نمی‌تواند با آن بازی کند! به این کار انتقال مالکیت یا <strong>Move</strong> می‌گوییم.</p>
+                        <div class="terminal-block mt-4 text-emerald-300">
+                            <span class="text-slate-400">// فریس مالک تراکتور است</span><br>
+                            <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                            <span class="text-slate-400">// مالکیت به بیل (s2) منتقل می‌شود</span><br>
+                            <span class="text-pink-400">let</span> s2 = s1;<br>
+                            <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Value moved!</span>
+                        </div>
+                    </div>
+
+                    <div class="lang-en leading-relaxed space-y-3">
+                        <p class="text-sky-300">> Rule #1: Every value in Rust has exactly <strong>one owner</strong>.</p>
+                        <p class="text-slate-300">> If Ferris gives his tractor to his friend Bill, Ferris can't play with it anymore! This is called <strong>Move</strong>.</p>
+                        <div class="terminal-block mt-4 text-emerald-300">
+                            <span class="text-slate-400">// Ferris owns the tractor</span><br>
+                            <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                            <span class="text-slate-400">// Ownership moves to Bill (s2)</span><br>
+                            <span class="text-pink-400">let</span> s2 = s1;<br>
+                            <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Value moved!</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-2 rounded font-bold code-font" onclick="triggerMove()">
+                            <i class="fa-solid fa-truck-fast"></i>
+                            <span class="lang-fa">اجرای انتقال مالکیت (Move)</span>
+                            <span class="lang-en">Execute Ownership Move</span>
+                        </button>
+                        <p id="move-feedback" class="mt-4 text-rose-400 font-bold hidden">
+                            <span class="lang-fa">⚠️ تراکتور منتقل شد! فریس دیگر مالک آن نیست.</span>
+                            <span class="lang-en">⚠️ Tractor moved! Ferris is no longer the owner.</span>
+                        </p>
+                        <button id="btn-next-m1" class="mt-4 bg-blue-700 hover:bg-blue-600 text-white px-6 py-2 rounded font-bold code-font hidden mx-auto" onclick="startMission(2)">
+                            <span class="lang-fa">مرحله بعد [Enter]</span><span class="lang-en">Next Step [Enter]</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 2: Normal Reference Puzzle -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div class="text-yellow-400 mb-2">
+                        <span class="lang-fa">>> مرحله ۱: کارت امانت آبی (Reference)</span>
+                        <span class="lang-en">>> Step 1: Blue Borrowing Card (Reference)</span>
+                    </div>
+
+                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
+                        <p>برای اینکه فریس تراکتورش را از دست ندهد، به جای دادن خود تراکتور، یک «کارت امانت» صادر می‌کند تا دیگران فقط به آن <strong>نگاه کنند</strong>.</p>
+                        <p class="text-sky-300 font-bold">برای ساخت یک کارت امانت (رفرنس) از چه علامتی استفاده می‌کنیم؟</p>
+                    </div>
+                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
+                        <p>To not lose his tractor, instead of moving it, Ferris issues a "borrowing card" so others can just <strong>look</strong> at it.</p>
+                        <p class="text-sky-300 font-bold">Which symbol do we use to create a borrowing card (reference)?</p>
+                    </div>
+
+                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-pink-400">let</span> s2 = <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span>s1; <span class="text-slate-500 text-sm">// 👈 Fill this</span>
+                    </div>
+
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
+
+                    <div class="border-t border-blue-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, '*')">*</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, '&')">&amp;</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, '@')">@</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'ref')">ref</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-blue-700 hover:bg-blue-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span class="lang-fa">صدور کارت آبی 📘</span><span class="lang-en">Issue Blue Card 📘</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: Mutable Reference Puzzle -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div class="text-yellow-400 mb-2">
+                        <span class="lang-fa">>> مرحله ۲: کارت طلایی (Mutable Reference)</span>
+                        <span class="lang-en">>> Step 2: Golden Card (Mutable Reference)</span>
+                    </div>
+
+                    <p class="lang-fa text-sm text-slate-300 mb-4">اگر دوستِ فریس بخواهد تراکتور را رنگ کند (تغییر دهد)، به یک کارت ویژه نیاز دارد. او به <strong>کارت طلایی امانت قابل تغییر</strong> نیاز دارد.</p>
+                    <p class="lang-en text-sm text-slate-300 mb-4">If Ferris's friend wants to paint the tractor (modify it), he needs a special card. He needs the <strong>Golden Mutable Borrowing Card</strong>.</p>
+
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">let mut</span> s = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-pink-400">let</span> r1 = <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> s;<br>
+                        r1.push_str(<span class="text-yellow-300">" red"</span>); <span class="text-slate-500 text-sm">// Paint it red!</span>
+                    </div>
+
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
+
+                    <div class="border-t border-blue-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, '&')">&amp;</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'mut')">mut</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, '&mut')">&amp;mut</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, '*mut')">*mut</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span class="lang-fa">صدور کارت طلایی 🪪</span><span class="lang-en">Issue Golden Card 🪪</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Borrow Checker Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-yellow-400 mb-2 border-b border-blue-800 pb-2 flex justify-between items-center">
+                        <div>
+                            <span class="lang-fa">>> مرحله نهایی: عبور از نگهبان (Borrow Checker)</span>
+                            <span class="lang-en">>> Final Step: Pass the Guard (Borrow Checker)</span>
+                        </div>
+                    </div>
+
+                    <div class="lang-fa text-sm mb-4 text-slate-300">نگهبان قوانین سختی دارد: بی‌نهایت کارت آبی (&) مجاز است. اما کارت طلایی (&mut) <strong>فقط یکی</strong> مجاز است، و نباید هیچ کارت دیگری همراهش باشد! دو ماموریت زیر را انجام بده:</div>
+                    <div class="lang-en text-sm mb-4 text-slate-300">The Guard is strict: Unlimited Blue cards (&) are allowed. But <strong>ONLY ONE</strong> Golden card (&mut) is allowed, with NO other cards at the same time! Complete these tasks:</div>
+
+                    <!-- Tasks -->
+                    <div class="bg-blue-950/50 border border-blue-800 rounded p-3 mb-4 text-sm">
+                        <div id="task1" class="flex items-center gap-2 text-slate-400">
+                            <i class="fa-regular fa-circle"></i>
+                            <span class="lang-fa">ماموریت ۱: برای ۳ نفر همزمان کارت آبی صادر کن (بدون کارت طلایی).</span>
+                            <span class="lang-en">Task 1: Issue 3 Blue cards simultaneously (no golden cards).</span>
+                        </div>
+                        <div id="task2" class="flex items-center gap-2 text-slate-400 mt-2">
+                            <i class="fa-regular fa-circle"></i>
+                            <span class="lang-fa">ماموریت ۲: همه را پاک کن و دقیقا ۱ کارت طلایی صادر کن.</span>
+                            <span class="lang-en">Task 2: Clear all, and issue exactly 1 Golden card.</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Display -->
+                    <div class="terminal-block flex-grow mb-4 min-h-[100px] flex flex-wrap content-start gap-2" id="card-display">
+                        <span class="text-slate-500 italic text-sm mt-2 w-full text-center" id="empty-msg">
+                            <span class="lang-fa">هیچ کارتی صادر نشده...</span>
+                            <span class="lang-en">No cards issued yet...</span>
+                        </span>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex flex-wrap gap-2 justify-center mt-auto">
+                        <button class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-bold code-font shadow-lg border border-blue-400" onclick="issueCard('blue')">
+                            + &amp; <span class="text-xs ml-1"><span class="lang-fa">(آبی)</span><span class="lang-en">(Blue)</span></span>
+                        </button>
+                        <button class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded font-bold code-font shadow-lg border border-yellow-300" onclick="issueCard('gold')">
+                            + &amp;mut <span class="text-xs ml-1"><span class="lang-fa">(طلایی)</span><span class="lang-en">(Gold)</span></span>
+                        </button>
+                        <button class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded font-bold ml-auto" onclick="clearCards()">
+                            <i class="fa-solid fa-trash"></i> <span class="lang-fa">پاک کردن</span><span class="lang-en">Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success overlay -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
+            <div class="text-7xl mb-4 animate-bounce">🛡️🦀🎉</div>
+            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
+                <span class="lang-fa">نگهبان راضی است!</span>
+                <span class="lang-en">The Guard is Happy!</span>
+            </h2>
+            <p class="text-xl text-sky-400 mb-6 text-center px-4">
+                <span class="lang-fa">شما سخت‌ترین مفهوم زبان راست یعنی Ownership و Borrowing را یاد گرفتید!</span>
+                <span class="lang-en">You've mastered Rust's hardest concept: Ownership and Borrowing!</span>
+            </p>
+            <button class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(59,130,246,0.6)]" onclick="location.reload()">
+                <span class="lang-fa">پایان فصل ۴ - دوباره بازی کن</span>
+                <span class="lang-en">End of Chapter 4 - Play Again</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Game State & Logic ---
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval;
+
+        // Borrow Checker State
+        let cards = { blue: 0, gold: 0 };
+        let task1Done = false;
+        let task2Done = false;
+
+        // --- Dialog Data ---
+        const dialogs = {
+            fa: [
+                "سلام! من یه تراکتور قرمز اسباب‌بازی دارم. امروز می‌خوام یه کلوب امانت‌داری باز کنم! 🚜",
+                "در زبان راست (Rust)، هر چیزی فقط یک «مالک» (Owner) داره. اگر اسباب‌بازیم رو بدم به دوستم، دیگه مال من نیست! به این می‌گن Move.",
+                "برای اینکه اسباب‌بازیم رو از دست ندم، به جای دادن خودش، یک «کارت امانت» (Reference) به بقیه می‌دم تا فقط نگاهش کنن.",
+                "اما باید مراقب «نگهبان کلوب» باشیم! اون قوانین امانت گرفتن رو به شدت کنترل می‌کنه و اگه قانون رو بشکنی ارور می‌ده. بیا بریم تو کلوب! 🛡️"
+            ],
+            en: [
+                "Hi! I have a red toy tractor. Today, I'm opening a Borrowing Club! 🚜",
+                "In Rust, everything has exactly one 'Owner'. If I give my toy to my friend, it's not mine anymore! This is called Move.",
+                "To not lose my toy, instead of giving it away, I hand out a 'Borrowing Card' (Reference) so they can just look at it.",
+                "But we must watch out for the 'Club Guard'! He strictly enforces borrowing rules and throws errors if broken. Let's go in! 🛡️"
+            ]
+        };
+
+        function setLang(lang) {
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            const btnEn = document.getElementById('btn-en');
+            const btnFa = document.getElementById('btn-fa');
+
+            if(lang === 'fa') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-blue-600 text-white";
+                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
+
+                // Update specific HUD texts depending on state
+                if(document.getElementById('tractor-owner').innerText.includes('Bill')) {
+                    document.getElementById('tractor-owner').innerText = "بیل (Bill)";
+                } else {
+                    document.getElementById('tractor-owner').innerText = "فریس (Ferris)";
+                }
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-blue-600 text-white";
+                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
+
+                if(document.getElementById('tractor-owner').innerText.includes('بیل')) {
+                    document.getElementById('tractor-owner').innerText = "Bill";
+                } else {
+                    document.getElementById('tractor-owner').innerText = "Ferris";
+                }
+            }
+
+            if(currentStep === 0) {
+                clearTimeout(typeInterval);
+                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+            }
+        }
+
+        function typeWriter(text, i, cb) {
+            const el = document.getElementById('dialog-text');
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
+            } else {
+                cb();
+            }
+        }
+
+        function showDialog() {
+            const text = dialogs[currentLang][currentDialogIndex];
+            const el = document.getElementById('dialog-text');
+            const nextBtn = document.getElementById('next-dialog-btn');
+
+            el.innerHTML = '';
+            nextBtn.classList.add('hidden');
+
+            typeWriter(text, 0, () => {
+                nextBtn.classList.remove('hidden');
+            });
+        }
+
+        function nextDialog() {
+            clearTimeout(typeInterval);
+            currentDialogIndex++;
+
+            if (currentDialogIndex < dialogs[currentLang].length) {
+                showDialog();
+            } else {
+                currentStep = 1;
+                document.getElementById('next-dialog-btn').classList.add('hidden');
+                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
+                    "بیا ببینیم چطور می‌تونیم بدون اینکه نگهبان رو عصبانی کنیم، اسباب‌بازی رو امانت بدیم!" :
+                    "Let's see how we can borrow the toy without making the Guard angry!";
+
+                document.getElementById('game-area').classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
+
+        // --- Mission 1 Logic ---
+        function triggerMove() {
+            document.getElementById('tractor-owner').innerText = currentLang === 'fa' ? "بیل (Bill)" : "Bill";
+            document.getElementById('tractor-owner').parentElement.classList.replace('text-sky-400', 'text-rose-400');
+            document.getElementById('move-feedback').classList.remove('hidden');
+            document.getElementById('btn-next-m1').classList.remove('hidden');
+        }
+
+        // --- Puzzle System ---
+        function selectOption(element, puzzleNum, word) {
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum+1} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function checkPuzzle1() {
+            const slotText = document.getElementById('slot1').innerText;
+            const feedback = document.getElementById('puzzle1-feedback');
+            const crt = document.getElementById('crt-monitor');
+
+            if (slotText === '&') {
+                feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
+                feedback.innerText = currentLang === 'fa' ? "> کارت صادر شد! حالا بقیه می‌توانند نگاه کنند." : "> Card issued! Now others can look at it.";
+
+                // Reset HUD
+                document.getElementById('tractor-owner').innerText = currentLang === 'fa' ? "فریس (Ferris)" : "Ferris";
+                document.getElementById('tractor-owner').parentElement.classList.replace('text-rose-400', 'text-sky-400');
+
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                crt.classList.add('glitch');
+                setTimeout(() => crt.classList.remove('glitch'), 300);
+                feedback.innerText = currentLang === 'fa' ? "خطا: برای یک رفرنس معمولی باید از علامت & استفاده کنی." : "Error: Use the & symbol for a normal reference.";
+            }
+        }
+
+        function checkPuzzle2() {
+            const slotText = document.getElementById('slot2').innerText;
+            const feedback = document.getElementById('puzzle2-feedback');
+            const crt = document.getElementById('crt-monitor');
+
+            if (slotText === '&mut') {
+                feedback.className = "text-yellow-400 h-6 mb-4 font-bold text-sm";
+                feedback.innerText = currentLang === 'fa' ? "> کارت طلایی صادر شد! تراکتور رنگ شد." : "> Golden card issued! Tractor painted.";
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                crt.classList.add('glitch');
+                setTimeout(() => crt.classList.remove('glitch'), 300);
+                feedback.innerText = currentLang === 'fa' ? "خطا: برای رفرنس قابل تغییر به ترکیب & و mut نیاز داری." : "Error: You need the combination of & and mut for a mutable reference.";
+            }
+        }
+
+        // --- Borrow Checker Terminal Simulator ---
+        function updateGuardHUD(isAngry) {
+            const guardUI = document.getElementById('guard-status');
+            const guardContainer = document.getElementById('guard-status-hud');
+            if(isAngry) {
+                guardUI.innerHTML = currentLang === 'fa' ? "عصبانی! 🚨" : "Angry! 🚨";
+                guardContainer.classList.replace('text-emerald-400', 'text-rose-500');
+            } else {
+                guardUI.innerHTML = currentLang === 'fa' ? "آرام 🛡️" : "Relaxed 🛡️";
+                guardContainer.classList.replace('text-rose-500', 'text-emerald-400');
+            }
+        }
+
+        function triggerError(msgFa, msgEn) {
+            const crt = document.getElementById('crt-monitor');
+            crt.classList.add('glitch');
+            updateGuardHUD(true);
+            setTimeout(() => {
+                crt.classList.remove('glitch');
+                setTimeout(() => updateGuardHUD(false), 1500);
+            }, 300);
+
+            // Show alert box (using standard alert for simplicity in demo, or we could add an in-game modal)
+            alert(currentLang === 'fa' ? `🚨 خطای Borrow Checker:\n${msgFa}` : `🚨 Borrow Checker Error:\n${msgEn}`);
+        }
+
+        function renderCards() {
+            const container = document.getElementById('card-display');
+            container.innerHTML = '';
+
+            if(cards.blue === 0 && cards.gold === 0) {
+                container.innerHTML = `<span class="text-slate-500 italic text-sm mt-2 w-full text-center" id="empty-msg">
+                    <span class="lang-fa" style="display:${currentLang==='fa'?'block':'none'}">هیچ کارتی صادر نشده...</span>
+                    <span class="lang-en" style="display:${currentLang==='en'?'block':'none'}">No cards issued yet...</span>
+                </span>`;
+                return;
+            }
+
+            for(let i=0; i<cards.blue; i++) {
+                const el = document.createElement('div');
+                el.className = 'borrow-card card-blue';
+                el.innerText = '&';
+                container.appendChild(el);
+            }
+
+            for(let i=0; i<cards.gold; i++) {
+                const el = document.createElement('div');
+                el.className = 'borrow-card card-gold';
+                el.innerText = '&mut';
+                container.appendChild(el);
+            }
+        }
+
+        function issueCard(type) {
+            if(type === 'blue') {
+                if(cards.gold > 0) {
+                    triggerError("وقتی کارت طلایی صادر شده، نمی‌توانی کارت آبی صادر کنی!", "Cannot issue a blue card while a golden card exists!");
+                    return;
+                }
+                cards.blue++;
+            } else if(type === 'gold') {
+                if(cards.blue > 0) {
+                    triggerError("کارت‌های آبی هنوز دست بقیه است! نمی‌توانی کارت طلایی بدهی.", "Blue cards are still out! Cannot issue a golden card.");
+                    return;
+                }
+                if(cards.gold > 0) {
+                    triggerError("فقط یک کارت طلایی همزمان مجاز است!", "Only ONE golden card is allowed at a time!");
+                    return;
+                }
+                cards.gold++;
+            }
+
+            renderCards();
+            checkWinCondition();
+        }
+
+        function clearCards() {
+            cards.blue = 0;
+            cards.gold = 0;
+            renderCards();
+        }
+
+        function checkWinCondition() {
+            if(!task1Done && cards.blue >= 3 && cards.gold === 0) {
+                task1Done = true;
+                const t1 = document.getElementById('task1');
+                t1.classList.replace('text-slate-400', 'text-emerald-400');
+                t1.querySelector('i').classList.replace('fa-circle', 'fa-circle-check');
+            }
+
+            if(task1Done && !task2Done && cards.gold === 1 && cards.blue === 0) {
+                task2Done = true;
+                const t2 = document.getElementById('task2');
+                t2.classList.replace('text-slate-400', 'text-emerald-400');
+                t2.querySelector('i').classList.replace('fa-circle', 'fa-circle-check');
+
+                // WIN!
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 500);
+            }
+        }
+
+        // --- Confetti System ---
+        let W = window.innerWidth;
+        let H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#3b82f6", "#eab308", "#60a5fa", "#fef08a"];
+
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+
+            let particle = {};
+            for (let i = 0; i < maxConfettis; i++) {
+                particle = particles[i];
+                particle.tiltAngle += particle.tiltAngleIncremental;
+                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
+
+                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
+                    particle.x = Math.random() * W;
+                    particle.y = -30;
+                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        }, false);
+
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if(!animationId) Draw();
+        }
+
+        // Initialize Game
+        setTimeout(() => {
+            setLang('fa'); // Start in Persian
+            showDialog();
+        }, 500);
+
+    </script>
+</body>
+</html>

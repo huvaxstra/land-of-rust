@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land of Rust: The Adventure</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #020617; /* Slate 950 */
+            --card-bg: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+            --accent: #f97316; /* Orange 500 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+
+        /* Animated Star Background */
+        #star-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+        }
+
+        /* Hero Section */
+        .hero-glow {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, rgba(0,0,0,0) 70%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: -1; pointer-events: none;
+        }
+
+        .ferris-hero {
+            font-size: 5rem;
+            filter: drop-shadow(0 0 20px rgba(249, 115, 22, 0.6));
+            animation: floatHero 4s ease-in-out infinite;
+        }
+
+        @keyframes floatHero {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Chapter Cards */
+        .chapter-card {
+            background: var(--card-bg);
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .chapter-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); transition: all 0.5s;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.2);
+        }
+
+        .chapter-card:hover::before {
+            left: 200%;
+        }
+
+        .chapter-num {
+            position: absolute;
+            top: -15px;
+            right: -10px; /* adjusted by rtl/ltr in logic */
+            font-size: 5rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        html[dir="rtl"] .chapter-num { right: auto; left: 10px; }
+        html[dir="ltr"] .chapter-num { right: 10px; left: auto; }
+
+        .chapter-card:hover .chapter-num { color: rgba(249, 115, 22, 0.15); }
+
+        .chapter-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f97316, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Bilingual Display Utilities */
+        .lang-fa { display: block; }
+        .lang-en { display: none; }
+        html[dir="ltr"] .lang-fa { display: none; }
+        html[dir="ltr"] .lang-en { display: block; }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Starry Background -->
+    <canvas id="star-canvas"></canvas>
+
+    <!-- Language Toggle -->
+    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800/80 backdrop-blur-md rounded-full p-1 border border-slate-600 flex shadow-lg z-50" dir="ltr">
+        <button onclick="setLang('en')" id="btn-en" class="px-5 py-1.5 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
+        <button onclick="setLang('fa')" id="btn-fa" class="px-5 py-1.5 rounded-full text-sm font-bold transition-colors bg-orange-500 text-white shadow-[0_0_10px_rgba(249,115,22,0.5)]">فارسی</button>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-4 py-20 mt-10">
+
+        <!-- Hero Section -->
+        <div class="text-center relative mb-20">
+            <div class="hero-glow"></div>
+            <div class="ferris-hero mb-6">🚀🦀🌌</div>
+
+            <h1 class="text-5xl md:text-7xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 tracking-tight">
+                <span class="lang-fa">سرزمین راست</span>
+                <span class="lang-en">Land of Rust</span>
+            </h1>
+
+            <h2 class="text-2xl md:text-3xl text-slate-300 mb-8 font-bold">
+                <span class="lang-fa">ماجراهای فضایی فریس خرچنگ</span>
+                <span class="lang-en">Ferris the Crab's Space Adventures</span>
+            </h2>
+
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                <span class="lang-fa">به یکی از جذاب‌ترین و تعاملی‌ترین دوره‌های آموزش برنامه‌نویسی Rust خوش آمدید! کمربندها را ببندید تا با فریس به اعماق کهکشان کدها سفر کنیم.</span>
+                <span class="lang-en">Welcome to one of the most engaging and interactive Rust programming courses! Fasten your seatbelts and journey into the galaxy of code with Ferris.</span>
+            </p>
+
+            <a href="chapter-1.html" class="inline-block bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white text-xl font-bold py-4 px-10 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.6)] hover:shadow-[0_0_30px_rgba(249,115,22,0.8)] transition-all transform hover:-translate-y-1">
+                <i class="fa-solid fa-play ml-2 mr-2"></i>
+                <span class="lang-fa">شروع ماجراجویی از فصل ۱</span>
+                <span class="lang-en">Start Adventure from Chapter 1</span>
+            </a>
+        </div>
+
+        <!-- Section Divider -->
+        <div class="flex items-center justify-center gap-4 mb-12 opacity-50">
+            <div class="h-px bg-slate-600 flex-grow max-w-[100px]"></div>
+            <i class="fa-solid fa-star text-orange-400 text-sm"></i>
+            <i class="fa-solid fa-star text-orange-400 text-xl"></i>
+            <i class="fa-solid fa-star text-orange-400 text-sm"></i>
+            <div class="h-px bg-slate-600 flex-grow max-w-[100px]"></div>
+        </div>
+
+        <h3 class="text-3xl font-bold text-center text-white mb-12">
+            <span class="lang-fa">فهرست ماموریت‌ها (فصل‌ها)</span>
+            <span class="lang-en">Mission Log (Chapters)</span>
+        </h3>
+
+        <!-- Chapters Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="chapters-grid">
+            <!-- Dynamic Cards Will Be Injected Here by JS -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-24 text-center text-slate-500 border-t border-slate-800 pt-8 pb-4 code-font">
+            <span class="lang-fa">ساخته شده با ❤️ و 🦀 برای برنامه‌نویسان آینده</span>
+            <span class="lang-en">Built with ❤️ and 🦀 for future programmers</span>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- Bilingual State Management ---
+        let currentLang = 'fa';
+
+        function setLang(lang) {
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            const btnEn = document.getElementById('btn-en');
+            const btnFa = document.getElementById('btn-fa');
+
+            const activeClass = ['bg-orange-500', 'text-white', 'shadow-[0_0_10px_rgba(249,115,22,0.5)]'];
+            const inactiveClass = ['text-slate-300', 'hover:text-white'];
+
+            if(lang === 'fa') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                btnFa.classList.add(...activeClass);
+                btnFa.classList.remove(...inactiveClass);
+                btnEn.classList.add(...inactiveClass);
+                btnEn.classList.remove(...activeClass);
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                btnEn.classList.add(...activeClass);
+                btnEn.classList.remove(...inactiveClass);
+                btnFa.classList.add(...inactiveClass);
+                btnFa.classList.remove(...activeClass);
+            }
+        }
+
+        // --- Chapter Data ---
+        const chapters = [
+            { id: 1, icon: 'fa-toolbox', fa: 'جعبه‌ابزار گمشده', en: 'The Lost Toolbox', subFa: 'معرفی، نصب، Cargo', subEn: 'Intro, Setup, Cargo' },
+            { id: 2, icon: 'fa-star', fa: 'بازی ستاره گمشده', en: 'The Lost Star Game', subFa: 'متغیرها و شروط', subEn: 'Variables & Conditions' },
+            { id: 3, icon: 'fa-cake-candles', fa: 'کیک شکلاتی فضایی', en: 'Space Chocolate Cake', subFa: 'توابع و انواع داده', subEn: 'Functions & Data Types' },
+            { id: 4, icon: 'fa-handshake', fa: 'کلوب امانت‌داری فریس', en: 'Ferris\'s Borrowing Club', subFa: 'مالکیت و Borrowing', subEn: 'Ownership & Borrowing' },
+            { id: 5, icon: 'fa-id-card', fa: 'کارت شناسایی هیولاها', en: 'Monster ID Cards', subFa: 'ساختارها (Structs)', subEn: 'Structs & Methods' },
+            { id: 6, icon: 'fa-shirt', fa: 'کمد لباس هوشمند', en: 'Smart Wardrobe', subFa: 'Enums و Match', subEn: 'Enums & Pattern Match' },
+            { id: 7, icon: 'fa-book-atlas', fa: 'کتابخانه بزرگ شهر', en: 'The Big City Library', subFa: 'ماژول‌ها و فایل‌ها', subEn: 'Modules & Files' },
+            { id: 8, icon: 'fa-box-open', fa: 'جعبه‌های جادویی', en: 'Magic Boxes', subFa: 'Collections (Vec, HashMap)', subEn: 'Collections (Vec, Map)' },
+            { id: 9, icon: 'fa-triangle-exclamation', fa: 'وقتی سفینه خراب می‌شود', en: 'When the Ship Breaks', subFa: 'مدیریت خطا (Result)', subEn: 'Error Handling (Result)' },
+            { id: 10, icon: 'fa-industry', fa: 'کارخانه اسباب‌بازی', en: 'The Toy Factory', subFa: 'Generics و Traits', subEn: 'Generics & Traits' },
+            { id: 11, icon: 'fa-vial', fa: 'تست دکمه خودتخریبی', en: 'Test the Button!', subFa: 'تست‌نویسی (Testing)', subEn: 'Writing Tests' },
+            { id: 12, icon: 'fa-magnifying-glass', fa: 'ربات جستجوگر', en: 'Mini-Robot Searcher', subFa: 'پروژه خط فرمان (CLI)', subEn: 'Command-Line Project' },
+            { id: 13, icon: 'fa-train', fa: 'قطار باربری', en: 'The Cargo Train', subFa: 'Iterators و Closures', subEn: 'Iterators & Closures' },
+            { id: 14, icon: 'fa-cart-shopping', fa: 'سوپرمارکت اسباب‌بازی', en: 'Toy Supermarket', subFa: 'مدیریت بسته‌ها (Crates)', subEn: 'Crates.io & Packages' },
+            { id: 15, icon: 'fa-vault', fa: 'راز جعبه‌های تو در تو', en: 'Secret of Nested Boxes', subFa: 'اشاره‌گرهای هوشمند', subEn: 'Smart Pointers' },
+            { id: 16, icon: 'fa-bugs', fa: 'دسته‌های مورچه', en: 'Swarms of Ants', subFa: 'هم‌روندی (Concurrency)', subEn: 'Concurrency & Threads' },
+            { id: 17, icon: 'fa-robot', fa: 'ربات‌های ترنسفورمر', en: 'Transformer Robots', subFa: 'شی‌گرایی در راست', subEn: 'OOP in Rust' },
+            { id: 18, icon: 'fa-map', fa: 'نقشه‌های پیچیده گنج', en: 'Complex Treasure Maps', subFa: 'الگویابی پیشرفته', subEn: 'Advanced Patterns' },
+            { id: 19, icon: 'fa-fire-flame-curved', fa: 'موتور سفینه را باز کنیم', en: 'Opening the Engine', subFa: 'کد Unsafe و ماکروها', subEn: 'Unsafe Rust & Macros' },
+            { id: 20, icon: 'fa-network-wired', fa: 'فریس‌نت: شبکه دوستان', en: 'FerrisNet: Secret Network', subFa: 'برنامه‌نویسی شبکه', subEn: 'Network Programming' }
+        ];
+
+        // --- Render Chapters ---
+        function renderChapters() {
+            const grid = document.getElementById('chapters-grid');
+            let html = '';
+
+            chapters.forEach(ch => {
+                html += `
+                <a href="chapter-${ch.id}.html" class="chapter-card group">
+                    <span class="chapter-num">${ch.id}</span>
+                    <i class="fa-solid ${ch.icon} chapter-icon"></i>
+
+                    <h4 class="text-xl font-bold text-white mb-2 relative z-10 lang-fa">فصل ${ch.id}: ${ch.fa}</h4>
+                    <h4 class="text-xl font-bold text-white mb-2 relative z-10 lang-en">Ch ${ch.id}: ${ch.en}</h4>
+
+                    <p class="text-slate-400 text-sm mt-auto relative z-10 font-bold code-font">
+                        <span class="lang-fa">${ch.subFa}</span>
+                        <span class="lang-en">${ch.subEn}</span>
+                    </p>
+                </a>`;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // --- Animated Starry Background ---
+        function initStars() {
+            const canvas = document.getElementById('star-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let stars = [];
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                createStars();
+            }
+
+            function createStars() {
+                stars = [];
+                const numStars = Math.floor((width * height) / 2000); // Density
+                for (let i = 0; i < numStars; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 1.5,
+                        vx: Math.floor(Math.random() * 50) - 25,
+                        vy: Math.floor(Math.random() * 50) - 25,
+                        opacity: Math.random()
+                    });
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = 0; i < stars.length; i++) {
+                    let s = stars[i];
+
+                    // Move slightly for parallax effect
+                    s.y -= 0.2;
+                    if (s.y < 0) s.y = height;
+
+                    // Twinkle
+                    s.opacity += (Math.random() - 0.5) * 0.1;
+                    if(s.opacity < 0.2) s.opacity = 0.2;
+                    if(s.opacity > 1) s.opacity = 1;
+
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.radius, 0, 2 * Math.PI);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            draw();
+        }
+
+        // --- Initialization ---
+        renderChapters();
+        initStars();
+        // Force the initial language setup safely after DOM is fully ready
+        setTimeout(() => setLang('fa'), 100);
+
+    </script>
+</body>
+</html>

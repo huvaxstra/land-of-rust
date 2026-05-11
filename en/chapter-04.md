@@ -46,7 +46,7 @@ println!("x = {}, y = {}", x, y); // Both work fine!
 ```
 Why? Because copying a number is like remembering a fact in your head: instant and free! But a `String` can be huge (like a thousand-page book). Copying it would waste time and memory. So Rust prefers to just move the ownership. We call types that copy automatically **Copy types**.
 
-**[Illustration: Two labeled boxes side-by-side. Box "s1" is empty with a faded cross mark. Box "s2" holds a shiny red toy tractor. A curved arrow shows ownership moving from s1 to s2. Ferris stands beside them, pointing at the boxes with a surprised but happy expression. Style: bright children's book illustration, clean lines, educational metaphor, 16:9 aspect ratio.]**
+![[Illustration: Two labeled boxes side-by-side. Box "s1" is empty with a faded cross mark. Box "s2" holds a shiny red toy tractor. A curved arrow shows ownership moving from s1 to s2. Ferris stands beside them, pointing at the boxes with a surprised but happy expression. Style: bright children's book illustration, clean lines, educational metaphor, 16:9 aspect ratio.]](../assets/images/4.1.png)
 
 ---
 
@@ -109,7 +109,7 @@ let r1 = &s;        // Normal card (look only)
 let r2 = &mut s;    // ❌ Error! You can't look and change at the same time
 ```
 
-**[Illustration: A cartoon scene at a "Borrowing Club" desk. On the left, several kids hold blue cards labeled "&" while looking at a toy. On the right, one kid holds a golden card labeled "&mut" and is carefully painting the toy. Ferris stands behind the desk holding a large rulebook. Style: playful, educational, vibrant colors, clear visual metaphor, 16:9 aspect ratio.]**
+![[Illustration: A cartoon scene at a "Borrowing Club" desk. On the left, several kids hold blue cards labeled "&" while looking at a toy. On the right, one kid holds a golden card labeled "&mut" and is carefully painting the toy. Ferris stands behind the desk holding a large rulebook. Style: playful, educational, vibrant colors, clear visual metaphor, 16:9 aspect ratio.]](../assets/images/4.2.png)
 
 ---
 
@@ -148,7 +148,7 @@ fn main() {
 ```
 Run it and read the compiler's error message carefully. See how precisely it tells you: *"cannot borrow `text` as mutable because it is also borrowed as immutable."* That means the guard is protecting you! 🤝
 
-**[Illustration: Ferris wearing a friendly security guard uniform, holding a flashlight and checking a rule clipboard. In the background, a cartoon compiler robot shows a red warning light next to broken code and a green checkmark next to safe code. Style: gentle technical metaphor, children's book illustration, soft lighting, 16:9 aspect ratio.]**
+![[Illustration: Ferris wearing a friendly security guard uniform, holding a flashlight and checking a rule clipboard. In the background, a cartoon compiler robot shows a red warning light next to broken code and a green checkmark next to safe code. Style: gentle technical metaphor, children's book illustration, soft lighting, 16:9 aspect ratio.]](../assets/images/4.3.png)
 
 ---
 
@@ -196,7 +196,7 @@ fn main() {
 ```
 This code is safe, fast, and exactly what a professional Rustacean would write! 🛠️
 
-**[Illustration: A close-up of a cartoon magnifying glass hovering over a long paper strip labeled "Ferris the crab". The glass brightly highlights only the word "Ferris". A pair of scissors (representing slicing) rests nearby. Ferris proudly holds the magnifying glass. Style: clean educational vector, bright colors, clear metaphor, 16:9 aspect ratio.]**
+![[Illustration: A close-up of a cartoon magnifying glass hovering over a long paper strip labeled "Ferris the crab". The glass brightly highlights only the word "Ferris". A pair of scissors (representing slicing) rests nearby. Ferris proudly holds the magnifying glass. Style: clean educational vector, bright colors, clear metaphor, 16:9 aspect ratio.]](../assets/images/4.4.png)
 
 ---
 
@@ -232,10 +232,4 @@ But the good news is: the more you code, the more naturally these rules will cli
 
 In the next chapter, we'll explore a super fun tool: **Structs**, which are like "ID cards for space monsters"! 🦑✨
 
-**[Illustration: Ferris sitting at a cozy wooden desk, carefully writing the "3 Ownership Rules" on a glowing parchment. Floating around him are small icons: a locked box (ownership), a blue card (&), a golden card (&mut), and a magnifying glass (slice). Warm, encouraging lighting. Style: children's book illustration, whimsical, high detail, 16:9 aspect ratio.]**
-
----
-
-> 🔚 **End of Chapter 4**
-
----
+![[Illustration: Ferris sitting at a cozy wooden desk, carefully writing the "3 Ownership Rules" on a glowing parchment. Floating around him are small icons: a locked box (ownership), a blue card (&), a golden card (&mut), and a magnifying glass (slice). Warm, encouraging lighting. Style: children's book illustration, whimsical, high detail, 16:9 aspect ratio.]](../assets/images/4.5.png)

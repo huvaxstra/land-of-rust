@@ -31,7 +31,7 @@ For one monster, it's fine. But what if we have ten monsters? We'd end up with m
 ### 5.1.3. Introducing `struct` as an ID Card Template
 A `struct` lets us group several pieces of data together under one name. Think of it like a blank ID card template. First, we design the template (deciding what fields it will have), and then we fill out real cards for different monsters.
 
-**[Illustration: A magical notebook open on a wooden desk. The left page shows messy scattered variables tied together with tangled string. The right page displays a clean, glowing ID card template with labeled slots: "Name", "Color", "Legs", "Power". Ferris stands proudly pointing at the organized page. Style: vibrant children's book illustration, educational metaphor, soft lighting, 16:9.]**
+![[Illustration: A magical notebook open on a wooden desk. The left page shows messy scattered variables tied together with tangled string. The right page displays a clean, glowing ID card template with labeled slots: "Name", "Color", "Legs", "Power". Ferris stands proudly pointing at the organized page. Style: vibrant children's book illustration, educational metaphor, soft lighting, 16:9.]](../assets/images/5.1.png)
 
 ---
 
@@ -84,7 +84,7 @@ struct SpaceShip {
 }
 ```
 
-**[Illustration: An educational infographic showing a Rust struct definition as a blueprint sheet. Fields are highlighted with colorful tags matching their data types (String=blue, u8=green, u32=orange). Ferris holds a ruler and pencil, drawing the blueprint. Style: clean, modern educational cartoon, bright colors, 16:9.]**
+![[Illustration: An educational infographic showing a Rust struct definition as a blueprint sheet. Fields are highlighted with colorful tags matching their data types (String=blue, u8=green, u32=orange). Ferris holds a ruler and pencil, drawing the blueprint. Style: clean, modern educational cartoon, bright colors, 16:9.]](../assets/images/5.2.png)
 
 ---
 
@@ -150,7 +150,7 @@ let monster2 = Monster {
 ⚠️ **Important Note**: This moves ownership for `String` fields! Because `String` doesn't implement `Copy`, `monster1.name` now belongs to `monster2`. You can't use `monster1.name` after this line. But numbers like `legs` and `power` *are* `Copy`, so they get copied safely. 
 Remember: `..` is convenient, but always keep Chapter 4's ownership rules in mind!
 
-**[Illustration: Split scene: Left shows a crab holding a "monster blueprint" copying data to a new card using a ".." stamp. Right shows a friendly warning sign: "String fields move ownership!". Ferris explains with a helpful gesture. Style: playful technical metaphor, children's book illustration, clear visual cues, 16:9.]**
+![[Illustration: Split scene: Left shows a crab holding a "monster blueprint" copying data to a new card using a ".." stamp. Right shows a friendly warning sign: "String fields move ownership!". Ferris explains with a helpful gesture. Style: playful technical metaphor, children's book illustration, clear visual cues, 16:9.]](../assets/images/5.3.png)
 
 ---
 
@@ -234,7 +234,7 @@ let dodo = Monster::new(
 ```
 This feels like a "monster factory"! 🏭
 
-**[Illustration: Cartoon scene showing a "Method Factory" conveyor belt. Crabs input raw monster parts, a machine labeled "impl Monster" adds behaviors (roar, attack, heal) via &self/&mut self tags, and finished monsters roll out with speech bubbles. Ferris operates a control panel. Style: dynamic, educational, bright colors, 16:9.]**
+![[Illustration: Cartoon scene showing a "Method Factory" conveyor belt. Crabs input raw monster parts, a machine labeled "impl Monster" adds behaviors (roar, attack, heal) via &self/&mut self tags, and finished monsters roll out with speech bubbles. Ferris operates a control panel. Style: dynamic, educational, bright colors, 16:9.]](../assets/images/5.4.png)
 
 ---
 
@@ -304,7 +304,7 @@ if dodo.is_stronger_than(&bombi) {
 }
 ```
 
-**[Illustration: A cozy notebook open to a "Monster Roster" page. Each entry shows a mini ID card with a cartoon monster sketch and stats. A golden trophy icon highlights the strongest monster. Ferris sits on the desk stamping "Approved" with a smile. Style: warm, inviting children's book illustration, detailed UI metaphor, 16:9.]**
+![[Illustration: A cozy notebook open to a "Monster Roster" page. Each entry shows a mini ID card with a cartoon monster sketch and stats. A golden trophy icon highlights the strongest monster. Ferris sits on the desk stamping "Approved" with a smile. Style: warm, inviting children's book illustration, detailed UI metaphor, 16:9.]](../assets/images/5.5.png)
 
 ---
 
@@ -359,10 +359,4 @@ fn main() {
 
 Now you know how to organize related data into `struct`s and give them behaviors with methods! In the next chapter, we'll explore `enum` and learn how to handle different states (like weather, game modes, or traffic lights) in a clean, safe way. 🌈✨
 
-**[Illustration: Ferris wearing a graduation cap, holding a glowing "Chapter 5 Complete" badge. Floating around him are mini structs, impl blocks, and &self tags turning into a neat organized library. Encouraging, bright lighting, children's book style.]**
-
----
-
-> 🔚 **End of Chapter 5**
-
----
+![[Illustration: Ferris wearing a graduation cap, holding a glowing "Chapter 5 Complete" badge. Floating around him are mini structs, impl blocks, and &self tags turning into a neat organized library. Encouraging, bright lighting, children's book style.]](../assets/images/5.6.png)

@@ -12,12 +12,12 @@
 
 ## 11.1. Before Launch: The Simulator
 
-### 11.1.1. The Story: Ferris’s Flight Simulator
+### 11.1.1. The Story: Ferris's Flight Simulator
 Before Ferris presses the real launch button on his spaceship, he tests every system in a special simulator room. 🚀🕹️ He pushes buttons, starts engines, turns the steering wheel, and checks if everything works correctly. If a red light turns on in the simulator, Ferris is actually happy! Why? Because he found a problem before the real danger and can now fix it.
 
 In programming, we do exactly the same thing, and we call it **Testing** – **one of the most important skills for a computer wizard** to ensure the program works correctly before sharing it with others. 🧙‍♂️
 
-**[Illustration: A cartoon cockpit labeled "SIMULATION MODE". Ferris the crab sits in the pilot seat, pressing buttons on a dashboard. Green checkmarks float above working systems, while a red warning light blinks on a "test failed" panel. Style: vibrant children's book illustration, playful tech metaphor, soft lighting, 16:9.]**
+![[Illustration: A cartoon cockpit labeled "SIMULATION MODE". Ferris the crab sits in the pilot seat, pressing buttons on a dashboard. Green checkmarks float above working systems, while a red warning light blinks on a "test failed" panel. Style: vibrant children's book illustration, playful tech metaphor, soft lighting, 16:9.]](../assets/images/11.1.png)
 
 ### 11.1.2. What Is a Test?
 A test is a small piece of code that calls a part of the main program and compares its result with what we expected.
@@ -37,7 +37,7 @@ fn check_addition() {
 }
 ```
 
-This code tells the compiler: “This is a test. Please check that 2+2 really equals 4!”
+This code tells the compiler: "This is a test. Please check that 2+2 really equals 4!"
 
 ### 11.1.4. Running Tests with `cargo test`
 To run all tests, open your terminal inside the project folder and type:
@@ -49,7 +49,7 @@ cargo test
 Cargo searches through all files, finds functions marked with `#[test]`, and runs them one by one.
 
 ### 11.1.5. Reading Test Output
-If everything is correct, you’ll see a nice green output:
+If everything is correct, you'll see a nice green output:
 
 ```
 running 1 test
@@ -68,9 +68,9 @@ thread 'check_addition' panicked at 'assertion failed: `(left == right)`
   right: `4`', src/lib.rs:3:5
 ```
 
-The compiler tells you exactly: “I saw `5` on the left side, but I expected `4` on the right side!”
+The compiler tells you exactly: "I saw `5` on the left side, but I expected `4` on the right side!"
 
-**[Illustration: A friendly robot quality inspector holding a rubber stamp. One stamp says "assert_eq! ✅", the other shows a red warning symbol. Ferris stands beside a conveyor belt of code blocks waiting for inspection. Style: clean educational cartoon, bright colors, clear visual metaphor.]**
+![[Illustration: A friendly robot quality inspector holding a rubber stamp. One stamp says "assert_eq! ✅", the other shows a red warning symbol. Ferris stands beside a conveyor belt of code blocks waiting for inspection. Style: clean educational cartoon, bright colors, clear visual metaphor.]](../assets/images/11.2.png)
 
 > 👨‍👩‍👧 **Note for parents and teachers**  
 > Test‑writing is one of the most valuable professional habits in programming. This chapter shows how writing tests helps us ensure code works correctly. If a child feels tired of writing tests at first, remind them that tests are like seatbelts – they might take a moment to buckle, but they save lives. The official Rust book has a complete chapter about testing:  
@@ -81,7 +81,7 @@ The compiler tells you exactly: “I saw `5` on the left side, but I expected `4
 ## 11.2. Essential Testing Macros
 
 ### 11.2.1. `assert!`
-This macro takes a condition and checks that it is definitely `true`. If it’s `false`, the test fails.
+This macro takes a condition and checks that it is definitely `true`. If it's `false`, the test fails.
 
 ```rust
 #[test]
@@ -159,7 +159,7 @@ mod tests {
 }
 ```
 
-**[Illustration: A friendly robot quality inspector holding a rubber stamp. One stamp says "assert_eq! ✅", the other "assert_ne! ❌". Ferris stands beside a conveyor belt of code blocks waiting for inspection. Style: clean educational cartoon, bright colors, clear visual metaphor.]**
+![[Illustration: A friendly robot quality inspector holding a rubber stamp. One stamp says "assert_eq! ✅", the other "assert_ne! ❌". Ferris stands beside a conveyor belt of code blocks waiting for inspection. Style: clean educational cartoon, bright colors, clear visual metaphor.]](../assets/images/11.3.png)
 
 ---
 
@@ -183,13 +183,13 @@ mod tests {
 }
 ```
 
-`#[cfg(test)]` means: “Only compile this module when I’m running tests.” It’s like a secret room that only opens during inspection! 🕵️‍♂️
+`#[cfg(test)]` means: "Only compile this module when I'm running tests." It's like a secret room that only opens during inspection! 🕵️‍♂️
 
-> 🧠 **Sometimes things are hard, and that’s okay!**  
+> 🧠 **Sometimes things are hard, and that's okay!**  
 > Writing tests might feel a bit tedious at first, but the more you practice, the faster and more enjoyable it becomes. Even professional programmers, when they find a bug, first write a test to make sure that bug never comes back.
 
 ### 11.3.3. Integration Tests
-These tests examine the program from an external user’s perspective. Integration tests live in a separate folder called `tests/` (next to the `src/` folder). Each `.rs` file in this folder behaves like an independent project and must `use` our library.
+These tests examine the program from an external user's perspective. Integration tests live in a separate folder called `tests/` (next to the `src/` folder). Each `.rs` file in this folder behaves like an independent project and must `use` our library.
 
 📂 **Folder Structure**:
 ```
@@ -221,7 +221,7 @@ cargo test test_add_positive
 You can even type part of the name to run all similar tests: `cargo test add`
 
 ### 11.3.5. Ignoring Tests with `#[ignore]`
-If a test takes too long or isn’t ready yet, you can temporarily disable it:
+If a test takes too long or isn't ready yet, you can temporarily disable it:
 
 ```rust
 #[test]
@@ -231,13 +231,13 @@ fn long_running_test() { /* Code that takes 10 minutes */ }
 
 To run ignored tests: `cargo test -- --ignored`
 
-**[Illustration: Architectural blueprint of a codebase. Left side: main factory labeled "src". Right side: a hidden laboratory labeled "#[cfg(test)] mod tests" connected by a secret tunnel. Top side: an external inspection booth labeled "tests/ integration". Ferris points to the different zones. Style: playful technical diagram, children's book style, bright, 16:9.]**
+![[Illustration: Architectural blueprint of a codebase. Left side: main factory labeled "src". Right side: a hidden laboratory labeled "#[cfg(test)] mod tests" connected by a secret tunnel. Top side: an external inspection booth labeled "tests/ integration". Ferris points to the different zones. Style: playful technical diagram, children's book style, bright, 16:9.]](../assets/images/11.4.png)
 
 ---
 
 ## 11.4. Project: Testing the Guess-the-Number Game (from Chapter 2)
 
-Now it’s time to rewrite the guess-the-number game so it can be tested. (Remember? It generated a random number, took user input, and gave hints.)
+Now it's time to rewrite the guess-the-number game so it can be tested. (Remember? It generated a random number, took user input, and gave hints.)
 
 ### 11.4.1. Converting the Game to a Library
 First, we create a library project so we can test its functions:
@@ -255,7 +255,7 @@ rand = "0.9.0"
 ```
 
 ### 11.4.2. The `generate_secret` Function with Fixed Seed
-In tests, we don’t want the number to be truly random (because it changes every time and we can’t predict the result). So we make a helper function just for tests that always returns a fixed number:
+In tests, we don't want the number to be truly random (because it changes every time and we can't predict the result). So we make a helper function just for tests that always returns a fixed number:
 
 ```rust
 // src/lib.rs
@@ -346,7 +346,7 @@ mod tests {
 }
 ```
 
-**[Illustration: Cartoon scene showing a "Mock Input" machine. A tape labeled "Cursor: b'42\n'" feeds into a reader slot. The machine outputs a glowing green "Ok(42)" ticket. Ferris operates the controls with a satisfied smile. Style: dynamic, educational, bright colors, technical metaphor for children, 16:9.]**
+![[Illustration: Cartoon scene showing a "Mock Input" machine. A tape labeled "Cursor: b'42\n'" feeds into a reader slot. The machine outputs a glowing green "Ok(42)" ticket. Ferris operates the controls with a satisfied smile. Style: dynamic, educational, bright colors, technical metaphor for children, 16:9.]](../assets/images/11.5.png)
 
 ---
 
@@ -366,7 +366,7 @@ In this chapter, you discovered:
 ### 11.5.2. Challenge: Tests for the `Monster` Struct
 Return to the `Monster` struct from Chapter 5. Add an `attack` method that attacks another monster and reduces its power. Then write three tests:
 
-1. An attack that reduces the victim’s power.
+1. An attack that reduces the victim's power.
 2. An attack with zero power (should not reduce anything).
 3. Checking that the returned damage value is correct.
 
@@ -415,10 +415,6 @@ mod monster_tests {
 
 Now you know how to write tests to ensure your program works correctly and add new changes with confidence. 🛡️✨
 
-In the next chapter, we’ll build a complete, professional command-line project (similar to the `grep` command) and put together everything we’ve learned so far! 🔍📜
+In the next chapter, we'll build a complete, professional command-line project (similar to the `grep` command) and put together everything we've learned so far! 🔍📜
 
-**[Illustration: Ferris wearing a graduation cap and safety goggles, holding a glowing "Chapter 11 Master" badge. Floating around him are testing tools: a green checkmark stamp, a red panic button, a mock tape reader, and a hidden lab door. Style: encouraging, vibrant children's book illustration, celebratory mood, 16:9.]**
-
----
-
-> 🔚 **End of Chapter 11**
+![[Illustration: Ferris wearing a graduation cap and safety goggles, holding a glowing "Chapter 11 Master" badge. Floating around him are testing tools: a green checkmark stamp, a red panic button, a mock tape reader, and a hidden lab door. Style: encouraging, vibrant children's book illustration, celebratory mood, 16:9.]](../assets/images/11.6.png)

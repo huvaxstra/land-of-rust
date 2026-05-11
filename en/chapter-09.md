@@ -53,7 +53,7 @@ You'll get a list of functions called one after another, helping you pinpoint ex
 ### 9.1.5. Exercise: Intentional Panic
 Write a program with a 5-element vector. Ask the user for an index and print that element. If the index is out of bounds, let it `panic`. (Try running it with `RUST_BACKTRACE=1` and watch the trail!)
 
-**[Illustration: A close-up of a shiny red emergency button labeled "panic!" on a spaceship control panel, surrounded by yellow warning tape. Ferris the crab stands nearby with a shocked expression, holding his claws up to stop someone from pressing it. Style: vibrant, dramatic but child-friendly, high contrast, soft lighting.]**
+![[Illustration: A close-up of a shiny red emergency button labeled "panic!" on a spaceship control panel, surrounded by yellow warning tape. Ferris the crab stands nearby with a shocked expression, holding his claws up to stop someone from pressing it. Style: vibrant, dramatic but child-friendly, high contrast, soft lighting.]](../assets/images/9.1.png)
 
 ---
 
@@ -142,7 +142,7 @@ fn main() {
 }
 ```
 
-**[Illustration: A cartoon dashboard with two glowing indicators. Left: a green "OK" light shining on a wrapped gift labeled "T". Right: a yellow "Warning" light flashing over a toolbox labeled "E". Ferris stands between them holding a checklist, looking thoughtful. Style: educational metaphor, clean vector, bright colors.]**
+![[Illustration: A cartoon dashboard with two glowing indicators. Left: a green "OK" light shining on a wrapped gift labeled "T". Right: a yellow "Warning" light flashing over a toolbox labeled "E". Ferris stands between them holding a checklist, looking thoughtful. Style: educational metaphor, clean vector, bright colors.]](../assets/images/9.2.png)
 
 ---
 
@@ -231,7 +231,7 @@ fn divide_files() -> Result<f64, String> {
 }
 ```
 
-**[Illustration: A magical floating question mark tool (?) glowing with soft blue light, acting as a shortcut tunnel. On one side, a long winding path labeled "match match match". On the other side, a straight fast road through the "?" tunnel. Ferris happily zooms through the shortcut. Style: dynamic, educational cartoon, bright colors.]**
+![[Illustration: A magical floating question mark tool (?) glowing with soft blue light, acting as a shortcut tunnel. On one side, a long winding path labeled "match match match". On the other side, a straight fast road through the "?" tunnel. Ferris happily zooms through the shortcut. Style: dynamic, educational cartoon, bright colors.]](../assets/images/9.3.png)
 
 ---
 
@@ -310,7 +310,7 @@ fn main() {
 }
 ```
 
-**[Illustration: A cozy cartoon desk with a retro-style calculator that has a glowing screen. Around it float colorful math symbols (+, -, *, /) and a small shield icon labeled "Error Safe". Ferris types on a keyboard with a confident smile. Style: warm, educational, children's book illustration.]**
+![[Illustration: A cozy cartoon desk with a retro-style calculator that has a glowing screen. Around it float colorful math symbols (+, -, *, /) and a small shield icon labeled "Error Safe". Ferris types on a keyboard with a confident smile. Style: warm, educational, children's book illustration.]](../assets/images/9.4.png)
 
 ---
 
@@ -332,8 +332,4 @@ Improve the project so it can handle inputs **without spaces**, like `10+5` or `
 Now you know how to handle errors like a champion and write programs that guide users instead of crashing! 🛡️🦀
 In the next chapter, we'll explore **Generics and Traits**: tools that let us write "one-size-fits-all" code that works with any type, just like a universal space wrench! 🔧🌌
 
-**[Illustration: Ferris wearing a superhero cape, holding a glowing "Chapter 9 Master" badge. Floating around him are safe shields, Result enums, crossed-out panic buttons, and a question mark tool. Encouraging, bright lighting, children's book style.]**
-
----
-
-> 🔚 **End of Chapter 9**
+![[Illustration: Ferris wearing a superhero cape, holding a glowing "Chapter 9 Master" badge. Floating around him are safe shields, Result enums, crossed-out panic buttons, and a question mark tool. Encouraging, bright lighting, children's book style.]](../assets/images/9.5.png)

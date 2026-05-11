@@ -24,7 +24,7 @@ A function is exactly like a magical recipe with a name. Whenever you call that 
 
 In Rust, we build functions with the keyword `fn` (short for *function*). Even `main` is a special function that the compiler knows is where the program must start.
 
-**[Illustration: A cartoon scene inside a spaceship kitchen. Ferris looks exhausted, surrounded by floating recipe cards that repeat "Mix, Bake, Wait." A glowing magical cookbook labeled "fn" appears, promising to save the day. Style: vibrant children's book illustration, warm lighting, playful mood.]**
+![[Illustration: A cartoon scene inside a spaceship kitchen. Ferris looks exhausted, surrounded by floating recipe cards that repeat "Mix, Bake, Wait." A glowing magical cookbook labeled "fn" appears, promising to save the day. Style: vibrant children's book illustration, warm lighting, playful mood.]](../assets/images/3.1.png)
 
 ### 3.1.3. Our First Simple Function
 Let's build a simple function that just prints a greeting. First, create a new project:
@@ -62,7 +62,7 @@ fn main() {
 ```
 See how easy that was? Instead of writing `println!` three times, we just called the function's name. This keeps our code tidy and much easier to read! 🧹
 
-**[Illustration: An educational illustration showing a large button labeled "say_hello()" being pressed three times. Each press triggers a speech bubble saying "Hello from inside the function!". Ferris stands beside it giving a thumbs up. Style: clean, cartoon, educational infographic, bright colors.]**
+![[Illustration: An educational illustration showing a large button labeled "say_hello()" being pressed three times. Each press triggers a speech bubble saying "Hello from inside the function!". Ferris stands beside it giving a thumbs up. Style: clean, cartoon, educational infographic, bright colors.]](../assets/images/3.2.png)
 
 ---
 
@@ -161,7 +161,7 @@ fn main() {
 }
 ```
 
-**[Illustration: A friendly robot machine labeled "fn" with input hoppers for "flour", "sugar", "eggs" and an output conveyor belt delivering a glowing "Cake Result". Rust syntax arrows connect inputs to outputs. Ferris watches proudly holding a slice. Style: educational cartoon, bright, technical metaphor for children.]**
+![[Illustration: A friendly robot machine labeled "fn" with input hoppers for "flour", "sugar", "eggs" and an output conveyor belt delivering a glowing "Cake Result". Rust syntax arrows connect inputs to outputs. Ferris watches proudly holding a slice. Style: educational cartoon, bright, technical metaphor for children.]](../assets/images/3.3.png)
 
 ---
 
@@ -266,7 +266,7 @@ fn main() {
 }
 ```
 
-**[Illustration: A cartoon sorting robot with labeled bins: "i32", "String", "bool", "char". Different items (numbers, letters, emojis) are flying into the correct bins. Ferris stands beside holding a checklist. Style: playful, educational, bright vector illustration.]**
+![[Illustration: A cartoon sorting robot with labeled bins: "i32", "String", "bool", "char". Different items (numbers, letters, emojis) are flying into the correct bins. Ferris stands beside holding a checklist. Style: playful, educational, bright vector illustration.]](../assets/images/3.4.png)
 
 ---
 
@@ -305,7 +305,7 @@ fn do_something() { }
 ### 3.4.4. Exercise: Comment the Guessing Game
 Open your Chapter 2 guessing game code. Add short explanatory comments for each major section (random number generation, reading input, type conversion, comparison). See how much easier the code becomes to read! 🧐
 
-**[Illustration: Ferris wearing a detective hat, writing a secret note inside a glowing code file. A small compiler robot next to him wears sunglasses and ignores the note. Background: cozy desk with coffee and books. Style: whimsical children's book illustration, soft lighting.]**
+![[Illustration: Ferris wearing a detective hat, writing a secret note inside a glowing code file. A small compiler robot next to him wears sunglasses and ignores the note. Background: cozy desk with coffee and books. Style: whimsical children's book illustration, soft lighting.]](../assets/images/3.5.png)
 
 ---
 
@@ -368,8 +368,5 @@ fn main() {
 ```
 📌 **Note**: `&[i32]` means *"a reference to a slice of i32 numbers"*. This allows the function to look at the array's contents without taking ownership of it. We'll talk extensively about these "permissions" in the next chapter!
 
-**[Illustration: Ferris standing proudly next to a computer screen showing completed code. A golden trophy labeled "Chapter 3 Master" sits on the desk. Floating code symbols (fn, i32, {}, //) surround him. Style: celebratory, vibrant children's book illustration, encouraging mood.]**
+![[Illustration: Ferris standing proudly next to a computer screen showing completed code. A golden trophy labeled "Chapter 3 Master" sits on the desk. Floating code symbols (fn, i32, {}, //) surround him. Style: celebratory, vibrant children's book illustration, encouraging mood.]](../assets/images/3.6.png)
 
----
-
-> 🔚 **End of Chapter 3**

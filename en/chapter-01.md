@@ -24,7 +24,7 @@ I need to talk to this computer to fix my ship. But here's the problem: Earth co
 
 > 💡 **Fun Fact**: The word "Rust" in English means corrosion. But don't worry! This language is neither rusty nor old. Actually, it's one of the newest, fastest, and safest languages in the world! ✨
 
-**[Illustration: A cheerful red-shelled crab with large expressive eyes stands on two legs beside a retro computer monitor. The screen displays glowing green text reading "Earth, I am here!" The background shows a slightly messy spaceship interior with a round window revealing a starry sky. The art style is vibrant and warm, perfect for children's books.]**
+![[Illustration: A cheerful red-shelled crab with large expressive eyes stands on two legs beside a retro computer monitor. The screen displays glowing green text reading "Earth, I am here!" The background shows a slightly messy spaceship interior with a round window revealing a starry sky. The art style is vibrant and warm, perfect for children's books.]](../assets/images/1.1.png)
 
 ### 1.1.2. Why Does Ferris Need a New Language?
 
@@ -39,11 +39,11 @@ No, my friend! Computers only understand zeros and ones. And we humans can't spe
 
 And most importantly: **Rust teaches you to think like an engineer**. I use Rust on all my space travels to keep my ship safe and avoid getting lost in space! 🌌
 
-**[Illustration: A laptop screen shows a split view: on the left side are zeros and ones, on the right side are colorful code blocks. A small friendly crab mascot sits on the keyboard pointing at the code. The background shows a simple desk with a coffee mug, notebook, and a tiny toy rocket. Clean, bright, educational style.]**
+![[Illustration: A laptop screen shows a split view: on the left side are zeros and ones, on the right side are colorful code blocks. A small friendly crab mascot sits on the keyboard pointing at the code. The background shows a simple desk with a coffee mug, notebook, and a tiny toy rocket. Clean, bright, educational style.]](../assets/images/1.2.png)
 
 ### 1.1.3. Ferris at the Terminal
 
-**[Illustration: A wide scene showing Ferris the red crab sitting in front of a dark terminal screen, typing with his claws. Glowing code lines reflect on his shell. Floating around him are tiny cartoon spaceships, stars, and gears. The style is whimsical and colorful, with high-quality children's book illustration and cinematic lighting.]**
+![[Illustration: A wide scene showing Ferris the red crab sitting in front of a dark terminal screen, typing with his claws. Glowing code lines reflect on his shell. Floating around him are tiny cartoon spaceships, stars, and gears. The style is whimsical and colorful, with high-quality children's book illustration and cinematic lighting.]](../assets/images/1.3.png)
 
 ---
 
@@ -72,7 +72,7 @@ https://rustup.rs
 ```
 and press `Enter`. A page like this will appear:
 
-**[Illustration: A close-up of a laptop screen displaying the rustup.rs homepage. A large, inviting blue "Download" button is visible. A tiny cartoon crab logo peeks from the corner of the browser window. The background shows a clean, minimal desk setup with soft pastel lighting. Modern educational illustration style with clear UI focus.]**
+![[Illustration: A close-up of a laptop screen displaying the rustup.rs homepage. A large, inviting blue "Download" button is visible. A tiny cartoon crab logo peeks from the corner of the browser window. The background shows a clean, minimal desk setup with soft pastel lighting. Modern educational illustration style with clear UI focus.]](../assets/images/1.4.png)
 
 ### 1.2.2. Click the Download Button
 
@@ -129,7 +129,7 @@ cargo --version
 ```
 If both commands show a version number, your magic toolbox is ready to go! 🛠️✨
 
-**[Illustration: A terminal window with dark background and bright green success text "Rust is installed now. Great!" Next to the screen, Ferris the crab is doing a happy little dance, holding a tiny wrench. The desk has a small lamp and a notebook. Cheerful, cartoon, educational style with vibrant colors.]**
+![[Illustration: A terminal window with dark background and bright green success text "Rust is installed now. Great!" Next to the screen, Ferris the crab is doing a happy little dance, holding a tiny wrench. The desk has a small lamp and a notebook. Cheerful, cartoon, educational style with vibrant colors.]](../assets/images/1.5.png)
 
 ---
 
@@ -154,7 +154,7 @@ We need a magic notebook to write our code. You can use `Notepad` (Windows) or `
 
 Download it from `code.visualstudio.com`. After installing, open it and open the `majara` folder (`File → Open Folder`).
 
-**[Illustration: A child's hand clicking "Open Folder" in VS Code interface. The folder name "majara" is highlighted in blue. Ferris the crab peeks curiously from behind the monitor. Semi-realistic cartoon style with warm lighting, educational tone.]**
+![[Illustration: A child's hand clicking "Open Folder" in VS Code interface. The folder name "majara" is highlighted in blue. Ferris the crab peeks curiously from behind the monitor. Semi-realistic cartoon style with warm lighting, educational tone.]](../assets/images/1.6.png)
 
 ### 1.3.3. Write the Magic Code
 
@@ -218,7 +218,7 @@ Earth, I am here!
 
 Congratulations! 🎉 You just wrote and ran your first Rust program. Ferris is so excited to see this message!
 
-**[Illustration: Ferris the crab jumping joyfully in front of a terminal screen that displays "Earth, I am here!" Colorful confetti and tiny stars float around. The background shows a cozy desk with a mug and notebook. Vibrant, celebratory children's book illustration with high energy.]**
+![[Illustration: Ferris the crab jumping joyfully in front of a terminal screen that displays "Earth, I am here!" Colorful confetti and tiny stars float around. The background shows a cozy desk with a mug and notebook. Vibrant, celebratory children's book illustration with high energy.]](../assets/images/1.7.before.png)
 
 ---
 
@@ -251,7 +251,7 @@ hello_ferris/
 ```
 (Don't worry about `.gitignore` for now; you'll learn about it later.)
 
-**[Illustration: A clean infographic-style illustration showing a folder tree: hello_ferris/ containing Cargo.toml and src/main.rs highlighted in bright colors. Ferris the crab stands beside it pointing like a tour guide. Modern, educational, vector-based style.]**
+![[Illustration: A clean infographic-style illustration showing a folder tree: hello_ferris/ containing Cargo.toml and src/main.rs highlighted in bright colors. Ferris the crab stands beside it pointing like a tour guide. Modern, educational, vector-based style.]](../assets/images/1.7.png)
 
 ### 1.4.3. Meet Cargo.toml
 
@@ -299,7 +299,7 @@ Hello, world!
 
 Quick and easy, right? 😎
 
-**[Illustration: Cartoon illustration of Ferris the crab pressing a big green button labeled "cargo run". Next to him, a terminal screen pops up showing "Hello, world!" Speed lines and sparkles emphasize quick action. Fun, dynamic, children's book style.]**
+![[Illustration: Cartoon illustration of Ferris the crab pressing a big green button labeled "cargo run". Next to him, a terminal screen pops up showing "Hello, world!" Speed lines and sparkles emphasize quick action. Fun, dynamic, children's book style.]](../assets/images/1.8.png)
 
 ### 1.4.6. Difference Between `cargo build` and `cargo run`
 
@@ -366,7 +366,7 @@ If you can do these, you're totally ready for the next chapter! In Chapter 2, we
 
 > 💬 **Remember**: Every great programmer started with "Hello, World." You've just taken your first step! 🚀
 
-**[Illustration: A child sitting at a desk looking happily at a computer terminal with a big green checkmark on screen. Ferris the crab stands on the desk giving a thumbs up. Floating text "Good luck!" in playful font above. Encouraging, bright, cartoon children's book illustration style.]**
+![[Illustration: A child sitting at a desk looking happily at a computer terminal with a big green checkmark on screen. Ferris the crab stands on the desk giving a thumbs up. Floating text "Good luck!" in playful font above. Encouraging, bright, cartoon children's book illustration style.]](../assets/images/1.9.png)
 
 ---
 

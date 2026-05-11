@@ -128,7 +128,7 @@ fn main() {
 }
 ```
 
-**[Illustration: A cartoon workbench with a flexible clay mold labeled `<T>`. Around it are colorful play-doh shapes (numbers, letters, emojis) being pressed into the mold, each emerging as a perfectly formed generic toy. Ferris the crab stands beside it holding a blueprint. Style: playful, educational children's book illustration, bright colors, clear metaphor.]**
+![[Illustration: A cartoon workbench with a flexible clay mold labeled `<T>`. Around it are colorful play-doh shapes (numbers, letters, emojis) being pressed into the mold, each emerging as a perfectly formed generic toy. Ferris the crab stands beside it holding a blueprint. Style: playful, educational children's book illustration, bright colors, clear metaphor.]](../assets/images/10.1.png)
 
 ---
 
@@ -249,7 +249,7 @@ fn main() {
 }
 ```
 
-**[Illustration: A cartoon quality-control desk. A friendly robot inspector stamps "CERTIFIED" badges labeled "MakeSound", "Fly", and "Debug" onto different toys (a dog, a car, a robot). Ferris watches proudly holding a checklist. Style: clean vector illustration, educational metaphor, bright colors.]**
+![[Illustration: A cartoon quality-control desk. A friendly robot inspector stamps "CERTIFIED" badges labeled "MakeSound", "Fly", and "Debug" onto different toys (a dog, a car, a robot). Ferris watches proudly holding a checklist. Style: clean vector illustration, educational metaphor, bright colors.]](../assets/images/10.2.png)
 
 ---
 
@@ -305,7 +305,7 @@ This tells the compiler: *"As long as `excerpt` exists, `novel` must also exist 
 ### 10.3.6. Don't Worry, Rust Has Your Back!
 For now, just remember: Lifetimes are safety stickers that prevent dangling references. In most of this book, Rust figures them out for you. If you're curious, check Appendix A for a deeper dive! 📖
 
-**[Illustration: A cartoon yogurt cup labeled "&'a str" with a glowing expiration date sticker. A friendly compiler robot checks the sticker with a magnifying glass, giving a green checkmark. Ferris stands nearby pointing at the safety seal. Style: educational, playful, soft lighting.]**
+![[Illustration: A cartoon yogurt cup labeled "&'a str" with a glowing expiration date sticker. A friendly compiler robot checks the sticker with a magnifying glass, giving a green checkmark. Ferris stands nearby pointing at the safety seal. Style: educational, playful, soft lighting.]](../assets/images/10.3.png)
 
 ---
 
@@ -388,7 +388,7 @@ fn main() {
 ```
 `dyn Shape` means: *"This box can hold anything that has the Shape trait."* `Box` puts it in flexible memory so size doesn't matter. Now we can loop through completely different shapes in one list! 🎉
 
-**[Illustration: A cartoon universal shipping box labeled "Box<dyn Shape>". Inside, different 3D shapes (circle, rectangle, triangle) with glowing trait badges are neatly stacked. Ferris operates a conveyor belt placing them into the box. Style: dynamic, educational vector, bright colors.]**
+![[Illustration: A cartoon universal shipping box labeled "Box<dyn Shape>". Inside, different 3D shapes (circle, rectangle, triangle) with glowing trait badges are neatly stacked. Ferris operates a conveyor belt placing them into the box. Style: dynamic, educational vector, bright colors.]](../assets/images/10.4.png)
 
 ---
 
@@ -427,8 +427,4 @@ fn main() {
 Now you know how to write all-purpose code with Generics and define shared behaviors with Traits. You also took your first look at Lifetimes and saw how Rust guarantees memory safety! 🛡️
 In the next chapter, we'll learn how to use **Tests** to make sure our programs always work correctly, just like testing a spaceship before launch! 🚀🧪
 
-**[Illustration: Ferris wearing a graduation cap and safety goggles, holding a glowing "Chapter 10 Master" badge. Floating around him are generic molds `<T>`, trait certificates, lifetime stickers `'a`, and a universal box. Encouraging, bright lighting, children's book style.]**
-
----
-
-> 🔚 **End of Chapter 10**
+![[Illustration: Ferris wearing a graduation cap and safety goggles, holding a glowing "Chapter 10 Master" badge. Floating around him are generic molds `<T>`, trait certificates, lifetime stickers `'a`, and a universal box. Encouraging, bright lighting, children's book style.]](../assets/images/10.5.png)

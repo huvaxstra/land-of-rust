@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land of Rust: Chapter 2</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #020617;
+            --crt-bg: #0f172a; /* Slightly darker for this chapter */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(rgba(99, 102, 241, 0.15) 2px, transparent 40px),
+                radial-gradient(rgba(168, 85, 247, 0.1) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+
+        /* Spaceship Dashboard UI */
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid #475569;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* CRT Screen Effect */
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #1e293b;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Dialog Box */
+        .dialog-box {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            border-radius: 15px;
+            border: 3px solid #8b5cf6;
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+        }
+
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #f8fafc; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid #8b5cf6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Interactive Elements */
+        .code-slot {
+            display: inline-block; min-width: 70px; height: 30px;
+            border-bottom: 3px dashed #fbbf24; margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: #fbbf24; background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid #a855f7; background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+        .code-option {
+            background: #334155; border: 2px solid #64748b;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none;
+        }
+        .code-option:hover { background: #475569; transform: scale(1.05); }
+        .code-option.selected { background: #8b5cf6; border-color: #a855f7; color: white; font-weight: bold; }
+
+        /* Animations */
+        .glitch { animation: glitch-skew 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-4deg); }
+            40% { transform: skew(4deg); }
+            60% { transform: skew(-2deg); }
+            80% { transform: skew(2deg); }
+            100% { transform: skew(0deg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lang-fa { display: block; }
+        .lang-en { display: none; }
+        html[dir="ltr"] .lang-fa { display: none; }
+        html[dir="ltr"] .lang-en { display: block; }
+
+        .terminal-block {
+            background: rgba(0,0,0,0.4); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Blinking Cursor */
+        .cursor-blink::after {
+            content: "█";
+            animation: blink 1s step-start infinite;
+            color: #a855f7;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
+
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
+
+        <!-- Language Toggle -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
+            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
+            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-purple-500 text-white">فارسی</button>
+        </div>
+
+        <!-- Top HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-emerald-400"><i class="fa-solid fa-heart"></i> <span class="lang-fa">سلامت: ۱۰۰٪</span><span class="lang-en">HP: 100%</span></div>
+                <div class="text-purple-400"><i class="fa-solid fa-star"></i> <span class="lang-fa">ستاره جادویی:</span><span class="lang-en">Magic Star:</span> <span id="star-status"><span class="lang-fa">قفل شده 🔒</span><span class="lang-en">Locked 🔒</span></span></div>
+            </div>
+            <div class="text-slate-400 code-font text-sm">RUST-OS v2.0 (Logic Module)</div>
+        </div>
+
+        <!-- Story Section -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
+
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-purple-500">
+                <h3 class="font-bold text-purple-600 mb-2 lang-fa">فریس خرچنگ:</h3>
+                <h3 class="font-bold text-purple-600 mb-2 lang-en">Ferris the Crab:</h3>
+
+                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold text-slate-700"></p>
+
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
+                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Screen -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-purple-300 code-font min-h-[400px] flex flex-col">
+
+                <!-- Mission 1: The Dice Box (rand) -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-purple-800 pb-2">
+                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۲: بازی ستاره گمشده 🌟</h2>
+                        <h2 class="text-xl font-bold text-white lang-en">Chapter 2: The Lost Star Game 🌟</h2>
+                    </div>
+
+                    <div class="lang-fa leading-relaxed space-y-3">
+                        <p class="text-slate-300">> برای ساخت بازی حدس عدد، اول به یک عدد شانسی (تصادفی) نیاز داریم.</p>
+                        <p class="text-slate-300">> در زبان راست، کامپیوترها تاس ندارند! ما باید یک جعبه ابزار جدید به نام <code>rand</code> را به پروژه اضافه کنیم.</p>
+                        <div class="terminal-block mt-4 text-emerald-300">
+                            <span class="text-slate-400">// اضافه کردن ابزار تاس ریختن به پروژه</span><br>
+                            $ cargo add rand<br>
+                            <span class="text-slate-400">// تولید یک عدد شانسی بین ۱ تا ۱۰۰</span><br>
+                            <span class="text-pink-400">let</span> secret_number = rand::thread_rng().gen_range(<span class="text-orange-300">1</span>..=<span class="text-orange-300">100</span>);
+                        </div>
+                    </div>
+
+                    <div class="lang-en leading-relaxed space-y-3">
+                        <p class="text-slate-300">> To build the Guess the Number game, we first need a random number.</p>
+                        <p class="text-slate-300">> Computers don't have dice! We must add a toolbox called <code>rand</code> to our project.</p>
+                        <div class="terminal-block mt-4 text-emerald-300">
+                            <span class="text-slate-400">// Adding the dice toolbox to our project</span><br>
+                            $ cargo add rand<br>
+                            <span class="text-slate-400">// Generate a random number from 1 to 100</span><br>
+                            <span class="text-pink-400">let</span> secret_number = rand::thread_rng().gen_range(<span class="text-orange-300">1</span>..=<span class="text-orange-300">100</span>);
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-2 rounded font-bold code-font" onclick="startMission(2)">
+                            <span class="lang-fa">دانلود ابزار rand و ادامه [Enter]</span>
+                            <span class="lang-en">Download 'rand' and Continue [Enter]</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 2: Mutability Puzzle -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div class="text-yellow-400 mb-2">
+                        <span class="lang-fa">>> مرحله ۱: جعبه‌های حافظه (متغیرها)</span>
+                        <span class="lang-en">>> Step 1: Memory Boxes (Variables)</span>
+                    </div>
+
+                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
+                        <p>وقتی در Rust متغیری با <code>let</code> می‌سازیم، درِ آن قفل می‌شود و نمی‌توان محتوایش را تغییر داد (Immutable).</p>
+                        <p>چون در این بازی بازیکن قرار است اعداد مختلفی را حدس بزند، باید قفل جعبه‌ی <code>guess</code> را باز بگذاریم.</p>
+                        <p class="text-emerald-400 font-bold">برای ساخت یک متغیر قابل تغییر (Mutable)، کدام کلمه را باید اضافه کنیم؟</p>
+                    </div>
+                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
+                        <p>When we create a variable with <code>let</code> in Rust, it is locked and cannot be changed (Immutable).</p>
+                        <p>Since the player will guess different numbers, we must leave the <code>guess</code> box unlocked.</p>
+                        <p class="text-emerald-400 font-bold">Which word do we add to make a variable Mutable?</p>
+                    </div>
+
+                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">let</span> <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span> guess = String::new();
+                    </div>
+
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
+
+                    <div class="border-t border-purple-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 1, 'const')">const</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 1, 'mut')">mut</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 1, 'var')">var</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 1, 'open')">open</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span class="lang-fa">باز کردن قفل 🔓</span><span class="lang-en">Unlock Box 🔓</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: If/Else Logic Puzzle -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div class="text-yellow-400 mb-2">
+                        <span class="lang-fa">>> مرحله ۲: منطق بازی (شروط)</span>
+                        <span class="lang-en">>> Step 2: Game Logic (Conditions)</span>
+                    </div>
+
+                    <p class="lang-fa text-sm text-slate-300 mb-4">اگر عدد حدس زده شده بزرگتر از عدد مخفی باشد، باید بگوییم "خیلی زیاده!". علامت درست (کوچکتر یا بزرگتر) را برای شرط زیر انتخاب کن:</p>
+                    <p class="lang-en text-sm text-slate-300 mb-4">If the guessed number is greater than the secret number, we should say "Too high!". Pick the correct sign for this condition:</p>
+
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">if</span> guess <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> secret_number {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"🔥 Too high! Go lower!"</span>);<br>
+                        }
+                    </div>
+
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
+
+                    <div class="border-t border-purple-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center text-xl">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, '<')">&lt;</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, '>')">&gt;</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, '==')">==</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span class="lang-fa">تنظیم منطق ⚙️</span><span class="lang-en">Set Logic ⚙️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: The Actual Game Terminal -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-yellow-400 mb-2 border-b border-purple-800 pb-2">
+                        <span class="lang-fa">>> مرحله نهایی: اجرای بازی (حلقه Loop)</span>
+                        <span class="lang-en">>> Final Step: Run the Game (Loop)</span>
+                    </div>
+
+                    <div id="game-console" class="terminal-block flex-grow overflow-y-auto mb-4 text-sm code-font" style="max-height: 220px;">
+                        <div class="text-emerald-400 mb-2">
+                            <span class="lang-fa">🎲 به بازی 'حدس عدد' خوش آمدید! 🎲</span>
+                            <span class="lang-en">🎲 Welcome to the Guess the Number Game! 🎲</span>
+                        </div>
+                        <div class="text-slate-300 mb-2">
+                            <span class="lang-fa">من یک عدد بین ۱ تا ۱۰۰ انتخاب کردم.</span>
+                            <span class="lang-en">I picked a secret number between 1 and 100.</span>
+                        </div>
+                        <!-- Game history will be appended here -->
+                        <div id="game-history"></div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <span class="text-purple-400 mt-2">$ ></span>
+                        <input type="number" id="guess-input" class="bg-slate-800 text-white border border-purple-500 rounded px-3 py-2 flex-grow focus:outline-none focus:ring-2 focus:ring-purple-400 code-font" placeholder="Enter a number..." onkeypress="handleEnter(event)">
+                        <button class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold" onclick="submitGuess()">
+                            <span class="lang-fa">حدس بزن</span><span class="lang-en">Guess</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success overlay -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
+            <div class="text-7xl mb-4 animate-bounce">🌟🏆🌟</div>
+            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
+                <span class="lang-fa">تو ستاره را پیدا کردی!</span>
+                <span class="lang-en">You Found the Star!</span>
+            </h2>
+            <p class="text-xl text-purple-400 mb-6 text-center px-4">
+                <span class="lang-fa">تو متغیرها، شرط‌ها و حلقه‌ها رو یاد گرفتی. آماده برای فصل بعدی؟</span>
+                <span class="lang-en">You mastered variables, conditions, and loops. Ready for Chapter 3?</span>
+            </p>
+            <button class="bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-lg" onclick="location.reload()">
+                <span class="lang-fa">پایان فصل ۲ - دوباره بازی کن</span>
+                <span class="lang-en">End of Chapter 2 - Play Again</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Game State & Logic ---
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval;
+
+        // Secret Game Engine
+        let targetSecretNumber = Math.floor(Math.random() * 100) + 1;
+        let attemptCount = 0;
+
+        // --- Dialog Data ---
+        const dialogs = {
+            fa: [
+                "سلام! خوشحالم دوباره می‌بینمت. من یک ستاره جادویی تو فضا پیدا کردم! 🌟",
+                "برای اینکه دزدان فضایی پیداش نکنن، گذاشتمش تو یه صندوقچه قفل‌دار.",
+                "رمز صندوقچه یک عدد بین ۱ تا ۱۰۰ است. اگه بتونی حدسش بزنی، ستاره مال تو میشه!",
+                "امروز قراره این بازی «حدس عدد» رو با زبان Rust برنامه‌نویسی کنیم و مفاهیم 'متغیرها' و 'حلقه‌ها' رو یاد بگیریم. آماده‌ای؟ 🚀"
+            ],
+            en: [
+                "Hello! Glad to see you again. I found a magic star in space! 🌟",
+                "To keep it safe from space pirates, I locked it inside a secure chest.",
+                "The password is a number between 1 and 100. If you guess it, the star is yours!",
+                "Today we will code this 'Guess the Number' game in Rust and learn about 'Variables' and 'Loops'. Ready? 🚀"
+            ]
+        };
+
+        function setLang(lang) {
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            const btnEn = document.getElementById('btn-en');
+            const btnFa = document.getElementById('btn-fa');
+
+            if(lang === 'fa') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-purple-500 text-white";
+                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                document.getElementById('guess-input').placeholder = "یک عدد وارد کن...";
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-purple-500 text-white";
+                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                document.getElementById('guess-input').placeholder = "Enter a number...";
+            }
+
+            if(currentStep === 0) {
+                clearTimeout(typeInterval);
+                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+            }
+        }
+
+        function typeWriter(text, i, cb) {
+            const el = document.getElementById('dialog-text');
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
+            } else {
+                cb();
+            }
+        }
+
+        function showDialog() {
+            const text = dialogs[currentLang][currentDialogIndex];
+            const el = document.getElementById('dialog-text');
+            const nextBtn = document.getElementById('next-dialog-btn');
+
+            el.innerHTML = '';
+            nextBtn.classList.add('hidden');
+
+            typeWriter(text, 0, () => {
+                nextBtn.classList.remove('hidden');
+            });
+        }
+
+        function nextDialog() {
+            clearTimeout(typeInterval);
+            currentDialogIndex++;
+
+            if (currentDialogIndex < dialogs[currentLang].length) {
+                showDialog();
+            } else {
+                currentStep = 1;
+                document.getElementById('next-dialog-btn').classList.add('hidden');
+                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
+                    "عالیه! به صفحه نمایش کامپیوتر (پایین) نگاه کن تا کدنویسی رو شروع کنیم." :
+                    "Great! Look at the computer screen below to start coding.";
+
+                document.getElementById('game-area').classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+
+            if(missionNum === 4) {
+                setTimeout(() => document.getElementById('guess-input').focus(), 500);
+            }
+        }
+
+        // --- Puzzle System ---
+        function selectOption(element, puzzleNum, word) {
+            // Deselect siblings in the same puzzle
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum+1} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function checkPuzzle1() {
+            const slotText = document.getElementById('slot1').innerText;
+            const feedback = document.getElementById('puzzle1-feedback');
+            const crt = document.getElementById('crt-monitor');
+
+            if (slotText === 'mut') {
+                feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
+                feedback.innerText = currentLang === 'fa' ? "> قفل باز شد! حالا متغیر قابل تغییر است." : "> Unlocked! Variable is now mutable.";
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                crt.classList.add('glitch');
+                setTimeout(() => crt.classList.remove('glitch'), 400);
+                feedback.innerText = currentLang === 'fa' ? "خطا: این کلمه قفل را باز نمی‌کند! (راهنمایی: مخفف mutable)" : "Error: This word doesn't unlock it! (Hint: short for mutable)";
+            }
+        }
+
+        function checkPuzzle2() {
+            const slotText = document.getElementById('slot2').innerText;
+            const feedback = document.getElementById('puzzle2-feedback');
+            const crt = document.getElementById('crt-monitor');
+
+            if (slotText === '>') {
+                feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
+                feedback.innerText = currentLang === 'fa' ? "> منطق درست است!" : "> Logic is correct!";
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                crt.classList.add('glitch');
+                setTimeout(() => crt.classList.remove('glitch'), 400);
+                feedback.innerText = currentLang === 'fa' ? "خطا: اگر حدس بازیکن 'بزرگتر' از رمز باشد، باید بگوییم خیلی زیاده." : "Error: If guess is 'greater' than secret, we say it's too high.";
+            }
+        }
+
+        // --- Terminal Game Logic ---
+        function handleEnter(e) {
+            if (e.key === 'Enter') submitGuess();
+        }
+
+        function appendHistory(text, colorClass) {
+            const history = document.getElementById('game-history');
+            const div = document.createElement('div');
+            div.className = `mt-1 ${colorClass}`;
+            div.innerText = text;
+            history.appendChild(div);
+
+            // Auto scroll to bottom
+            const consoleBox = document.getElementById('game-console');
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function submitGuess() {
+            const inputEl = document.getElementById('guess-input');
+            const guessVal = inputEl.value.trim();
+
+            if(!guessVal || isNaN(guessVal)) {
+                appendHistory(currentLang === 'fa' ? "❌ خطا: لطفا فقط عدد وارد کن! (ارور هندلینگ با match)" : "❌ Error: Please enter only numbers! (match handling)", "text-rose-400");
+                inputEl.value = '';
+                return;
+            }
+
+            const guessNum = parseInt(guessVal);
+            attemptCount++;
+
+            appendHistory(`> ${guessNum}`, "text-white opacity-80");
+
+            if(guessNum < targetSecretNumber) {
+                // Check challenge (difference < 5)
+                if(targetSecretNumber - guessNum < 5) {
+                    appendHistory(currentLang === 'fa' ? "🔥 خیلی نزدیک شدی! اما یکم بالاتره." : "🔥 You're getting close! But a bit higher.", "text-orange-400");
+                } else {
+                    appendHistory(currentLang === 'fa' ? "❄️ خیلی کمه! برو بالاتر ⬆️" : "❄️ Too low! Go higher ⬆️", "text-blue-300");
+                }
+            }
+            else if(guessNum > targetSecretNumber) {
+                if(guessNum - targetSecretNumber < 5) {
+                    appendHistory(currentLang === 'fa' ? "🔥 خیلی نزدیک شدی! اما یکم پایین‌تره." : "🔥 You're getting close! But a bit lower.", "text-orange-400");
+                } else {
+                    appendHistory(currentLang === 'fa' ? "🔥 خیلی زیاده! بیا پایین‌تر ⬇️" : "🔥 Too high! Go lower ⬇️", "text-red-400");
+                }
+            }
+            else {
+                // WIN!
+                appendHistory(currentLang === 'fa' ? `🏆 آفرین! عدد درست رو توی ${attemptCount} حدس پیدا کردی!` : `🏆 You guessed it! You won in ${attemptCount} tries!`, "text-yellow-300 font-bold text-lg mt-2");
+                inputEl.disabled = true;
+
+                // Update HUD Star
+                document.getElementById('star-status').innerHTML = '<span class="lang-fa">باز شد! 🌟</span><span class="lang-en">Unlocked! 🌟</span>';
+                document.getElementById('star-status').classList.add('animate-pulse', 'text-yellow-300');
+
+                triggerConfetti();
+                setTimeout(() => {
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 2000);
+            }
+
+            inputEl.value = '';
+            inputEl.focus();
+        }
+
+        // --- Confetti System ---
+        let W = window.innerWidth;
+        let H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 120;
+        const particles = [];
+        const possibleColors = ["#fb923c", "#fcd34d", "#c084fc", "#34d399", "#f472b6"];
+
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+
+            let particle = {};
+            for (let i = 0; i < maxConfettis; i++) {
+                particle = particles[i];
+                particle.tiltAngle += particle.tiltAngleIncremental;
+                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
+
+                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
+                    particle.x = Math.random() * W;
+                    particle.y = -30;
+                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        }, false);
+
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if(!animationId) Draw();
+        }
+
+        // Initialize Game
+        setTimeout(() => {
+            setLang('fa'); // Start in Persian
+            showDialog();
+        }, 500);
+
+    </script>
+</body>
+</html>

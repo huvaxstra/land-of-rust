@@ -35,7 +35,7 @@ Modules do three amazing things for us:
 🔹 **Privacy**: Lets us hide certain code so no one from the outside can accidentally change it.
 🔹 **No Conflicts**: Two different modules can have functions with the exact same name without mixing them up!
 
-**[Illustration: Educational illustration of Ferris the crab standing in a messy spaceship room full of scattered books. On the right side, a clean, organized bookshelf with labeled shelves (Science, Stories, Maps) is shown. Ferris is happily placing a book on the correct shelf. Style: vibrant children's book, clean lines, soft lighting, 16:9.]**
+![[Illustration: Educational illustration of Ferris the crab standing in a messy spaceship room full of scattered books. On the right side, a clean, organized bookshelf with labeled shelves (Science, Stories, Maps) is shown. Ferris is happily placing a book on the correct shelf. Style: vibrant children's book, clean lines, soft lighting, 16:9.]](../assets/images/7.1.png)
 
 ---
 
@@ -127,6 +127,8 @@ Create a new project (`cargo new math_modules`). Create two modules in separate 
 - `strings` module: `to_uppercase` and `to_lowercase` functions.
 Then use all of them in `main.rs`.
 
+![[Illustration: A cartoon carpenter Ferris building wooden shelves labeled "mod" and "pub". Each shelf holds different code blocks (functions, structs). Tools like a hammer and ruler are scattered around. Style: educational, playful, bright colors, children's book, 16:9.]](../assets/images/7.2.png)
+
 ---
 
 ## 7.3. The Library's Lock (Privacy)
@@ -188,7 +190,7 @@ impl Account {
 }
 ```
 
-**[Illustration: Illustration of Ferris the crab standing in front of a bank vault door. One door is open with a bright "pub" sign, revealing shiny gold coins. The other door is closed with a heavy lock and a "private" sign. Style: educational cartoon, bright colors, clear metaphor, 16:9.]**
+![[Illustration: Illustration of Ferris the crab standing in front of a bank vault door. One door is open with a bright "pub" sign, revealing shiny gold coins. The other door is closed with a heavy lock and a "private" sign. Style: educational cartoon, bright colors, clear metaphor, 16:9.]](../assets/images/7.3.png)
 
 ---
 
@@ -226,7 +228,7 @@ use animals::cat::speak as cat_speak;
 
 For now, these two uses of `use` are all you need. As you grow as a programmer, you'll learn more advanced ways, but for now, just remember: `use` keeps your code clean and easy to read!
 
-**[Illustration: A cartoon map showing a path from "crate" root to a function. A magnifying glass focuses on a shortcut sign labeled "use". Ferris is walking a shorter path thanks to the shortcut. Style: playful vector illustration, clear educational graphic, 16:9.]**
+![[Illustration: A cartoon map showing a path from "crate" root to a function. A magnifying glass focuses on a shortcut sign labeled "use". Ferris is walking a shorter path thanks to the shortcut. Style: playful vector illustration, clear educational graphic, 16:9.]](../assets/images/7.4.png)
 
 ---
 
@@ -329,6 +331,8 @@ fn main() {
 ```
 No more scrolling through 100 lines of mixed code! Each file does exactly one job. 😎
 
+![[Illustration: A cartoon folder tree structure showing src/ folder with four glowing files: main.rs, input.rs, random.rs, game_logic.rs. Arrows connect them showing how modules interact. Ferris stands beside giving a thumbs up. Style: clean infographic, educational, bright colors, 16:9.]](../assets/images/7.5.png)
+
 ---
 
 ## 7.6. Summary & Challenge
@@ -363,10 +367,4 @@ pub fn perimeter(radius: f64) -> f64 {
 Now you're a real programmer who knows how to manage large projects! 🏗️
 In the next chapter, we'll dive into **Collections** (Vectors and Hash Maps): magical boxes that can grow, shrink, and hold tons of data! 📦✨
 
-**[Illustration: Ferris the crab wearing a graduation cap, holding a glowing badge "Chapter 7 Master". Background shows a well-organized file cabinet with labels "mod", "pub", "use". Floating icons of Rust files and folders surround him. Style: encouraging, vibrant children's book, 16:9.]**
-
----
-
-> 🔚 **End of Chapter 7**
-
----
+![[Illustration: Ferris the crab wearing a graduation cap, holding a glowing badge "Chapter 7 Master". Background shows a well-organized file cabinet with labels "mod", "pub", "use". Floating icons of Rust files and folders surround him. Style: encouraging, vibrant children's book, 16:9.]](../assets/images/7.6.png)

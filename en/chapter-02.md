@@ -28,7 +28,7 @@ Computers are logical machines. They can't truly "pick randomly" on their own. B
 
 In Rust, engineers built a ready-to-use toolbox called `rand` that does this for us. We just need to add it to our project.
 
-**[Illustration: A cartoon scene of Ferris holding a glowing cosmic die. Floating around it are numbers like 42, 7, and 99. The background shows a cozy spaceship control panel with soft blinking lights. Style: playful, vibrant children's book illustration, warm lighting.]**
+![[Illustration: A cartoon scene of Ferris holding a glowing cosmic die. Floating around it are numbers like 42, 7, and 99. The background shows a cozy spaceship control panel with soft blinking lights. Style: playful, vibrant children's book illustration, warm lighting.]](../assets/images/2.1.png)
 
 ### 2.1.3. Adding the `rand` Crate
 Open your terminal and create a new project:
@@ -111,7 +111,7 @@ y = 20; // ✅ Now it's totally fine!
 ```
 In our game, `guess` needs to hold different answers from the player, so we must create it with `let mut`.
 
-**[Illustration: An educational cartoon showing two labeled boxes on a wooden desk. Box 1: "let x = 5" (secured with a small padlock). Box 2: "let mut y = 10" (open, with a tiny wrench inside). Ferris stands beside them, pointing at the difference. Style: bright, clear, infographic-style children's illustration.]**
+![[Illustration: An educational cartoon showing two labeled boxes on a wooden desk. Box 1: "let x = 5" (secured with a small padlock). Box 2: "let mut y = 10" (open, with a tiny wrench inside). Ferris stands beside them, pointing at the difference. Style: bright, clear, infographic-style children's illustration.]](../assets/images/2.2.png)
 
 ### 2.2.4. Our Friendly Guide: Compiler Errors
 If you get an error in Rust, don't worry! The Rust compiler acts like a kind teacher. It shows exactly where you slipped up and often suggests a fix. For example, if you forget `mut`, it says:
@@ -147,7 +147,7 @@ This line might look scary, but let's open it piece by piece:
 ### 2.3.3. Why `&mut guess`? (Handing Over the Key)
 The `&mut` symbol means **temporary key**. The `read_line` function wants to write inside our `guess` box. We give it permission to do that, but we don't give away ownership of the box. For now, just remember: `&mut` means *"You're allowed to change what's inside this box."* (We'll dive deeper into these permissions in Chapter 4!)
 
-**[Illustration: Ferris handing a glowing key labeled "&mut" to a small, friendly robot labeled "read_line". The robot stands next to an open box named "guess". Background: a soft, tech-themed workspace. Style: metaphorical, warm children's book illustration.]**
+![[Illustration: Ferris handing a glowing key labeled "&mut" to a small, friendly robot labeled "read_line". The robot stands next to an open box named "guess". Background: a soft, tech-themed workspace. Style: metaphorical, warm children's book illustration.]](../assets/images/2.3.png)
 
 ---
 
@@ -211,7 +211,7 @@ if guess < secret_number {
 
 If you accidentally use `=` inside an `if`, the compiler will complain because it's looking for a question, not an instruction!
 
-**[Illustration: A split-screen educational graphic. Left: a balancing scale showing "x = 5" with a loading arrow. Right: a magnifying glass examining "x == 5" with a green checkmark. Ferris stands in the middle explaining. Style: clean, modern educational illustration, bright colors.]**
+![[Illustration: A split-screen educational graphic. Left: a balancing scale showing "x = 5" with a loading arrow. Right: a magnifying glass examining "x == 5" with a green checkmark. Ferris stands in the middle explaining. Style: clean, modern educational illustration, bright colors.]](../assets/images/2.4.png)
 
 ---
 
@@ -253,7 +253,7 @@ loop {
 ```
 `count += 1` is the fastest way to add one!
 
-**[Illustration: Ferris running on a circular track labeled "loop". He holds a counter flag showing "1, 2, 3...". At one point, a red gate labeled "break" swings open. Style: dynamic, cartoon motion lines, encouraging mood.]**
+![[Illustration: Ferris running on a circular track labeled "loop". He holds a counter flag showing "1, 2, 3...". At one point, a red gate labeled "break" swings open. Style: dynamic, cartoon motion lines, encouraging mood.]](../assets/images/2.5.png)
 
 ---
 
@@ -280,7 +280,7 @@ let guess: u32 = match guess.trim().parse() {
 ### 2.7.3. In Simple Words
 *"Try to turn the text into a number. If it works, great! Keep going. If it fails, show a polite message and ask again without crashing."* Now the game never freezes! 🛡️
 
-**[Illustration: A cartoon sorting machine labeled "match". Left chute: text "abc" goes in, comes out as "❌ Try again!". Right chute: text "42" goes in, comes out as a golden "42 ✅". Ferris operates the machine with a friendly smile. Style: playful, technical metaphor, children's book.]**
+![[Illustration: A cartoon sorting machine labeled "match". Left chute: text "abc" goes in, comes out as "❌ Try again!". Right chute: text "42" goes in, comes out as a golden "42 ✅". Ferris operates the machine with a friendly smile. Style: playful, technical metaphor, children's book.]](../assets/images/2.6.png)
 
 ---
 
@@ -354,4 +354,4 @@ In the next chapter, we'll learn how to wrap repetitive code inside **functions*
 
 > 🔚 **End of Chapter 2**
 
-**[Illustration: A child sitting at a desk, smiling at a terminal screen showing a green checkmark. Ferris stands on the desk giving a thumbs up. Floating above is playful text saying "Great job!". Style: encouraging, bright, cartoon children's book illustration.]**
+![[Illustration: A child sitting at a desk, smiling at a terminal screen showing a green checkmark. Ferris stands on the desk giving a thumbs up. Floating above is playful text saying "Great job!". Style: encouraging, bright, cartoon children's book illustration.]](../assets/images/2.7.png)

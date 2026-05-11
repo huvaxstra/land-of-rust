@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land of Rust: Chapter 16</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #292524; /* Stone 800 */
+            --crt-bg: #451a03; /* Amber 950 */
+            --accent-primary: #d97706; /* Amber 500 */
+            --accent-secondary: #10b981; /* Emerald 500 */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(rgba(217, 119, 6, 0.1) 2px, transparent 40px),
+                radial-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+
+        /* Spaceship Dashboard UI - Ant Colony Edition */
+        .dashboard {
+            background: linear-gradient(180deg, #44403c 0%, #292524 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(217, 119, 6, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+
+        /* CRT Screen Effect */
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #b45309; /* Amber 600 */
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(217, 119, 6, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(16, 185, 129, 0.02), rgba(217, 119, 6, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Dialog Box */
+        .dialog-box {
+            background: rgba(254, 252, 232, 0.95); /* Yellow 50 */
+            color: #451a03; /* Amber 950 */
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(254, 252, 232, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(254, 252, 232, 0.95) transparent transparent transparent;
+        }
+
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #fef3c7; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Interactive Elements */
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: var(--accent-secondary); background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(217, 119, 6, 0.2); color: #fde68a; }
+
+        .code-option {
+            background: #292524; border: 2px solid #57534e;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #44403c; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #fcd34d; color: white; font-weight: bold; }
+
+        /* Animations */
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .lang-fa { display: block; }
+        .lang-en { display: none; }
+        html[dir="ltr"] .lang-fa { display: none; }
+        html[dir="ltr"] .lang-en { display: block; }
+
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(217, 119, 6, 0.3);
+        }
+
+        /* Simulator Styles */
+        .ant-track {
+            background: rgba(0,0,0,0.4); border-radius: 8px; height: 40px;
+            border: 1px dashed #78350f; position: relative; margin-bottom: 8px;
+            display: flex; align-items: center; overflow: hidden;
+        }
+
+        .ant-emoji {
+            font-size: 1.5rem; position: absolute; transition: left 0.5s linear, right 0.5s linear;
+        }
+
+        html[dir="ltr"] .ant-emoji { left: -30px; transform: scaleX(1); }
+        html[dir="ltr"] .ant-emoji.returning { transform: scaleX(-1); }
+
+        html[dir="rtl"] .ant-emoji { right: -30px; transform: scaleX(-1); }
+        html[dir="rtl"] .ant-emoji.returning { transform: scaleX(1); }
+
+        .food-vault {
+            background: #b45309; border: 2px solid #fcd34d; border-radius: 50%;
+            width: 80px; height: 80px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+            margin: 0 auto; transition: transform 0.2s;
+        }
+        .food-vault.locked {
+            border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            background: #991b1b;
+        }
+
+        .ant-btn {
+            background: #10b981; border: 2px solid #34d399; border-radius: 8px;
+            padding: 4px 8px; cursor: pointer; color: white; font-weight: bold; font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .ant-btn:hover { background: #059669; }
+        .ant-btn:disabled { background: #475569; border-color: #64748b; cursor: not-allowed; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
+
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
+
+        <!-- Language Toggle -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
+            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
+            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-amber-500 text-amber-950">فارسی</button>
+        </div>
+
+        <!-- Top HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-amber-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-amber-400"><i class="fa-solid fa-users-gear"></i> <span class="lang-fa">مورچه‌های فعال:</span><span class="lang-en">Active Ants:</span> <span class="text-white" id="hud-ants">۰ / ۳</span></div>
+                <div class="text-emerald-400"><i class="fa-solid fa-leaf"></i> <span class="lang-fa">غذای انبار شده:</span><span class="lang-en">Food Stored:</span> <span class="text-white" id="hud-food">۰</span></div>
+            </div>
+            <div class="text-amber-300 code-font text-sm opacity-70">COLONY-OS v16.0</div>
+        </div>
+
+        <!-- Story Section -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🐜🦀</div>
+
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-amber-500">
+                <h3 class="font-bold text-amber-800 mb-2 lang-fa">فریس خرچنگ:</h3>
+                <h3 class="font-bold text-amber-800 mb-2 lang-en">Ferris the Crab:</h3>
+
+                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold text-amber-950"></p>
+
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
+                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Screen -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-amber-100 code-font min-h-[400px] flex flex-col">
+
+                <!-- Mission 1: thread::spawn -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-amber-900 pb-2">
+                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۱۶: دسته‌های مورچه (هم‌روندی) 🐜</h2>
+                        <h2 class="text-xl font-bold text-white lang-en">Chapter 16: Swarms of Ants (Concurrency) 🐜</h2>
+                    </div>
+
+                    <div class="lang-fa leading-relaxed space-y-3">
+                        <p class="text-amber-300">> یک مورچه به تنهایی نمی‌تواند یک برگ بزرگ را ببرد. اما وقتی چند مورچه با هم کار کنند، کارها خیلی سریع انجام می‌شود!</p>
+                        <p class="text-slate-300">> در برنامه‌نویسی به این کارگرهای همزمان **ریسه (Thread)** می‌گوییم. تو می‌توانی از سیستم‌عامل بخواهی یک کارگر جدید استخدام کند.</p>
+                        <p class="text-emerald-300 mt-4 font-bold">برای ایجاد یک ریسه‌ی جدید، از کدام متد در ماژول `thread` استفاده می‌کنیم؟</p>
+                    </div>
+
+                    <div class="lang-en leading-relaxed space-y-3">
+                        <p class="text-amber-300">> A single ant can't carry a giant leaf alone. But when multiple ants work together, things get done really fast!</p>
+                        <p class="text-slate-300">> In programming, these simultaneous workers are called **Threads**. You can ask the OS to hire a new worker.</p>
+                        <p class="text-emerald-300 mt-4 font-bold">To create a new thread, which method in the `thread` module do we use?</p>
+                    </div>
+
+                    <div class="terminal-block mt-4 text-emerald-300 text-lg">
+                        <span class="text-pink-400">use</span> std::thread;<br><br>
+                        <span class="text-pink-400">let</span> ant = thread::<span id="slot1" class="code-slot text-amber-400" onclick="clearSlot(1)">---</span>(|| {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"I'm working in background!"</span>);<br>
+                        });
+                    </div>
+
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"></div>
+
+                    <div class="border-t border-amber-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'create')">create</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'new')">new</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'spawn')">spawn</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'start')">start</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span class="lang-fa">استخدام مورچه 👷‍♂️</span><span class="lang-en">Hire Ant Worker 👷‍♂️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 2: mpsc::channel -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div class="text-emerald-400 mb-2">
+                        <span class="lang-fa">>> مرحله ۱: لوله‌های ارتباطی (Channels)</span>
+                        <span class="lang-en">>> Step 1: Communication Pipes (Channels)</span>
+                    </div>
+
+                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
+                        <p>مورچه‌ها برای هماهنگی باید با هم حرف بزنند. در راست از **کانال‌ها (Channels)** استفاده می‌کنیم که مثل یک لوله است: یک طرف پیام می‌اندازد (tx) و طرف دیگر پیام را برمی‌دارد (rx).</p>
+                        <p class="text-white font-bold">با کدام متد پیام را داخل لوله (فرستنده) می‌اندازیم؟</p>
+                    </div>
+                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
+                        <p>Ants need to communicate to coordinate. In Rust, we use **Channels**, which act like a pipe: one side drops messages in (tx), and the other takes them out (rx).</p>
+                        <p class="text-white font-bold">Which method drops a message into the pipe (transmitter)?</p>
+                    </div>
+
+                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">use</span> std::sync::mpsc;<br><br>
+                        <span class="text-pink-400">let</span> (tx, rx) = mpsc::channel();<br>
+                        <span class="text-slate-400 text-sm">// Thread dropping a message</span><br>
+                        tx.<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(<span class="text-yellow-300">"Leaf found!"</span>).unwrap();
+                    </div>
+
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
+
+                    <div class="border-t border-amber-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'push')">push</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'send')">send</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'drop')">drop</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'give')">give</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span class="lang-fa">ارسال پیام 📮</span><span class="lang-en">Send Message 📮</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: Mutex -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div class="text-emerald-400 mb-2 font-bold">
+                        <span class="lang-fa">>> مرحله ۲: راهروی یک‌نفره (Mutex)</span>
+                        <span class="lang-en">>> Step 2: One-Way Hallway (Mutex)</span>
+                    </div>
+
+                    <p class="lang-fa text-sm text-slate-300 mb-4">برای تغییر یک داده‌ی مشترک توسط چند مورچه، باید از درگیری (Data Race) جلوگیری کنیم. `Mutex` مثل یک درِ قفل‌دار است. هر مورچه باید کلید را بگیرد، کارش را بکند و بعد قفل را باز کند. با کدام متد کلید قفل را می‌گیریم؟</p>
+                    <p class="lang-en text-sm text-slate-300 mb-4">To modify shared data from multiple ants, we must prevent Data Races. A `Mutex` is like a locked door. An ant must get the key, do the work, and release it. Which method grabs the lock key?</p>
+
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">use</span> std::sync::Mutex;<br><br>
+                        <span class="text-pink-400">let</span> food = Mutex::new(<span class="text-orange-300">0</span>);<br>
+                        <span class="text-slate-400 text-sm">// Ant requests access</span><br>
+                        <span class="text-pink-400">let mut</span> vault = food.<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>().unwrap();<br>
+                        *vault += <span class="text-orange-300">1</span>; <span class="text-slate-400 text-sm">// Safe modification!</span>
+                    </div>
+
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
+
+                    <div class="border-t border-amber-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'open')">open</div>
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'key')">key</div>
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'lock')">lock</div>
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'wait')">wait</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span class="lang-fa">گرفتن کلید 🗝️</span><span class="lang-en">Grab Key 🗝️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Anthill Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-emerald-400 mb-2 border-b border-amber-800 pb-2 flex justify-between items-center">
+                        <div>
+                            <span class="lang-fa">>> مرحله نهایی: شبیه‌ساز انبار مورچه‌ها</span>
+                            <span class="lang-en">>> Final Step: Anthill Simulator</span>
+                        </div>
+                        <div class="text-xs bg-amber-900 px-2 py-1 rounded text-white">
+                            <span class="lang-fa">پروژه ۱۶.۴</span><span class="lang-en">Project 16.4</span>
+                        </div>
+                    </div>
+
+                    <div class="lang-fa text-sm mb-2 text-slate-300">
+                        ما از `Arc<Mutex<i32>>` برای اشتراک امن انبار بین مورچه‌ها استفاده کردیم. هر ۳ مورچه را <code class="text-amber-300">spawn</code> کن. آن‌ها همزمان برای گرفتن قفل انبار و ذخیره غذا تلاش می‌کنند!
+                    </div>
+                    <div class="lang-en text-sm mb-2 text-slate-300">
+                        We used `Arc<Mutex<i32>>` to safely share the vault. <code class="text-amber-300">spawn</code> all 3 ants. They will concurrently try to grab the lock and store food!
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 flex-grow">
+
+                        <!-- Visual Colony -->
+                        <div class="w-full md:w-1/2 flex flex-col justify-center">
+
+                            <!-- Central Vault -->
+                            <div class="food-vault mb-4 relative" id="main-vault">
+                                <i class="fa-solid fa-lock text-yellow-300 mb-1" id="vault-lock"></i>
+                                <span class="text-white font-bold text-xl" id="vault-amount">0</span>
+                                <div class="absolute -top-3 -right-3 text-xs bg-emerald-600 text-white px-1 rounded">Mutex</div>
+                            </div>
+
+                            <!-- Tracks -->
+                            <div class="ant-track">
+                                <span class="ant-emoji" id="ant-1">🐜 <span class="text-xs">1</span></span>
+                                <button class="ant-btn absolute right-2 ml-2 rtl:left-2 rtl:right-auto" id="btn-ant-1" onclick="spawnAnt(1)">
+                                    <span class="lang-fa">thread::spawn(1)</span><span class="lang-en">thread::spawn(1)</span>
+                                </button>
+                            </div>
+                            <div class="ant-track">
+                                <span class="ant-emoji" id="ant-2">🐜 <span class="text-xs">2</span></span>
+                                <button class="ant-btn absolute right-2 ml-2 rtl:left-2 rtl:right-auto" id="btn-ant-2" onclick="spawnAnt(2)">
+                                    <span class="lang-fa">thread::spawn(2)</span><span class="lang-en">thread::spawn(2)</span>
+                                </button>
+                            </div>
+                            <div class="ant-track">
+                                <span class="ant-emoji" id="ant-3">🐜 <span class="text-xs">3</span></span>
+                                <button class="ant-btn absolute right-2 ml-2 rtl:left-2 rtl:right-auto" id="btn-ant-3" onclick="spawnAnt(3)">
+                                    <span class="lang-fa">thread::spawn(3)</span><span class="lang-en">thread::spawn(3)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Terminal -->
+                        <div id="sim-terminal" class="terminal-block text-xs overflow-y-auto w-full md:w-1/2" style="max-height: 250px;">
+                            <div class="text-slate-500 italic">
+                                <span class="lang-fa">> منتظر فراخوانی thread::spawn...</span>
+                                <span class="lang-en">> Waiting for thread::spawn...</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success overlay -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
+            <div class="text-7xl mb-4 animate-bounce">🐜💪🎉</div>
+            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
+                <span class="lang-fa">کار گروهی عالی بود!</span>
+                <span class="lang-en">Great Teamwork!</span>
+            </h2>
+            <p class="text-xl text-emerald-400 mb-6 text-center px-4">
+                <span class="lang-fa">شما مفهوم هم‌روندی (Concurrency) و کار با Arc و Mutex را با موفقیت یاد گرفتید! حالا کدهای شما از قدرت تمام هسته‌های پردازنده استفاده می‌کند.</span>
+                <span class="lang-en">You successfully learned Concurrency and how to use Arc and Mutex! Your code now utilizes the power of all CPU cores.</span>
+            </p>
+            <button class="bg-amber-600 hover:bg-amber-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(217,119,6,0.6)]" onclick="location.reload()">
+                <span class="lang-fa">پایان فصل ۱۶ - دوباره بازی کن</span>
+                <span class="lang-en">End of Chapter 16 - Play Again</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Game State & Logic ---
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval;
+
+        // Anthill State
+        let antsActive = 0;
+        let antsFinished = 0;
+        let totalFood = 0;
+        let isVaultLocked = false;
+
+        const FOOD_PER_TRIP = 10;
+        const TRIPS_PER_ANT = 4; // Each ant does 4 trips
+
+        // --- Dialog Data ---
+        const dialogs = {
+            fa: [
+                "سلام! یه برگ خیلی بزرگ پیدا کردیم که باید ببریم تو انبار! 🍃",
+                "من به تنهایی نمی‌تونم ببرمش. اما اگه چند تا مورچه‌ی کارگر رو همزمان خبر کنم، کار خیلی سریع‌تر پیش میره.",
+                "تو زبان برنامه‌نویسی به این کارگرها ریسه (Thread) میگن. ما با `thread::spawn` استخدامشون می‌کنیم.",
+                "اما باید مراقب درگیری‌ها (Data Race) هم باشیم! برای همین از قفلِ Mutex استفاده می‌کنیم تا هر بار فقط یه نفر وارد انبار بشه. بیا شروع کنیم! 🛠️"
+            ],
+            en: [
+                "Hi! We found a giant leaf that needs to go to the storage! 🍃",
+                "I can't carry it alone. But if I call a few worker ants at the same time, it'll be much faster.",
+                "In programming, these workers are called Threads. We hire them using `thread::spawn`.",
+                "But we must watch out for Data Races! That's why we use a Mutex lock so only one ant enters storage at a time. Let's begin! 🛠️"
+            ]
+        };
+
+        function setLang(lang) {
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            const btnEn = document.getElementById('btn-en');
+            const btnFa = document.getElementById('btn-fa');
+
+            if(lang === 'fa') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-amber-500 text-amber-950";
+                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
+
+                document.getElementById('hud-ants').innerText = `${antsActive.toLocaleString('fa-IR')} / ۳`;
+                document.getElementById('hud-food').innerText = totalFood.toLocaleString('fa-IR');
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-amber-500 text-amber-950";
+                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
+
+                document.getElementById('hud-ants').innerText = `${antsActive} / 3`;
+                document.getElementById('hud-food').innerText = totalFood;
+            }
+
+            if(currentStep === 0) {
+                clearTimeout(typeInterval);
+                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+            }
+        }
+
+        function typeWriter(text, i, cb) {
+            const el = document.getElementById('dialog-text');
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
+            } else {
+                cb();
+            }
+        }
+
+        function showDialog() {
+            const text = dialogs[currentLang][currentDialogIndex];
+            const el = document.getElementById('dialog-text');
+            const nextBtn = document.getElementById('next-dialog-btn');
+
+            el.innerHTML = '';
+            nextBtn.classList.add('hidden');
+
+            typeWriter(text, 0, () => {
+                nextBtn.classList.remove('hidden');
+            });
+        }
+
+        function nextDialog() {
+            clearTimeout(typeInterval);
+            currentDialogIndex++;
+
+            if (currentDialogIndex < dialogs[currentLang].length) {
+                showDialog();
+            } else {
+                currentStep = 1;
+                document.getElementById('next-dialog-btn').classList.add('hidden');
+                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
+                    "بزن بریم! به مانیتور پایین نگاه کن تا اولین مورچه رو استخدام کنیم." :
+                    "Let's go! Look at the monitor below to hire our first ant.";
+
+                document.getElementById('game-area').classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
+
+        // --- Puzzle System ---
+        function selectOption(element, puzzleNum, word) {
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msgFa, msgEn) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = currentLang === 'fa' ? msgFa : msgEn;
+        }
+
+        function checkPuzzle1() {
+            const slotText = document.getElementById('slot1').innerText;
+            const feedback = document.getElementById('puzzle1-feedback');
+
+            if (slotText === 'spawn') {
+                feedback.className = "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
+                feedback.innerText = currentLang === 'fa' ? "> ریسه‌ی جدید با موفقیت ایجاد شد!" : "> New thread successfully created!";
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, "خطا: برای استخدام یک ریسه‌ی جدید، از متد thread::spawn استفاده می‌کنیم.", "Error: To hire a new thread, we use the thread::spawn method.");
+            }
+        }
+
+        function checkPuzzle2() {
+            const slotText = document.getElementById('slot2').innerText;
+            const feedback = document.getElementById('puzzle2-feedback');
+
+            if (slotText === 'send') {
+                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
+                feedback.innerText = currentLang === 'fa' ? "> پیام با موفقیت به کانال ارسال شد." : "> Message successfully sent to channel.";
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, "خطا: برای انداختن پیام در لوله (transmitter)، باید از متد send استفاده کنیم.", "Error: To drop a message into the pipe (transmitter), we must use the send method.");
+            }
+        }
+
+        function checkPuzzle3() {
+            const slotText = document.getElementById('slot3').innerText;
+            const feedback = document.getElementById('puzzle3-feedback');
+
+            if (slotText === 'lock') {
+                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
+                feedback.innerText = currentLang === 'fa' ? "> قفل باز شد! حالا می‌توانیم داده را تغییر دهیم." : "> Lock acquired! We can now modify the data.";
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, "خطا: برای گرفتن کلیدِ درِ Mutex، متد lock() را فراخوانی می‌کنیم.", "Error: To get the key for the Mutex door, we call the lock() method.");
+            }
+        }
+
+        // --- Anthill Simulator ---
+        function appendToTerminal(htmlContent) {
+            const term = document.getElementById('sim-terminal');
+            if(term.innerHTML.includes("منتظر فراخوانی") || term.innerHTML.includes("Waiting for")) {
+                term.innerHTML = '';
+            }
+            const div = document.createElement('div');
+            div.className = "mb-1 border-b border-white/5 pb-1";
+            div.innerHTML = htmlContent;
+            term.appendChild(div);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        // Utility sleep for async JS
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        async function spawnAnt(antId) {
+            const btn = document.getElementById(`btn-ant-${antId}`);
+            btn.disabled = true;
+            btn.innerText = currentLang === 'fa' ? "در حال اجرا..." : "running...";
+            btn.classList.add('opacity-50');
+
+            antsActive++;
+            setLang(currentLang); // Update HUD
+
+            const antIcon = document.getElementById(`ant-${antId}`);
+            const vault = document.getElementById('main-vault');
+            const vaultLock = document.getElementById('vault-lock');
+            const vaultAmt = document.getElementById('vault-amount');
+
+            appendToTerminal(`<span class="text-amber-400">> Thread ${antId} spawned. Arc::clone successful.</span>`);
+
+            for (let i = 0; i < TRIPS_PER_ANT; i++) {
+                // 1. Walk to Vault (Simulate Work)
+                antIcon.style.left = '50%'; // Move to middle
+
+                // Randomize sleep slightly to simulate race condition timing
+                const walkTime = 400 + Math.random() * 300;
+                await sleep(walkTime);
+
+                // 2. Try to get Mutex Lock
+                let waited = false;
+                while (isVaultLocked) {
+                    if (!waited) {
+                        appendToTerminal(`<span class="text-rose-400 pl-2">Thread ${antId}: waiting for Mutex lock... 🔒</span>`);
+                        waited = true;
+                    }
+                    await sleep(100); // Wait for lock
+                }
+
+                // 3. Acquire Lock
+                isVaultLocked = true;
+                vault.classList.add('locked');
+                vaultLock.classList.replace('fa-lock-open', 'fa-lock');
+                vaultLock.classList.replace('text-emerald-400', 'text-rose-400');
+
+                appendToTerminal(`<span class="text-emerald-400 pl-2">Thread ${antId}: Acquired lock! +${FOOD_PER_TRIP} food.</span>`);
+
+                // Modify data
+                totalFood += FOOD_PER_TRIP;
+                vaultAmt.innerText = totalFood;
+                setLang(currentLang); // update HUD
+
+                // Simulate holding lock
+                await sleep(300);
+
+                // 4. Release Lock (End of Scope in Rust)
+                isVaultLocked = false;
+                vault.classList.remove('locked');
+                vaultLock.classList.replace('fa-lock', 'fa-lock-open');
+                vaultLock.classList.replace('text-rose-400', 'text-emerald-400');
+
+                // 5. Walk back
+                antIcon.classList.add('returning');
+                antIcon.style.left = currentLang === 'fa' ? '100%' : '0%'; // Reset pos
+                await sleep(500);
+                antIcon.classList.remove('returning');
+            }
+
+            // Thread finished
+            appendToTerminal(`<span class="text-slate-400">> Thread ${antId} join() complete. ✅</span>`);
+            antsFinished++;
+
+            if (antsFinished === 3) {
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        // --- Confetti System ---
+        let W = window.innerWidth;
+        let H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#d97706", "#f59e0b", "#10b981", "#34d399", "#ffffff"]; // Amber, Emerald
+
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+
+            let particle = {};
+            for (let i = 0; i < maxConfettis; i++) {
+                particle = particles[i];
+                particle.tiltAngle += particle.tiltAngleIncremental;
+                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
+
+                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
+                    particle.x = Math.random() * W;
+                    particle.y = -30;
+                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        }, false);
+
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if(!animationId) Draw();
+        }
+
+        // Initialize Game
+        setTimeout(() => {
+            setLang('fa'); // Start in Persian
+            showDialog();
+        }, 500);
+
+    </script>
+</body>
+</html>

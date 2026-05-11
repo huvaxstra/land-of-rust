@@ -18,7 +18,7 @@ Before going to the space market, Ferris's mom always grabs a piece of paper and
 
 In programming, we often need exactly this kind of smart list: one that can grow and shrink as we go. Remember arrays (`[]`) from Chapter 3? Their size is fixed once created. But a **Vector** is exactly our magical shopping list! 🦀✨
 
-**[Illustration: A cute cartoon crab (Ferris) holding a magical floating shopping list that keeps growing and shrinking. Items like milk, bread, eggs, and cheese pop in and out with gentle sparkles. Background: a cozy space-market aisle with glowing shelves. Style: vibrant children's book illustration, playful, high quality.]**
+![[Illustration: A cute cartoon crab (Ferris) holding a magical floating shopping list that keeps growing and shrinking. Items like milk, bread, eggs, and cheese pop in and out with gentle sparkles. Background: a cozy space-market aisle with glowing shelves. Style: vibrant children's book illustration, playful, high quality.]](../assets/images/8.1.png)
 
 ### 8.1.2. Introducing `Vec<T>`
 `Vec<T>` is a smart box that can hold many items of the same type (`T`) in a row. That `T` can be anything: numbers, text, or even `struct`s we built ourselves! The best thing about vectors is that their size isn't fixed. You can add or remove items anytime.
@@ -102,6 +102,8 @@ fn main() {
 }
 ```
 
+![[Illustration: A cartoon vector visualized as a train of glowing train cars. Each car holds a different item (Milk, Bread, Eggs, Apple). A crab is pushing a new car "Cheese" onto the end, and another crab is popping off the last car. Style: playful, educational, bright colors, 16:9.]](../assets/images/8.2.png)
+
 ---
 
 ## 8.2. The Secret Address Book (HashMap)
@@ -109,7 +111,7 @@ fn main() {
 ### 8.2.1. The Story: Ferris's Contact Book
 Ferris has many friends across the galaxy: Bill, Luna, Stella... 🌌 He keeps a magical notebook. Whenever he opens it to a friend's name, their space phone number magically appears. In this book, every name is connected to a number. In programming, we call this a **Map**. In Rust, it's called `HashMap`.
 
-**[Illustration: A cartoon crab holding a glowing magical address book. When a page labeled "Luna" opens, a holographic phone number floats out. The background shows a starry galaxy with tiny planets. Style: whimsical, educational children's book illustration, bright colors.]**
+![[Illustration: A cartoon crab holding a glowing magical address book. When a page labeled "Luna" opens, a holographic phone number floats out. The background shows a starry galaxy with tiny planets. Style: whimsical, educational children's book illustration, bright colors.]](../assets/images/8.3.png)
 
 ### 8.2.2. Introducing `HashMap<K, V>`
 `HashMap<K, V>` is a smart box that connects a **Key** (`K`) to a **Value** (`V`). Its superpower is speed: finding a value by its key is incredibly fast, even if we have millions of entries!
@@ -205,6 +207,8 @@ fn main() {
 }
 ```
 
+![[Illustration: A cartoon address book with pages that have key-value pairs (Ferris→12345, Bill→67890, Luna→99999). A magical magnifying glass highlights the "Luna" page, and a holographic number pops out. Style: educational, whimsical, bright colors, 16:9.]](../assets/images/8.4.png)
+
 ---
 
 ## 8.3. Story: Collecting RPG Items
@@ -280,6 +284,8 @@ fn main() {
 }
 ```
 
+![[Illustration: A cartoon RPG game scene. Ferris stands in front of a treasure chest with a map in hand. A vector backpack is on his back with item slots (Wooden Sword, Health Potion). A glowing map table shows locations: Dark Cave, Misty Forest, Snowy Peak. Style: fantasy children's book illustration, adventurous, bright, 16:9.]](../assets/images/8.5.png)
+
 ---
 
 ## 8.4. Performance & Choosing the Right Tool
@@ -325,7 +331,7 @@ fn main() {
 }
 ```
 
-**[Illustration: Two overlapping magical circles labeled "List A" and "List B". In the intersection, glowing numbers "4" and "5" float with sparkles. Ferris the crab stands nearby holding a magnifying glass. Style: educational vector illustration, clean, bright.]**
+![[Illustration: Two overlapping magical circles labeled "List A" and "List B". In the intersection, glowing numbers "4" and "5" float with sparkles. Ferris the crab stands nearby holding a magnifying glass. Style: educational vector illustration, clean, bright.]](../assets/images/8.6.png)
 
 ---
 
@@ -430,6 +436,8 @@ fn show_all(book: &HashMap<String, String>) {
 }
 ```
 
+![[Illustration: A cartoon smartphone screen showing Ferris's Phonebook app interface. The screen displays menu options (Add, Search, Delete, Show All) and a sample contact list. Ferris sits next to the phone holding a pen and notebook. Style: clean, educational, bright UI metaphor, 16:9.]](../assets/images/8.7.png)
+
 ---
 
 ## 8.6. Summary & Challenge
@@ -479,10 +487,4 @@ fn main() {
 Now you know how to use vectors and hash maps to store dynamic, real-world data! 🎒📦
 In the next chapter, we'll dive into **Error Handling**: learning how to prevent crashes and manage mistakes like a true programming hero! 🛡️🦀
 
-**[Illustration: Ferris wearing a graduation cap, holding a glowing "Chapter 8 Master" badge. Floating around him are colorful Vectors, HashMaps, and Set symbols transforming into a neat digital backpack. Style: encouraging, vibrant children's book illustration.]**
-
----
-
-> 🔚 **End of Chapter 8**
-
----
+![[Illustration: Ferris wearing a graduation cap, holding a glowing "Chapter 8 Master" badge. Floating around him are colorful Vectors, HashMaps, and Set symbols transforming into a neat digital backpack. Style: encouraging, vibrant children's book illustration.]](../assets/images/8.8.png)

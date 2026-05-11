@@ -5,20 +5,36 @@
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![Rust Edition](https://img.shields.io/badge/rust-2024%2B-blue)](https://doc.rust-lang.org/edition-guide/)
 [![Rust Version](https://img.shields.io/badge/rust-1.85%2B-blue)](https://www.rust-lang.org/)
-[![Status: In Development](https://img.shields.io/badge/status-in%20development-yellow)](#)
-[![Chapters Ready](https://img.shields.io/badge/chapters-12%2F20-brightgreen)](#)
+[![Status: Ready for Sponsorship](https://img.shields.io/badge/status-ready%20for%20sponsorship-brightgreen)](#)
+[![Chapters English](https://img.shields.io/badge/chapters%20(English)-12%2F20-blue)](#)
+[![Chapters Persian](https://img.shields.io/badge/chapters%20(Persian)-20%2F20-brightgreen)](#)
 
 ---
 
 ## ✨ What’s New (May 2026)
 
-Based on valuable feedback from the Rust community forum, **chapters 1–10 have been completely rewritten** with major improvements:
+- ✅ **Complete Persian translation** of all 20 chapters (beginners to advanced) with full illustration prompts.
+- ✅ **English chapters 1–12** fully rewritten based on Rust Edu community feedback (beginners & intermediate).
+- ✅ **English chapters 13–20 (advanced)** – planned for Q3 2026 (dependent on sponsorship).
+- ✅ **Bilingual interactive web demo** (MVP) – live at [https://huvaxstra.github.io/land-of-rust/](https://huvaxstra.github.io/land-of-rust/).
+- ✅ **Sponsorship call open** – help us illustrate, translate, and build advanced features.
 
-- ✅ **Parent/educator sidebars** in every chapter – plain‑English explanations + links to the official Rust book.
-- ✅ **“Normalizing complexity” notes** – friendly warnings that hard topics (ownership, lifetimes) are okay to struggle with.
-- ✅ **Repositioned messaging** – from “first programming language” to **“become a computer wizard who understands how computers really work”**.
-- ✅ **Strengthened metaphors** – a consistent “Toy Town” world for ownership, borrowing, and lifetimes.
-- ✅ **All existing code examples, exercises, and illustration prompts preserved** – only explanations improved.
+---
+
+## 🌐 Try the Interactive Demo
+
+[**🎮 Play & Learn: The Land of Rust – Interactive Demo**](https://huvaxstra.github.io/land-of-rust/)
+
+> A working MVP of the interactive version (bilingual, 20 chapters).  
+> Code editor and live Rust execution are currently **not** implemented – this is a static demonstration of the book’s content.  
+> With sponsorship, we will upgrade it to a full interactive platform with WASM.
+
+---
+
+## 🎨 Illustration Prompts Ready
+
+We have detailed **prompts for ~100 professional illustrations** that bring Ferris’s world to life.  
+Sponsors can help turn these prompts into real artwork.
 
 ---
 
@@ -26,7 +42,7 @@ Based on valuable feedback from the Rust community forum, **chapters 1–10 have
 
 > *“Why should kids learn Rust first? Because it teaches you to think like an engineer – safely, creatively, and with a friendly crab by your side.”*
 
-Most introductory programming books start with Python or Scratch. **The Land of Rust** takes a different path: we believe that Rust’s emphasis on safety, clarity, and explicit reasoning can actually make it an *excellent* first language – when taught through the right metaphors, stories, and pacing.
+Most introductory programming books start with Python or Scratch. **The Land of Rust** takes a different path: Rust’s emphasis on safety, clarity, and explicit reasoning makes it an *excellent* first language – when taught through the right metaphors, stories, and pacing.
 
 ---
 
@@ -34,69 +50,42 @@ Most introductory programming books start with Python or Scratch. **The Land of 
 
 **The Land of Rust** follows **Ferris**, a curious space crab whose spaceship crashes on Earth. To repair his ship and return home, Ferris must learn to communicate with an old Earth computer – and the only language it understands is Rust.
 
-Through playful adventures, readers learn programming concepts alongside Ferris:
+Through playful adventures, readers learn:
 - 🎒 **Ownership** = A toy borrowing club with clear rules
-- ⏰ **Lifetimes** = Yogurt expiration dates – nothing lasts forever! (See Appendix A)
+- ⏰ **Lifetimes** = Yogurt expiration dates (see Appendix A)
 - 🧩 **Traits** = Clay molds that shape different objects the same way
 - 🔐 **Safety** = Wearing a helmet while riding your space scooter
 
-No prior coding experience is required – just curiosity, a computer, and a willingness to explore.
+No prior coding experience required – just curiosity, a computer, and a willingness to explore.
 
 ---
 
-## 🎯 Target Audience
+## 📚 Book Structure
 
-| Group | Details |
-|-------|---------|
-| 👧 Children 9–11 | With parent/teacher guidance; focus on concepts & simple projects |
-| 👦 Teens 12–13 | Can work more independently; tackle intermediate projects |
-| 👨‍🏫 Educators & Parents | Non-programmers welcome – teacher’s guide included |
-| 🧑‍💻 Adult Beginners | Zero experience? Perfect. Start your Rust journey here. |
-
----
-
-## 📚 Book Structure (12 Completed Chapters + Appendices)
-
-```
-🌱 Beginner Level (Ages 9–11)
-├── ✅ Ch 1: Ferris and the Lost Toolbox → Hello World, cargo, println!
-├── ✅ Ch 2: The Missing Star Game → Variables, input, if/else, loops
-├── ✅ Ch 3: The Space Chocolate Cake → Functions, data types, parameters
-└── ✅ Ch 4: Ferris's Borrowing Club → Ownership, borrowing, slices
-
-🌟 Intermediate Level (Ages 12–14)
-├── ✅ Ch 5: Monster ID Cards → Structs, methods
-├── ✅ Ch 6: The Smart Wardrobe → Enums, Option, match, if let
-├── ✅ Ch 7: The Big City Library → Modules, files, pub, use
-├── ✅ Ch 8: The Magic Backpack → Vec, HashMap, HashSet
-├── ✅ Ch 9: When the Spaceship Breaks → panic!, Result, ?, map_err
-├── ✅ Ch 10: The Toy Factory → Generics, Traits, impl Trait, Box<dyn Trait>
-├── ✅ Ch 11: Test the Self‑Destruct Button! → Unit & integration tests
-└── ✅ Ch 12: Mini‑robot Searcher (minigrep) → CLI args, file I/O, env vars
-
-🚀 Advanced Level (Ages 14+) – coming soon
-├── Ch 13–20: Iterators, closures, crates.io, smart pointers, concurrency, OOP, macros, networking
-├── 📎 Appendix A: The Story of Colored Stickers – Lifetimes Deep Dive
-└── 🎁 Bonus Chapter: Ferris’s Pearl Farm – Async Programming Made Simple
-```
+| Level | Chapters | English | Persian |
+|-------|----------|---------|---------|
+| Beginner | 1–4 | ✅ Complete | ✅ Complete |
+| Intermediate | 5–12 | ✅ Complete | ✅ Complete |
+| Advanced | 13–20 | 📝 Planned (Q3 2026) | ✅ Complete |
+| Appendices & Bonus | – | 📝 Planned | ✅ Complete |
 
 👉 Full detailed outline: [OUTLINE.md](./OUTLINE.md)
 
 ---
 
-## 🚀 Getting Started (For Readers)
+## 🚀 Getting Started
 
-1. **Install Rust** – follow the guided setup in Chapter 1 (`rustup`)
-2. **Choose your path** – read online via GitHub or clone the repo
-3. **Follow Ferris** – type every example, solve exercises, build projects
-4. **Ask for help** – stuck? Check the Teacher’s Guide or ask in Rust communities
+1. **Install Rust** – follow the guided setup in Chapter 1.
+2. **Choose your language** – read the English version (1–12) or the full Persian version.
+3. **Follow Ferris** – type every example, solve exercises, build projects.
+4. **Ask for help** – check the Teacher’s Guide or join Rust communities.
 
 ---
 
 ## 👩‍🏫 For Teachers & Parents
 
 A dedicated **Teacher’s Guide** ([teacher-guide.md](./teacher-guide.md)) includes:
-- 🎯 Age‑appropriate pacing recommendations (3 skill levels)
+- 🎯 Age‑appropriate pacing (3 skill levels)
 - ⏱️ Sample 90‑minute session structure
 - 🔧 Troubleshooting common setup & conceptual hurdles
 - 🎓 Printable completion certificate template
@@ -104,21 +93,35 @@ A dedicated **Teacher’s Guide** ([teacher-guide.md](./teacher-guide.md)) inclu
 
 ---
 
+## 💰 Sponsorship
+
+We are seeking funding to:
+
+- 🎨 **Illustrate the book** – ~100 professional drawings from existing prompts.
+- 🌍 **Translate into 5+ languages** (Spanish, German, Chinese, Japanese, Arabic, etc.)
+- 💻 **Build advanced interactive features** – live Rust execution (WASM), progress tracking, user accounts.
+- 📣 **Market the book** to schools, coding clubs, and libraries worldwide.
+
+**Sponsorship tiers (example):**
+
+| Tier | Amount | Benefits |
+|------|--------|----------|
+| Bronze | $100 – $499 | Name on website & GitHub |
+| Silver | $500 – $1,999 | + Logo on README & interactive demo |
+| Gold | $2,000 – $4,999 | + Full-page thank you in the book |
+| Platinum | $5,000+ | + Naming rights for a character or chapter |
+
+If you or your organization would like to support this project, please email: **jgh.rust@gmail.com**  
+(We are working on GitHub Sponsors – until then, direct contact is best.)
+
+---
+
 ## 🔍 For Rust Edu Reviewers
 
-If you’re from the Rust Edu team reviewing this proposal:
-
-- 📂 **Chapters 1–12 (English)** are fully rewritten based on your feedback.
-- 🎯 **Focus areas for feedback** (already addressed):
-  - Age‑appropriateness of metaphors (Toy Town ownership)
-  - Pacing of ownership introduction
-  - Project complexity alignment with target age groups
-- 📝 **Key improvements made**:
-  - Parent/educator sidebars with links to official Rust book
-  - Normalizing complexity notes
-  - Repositioned messaging: “become a computer wizard”
-  - Strengthened “Toy Town” metaphor
-- 💬 **Preferred feedback channels**: GitHub Issues / Email
+- 📂 **English chapters 1–12** are fully rewritten based on your feedback.
+- 🎯 Focus areas addressed: metaphors, pacing, project complexity.
+- 📝 Improvements: parent sidebars, complexity normalization, “computer wizard” framing.
+- 💬 Feedback via GitHub Issues or email.
 
 ---
 
@@ -136,7 +139,7 @@ If you’re from the Rust Edu team reviewing this proposal:
 
 Feedback, corrections, translations, and teaching experiences are warmly welcomed!
 
-- 🐛 Found a typo or unclear explanation? → [Open an issue](mailto:jgh.rust@gmail.com)
+- 🐛 Found a typo or unclear explanation? → [Open an issue on GitHub](https://github.com/huvaxstra/land-of-rust/issues)
 - 💡 Have a better metaphor or example? → [Email me](mailto:jgh.rust@gmail.com)
 - 🌍 Want to translate to another language? → [Check CONTRIBUTING.md](./CONTRIBUTING.md)
 
@@ -156,7 +159,7 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md).
 ## 💌 Acknowledgments
 
 - The Rust Foundation and Rust Edu team for inspiration and feedback
-- Early testers: young learners, parents, and educators who shaped this book
+- Early testers: young learners, parents, and educators
 - The global Rust community – your kindness makes learning Rust joyful
 
 ---

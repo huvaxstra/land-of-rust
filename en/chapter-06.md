@@ -47,7 +47,7 @@ let tomorrow = Weather::Rainy;
 ```
 The `::` means: *"From inside this enum, pick this specific option."*
 
-**[Illustration: Ferris the crab stands in front of a magical weather map. Four glowing icons float above: a sun, a rain cloud, a snowflake, and a gray cloud. A friendly selector tool connects them to a dropdown menu. Style: vibrant children's book illustration, clear educational metaphor, soft lighting, 16:9.]**
+![[Illustration: Ferris the crab stands in front of a magical weather map. Four glowing icons float above: a sun, a rain cloud, a snowflake, and a gray cloud. A friendly selector tool connects them to a dropdown menu. Style: vibrant children's book illustration, clear educational metaphor, soft lighting, 16:9.]](../assets/images/6.1.png)
 
 ---
 
@@ -82,7 +82,7 @@ let cloudy_day = WeatherInfo::Cloudy;
 🔹 **`struct`**: All fields are always present. A `Monster` always has a name, color, legs, and power.
 🔹 **`enum`**: Only *one* variant is active at a time. A `WeatherInfo` is either Sunny, Rainy, Snowy, or Cloudy. It can't have a temperature AND an umbrella color simultaneously!
 
-**[Illustration: Split educational graphic. Left: a "struct" box showing all four slots filled at once. Right: an "enum" wardrobe with four drawers, but only ONE drawer is open at a time. Ferris points to the open drawer explaining the difference. Style: clean, cartoon, bright colors, clear visual metaphor, 16:9.]**
+![[Illustration: Split educational graphic. Left: a "struct" box showing all four slots filled at once. Right: an "enum" wardrobe with four drawers, but only ONE drawer is open at a time. Ferris points to the open drawer explaining the difference. Style: clean, cartoon, bright colors, clear visual metaphor, 16:9.]](../assets/images/6.2.png)
 
 ---
 
@@ -144,7 +144,7 @@ fn main() {
 }
 ```
 
-**[Illustration: Ferris opening two floating treasure chests. One chest contains a glowing key labeled "Some(key)". The other chest is empty with a gentle "None" tag. A friendly compiler robot holds a checklist saying "Always check both!". Style: playful, educational, warm lighting, children's book, 16:9.]**
+![[Illustration: Ferris opening two floating treasure chests. One chest contains a glowing key labeled "Some(key)". The other chest is empty with a gentle "None" tag. A friendly compiler robot holds a checklist saying "Always check both!". Style: playful, educational, warm lighting, children's book, 16:9.]](../assets/images/6.3.png)
 
 ---
 
@@ -234,7 +234,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 }
 ```
 
-**[Illustration: A cartoon remote control with four glowing buttons labeled with enum variants (Sunny, Rainy, Snowy, Cloudy). A hand presses "Rainy" and a speech bubble pops up saying "Take an umbrella!". Ferris watches from the side holding a checklist. Style: dynamic, educational vector illustration, bright colors, 16:9.]**
+![[Illustration: A cartoon remote control with four glowing buttons labeled with enum variants (Sunny, Rainy, Snowy, Cloudy). A hand presses "Rainy" and a speech bubble pops up saying "Take an umbrella!". Ferris watches from the side holding a checklist. Style: dynamic, educational vector illustration, bright colors, 16:9.]](../assets/images/6.4.png)
 
 ---
 
@@ -307,7 +307,7 @@ let final_color = match preferred_color {
 println!("Final color choice: {}", final_color);
 ```
 
-**[Illustration: A friendly cartoon robot display panel showing a weather input screen. A dropdown enum selector points to a suggested shirt popping out of a slot. Ferris stands beside holding a rainbow-colored shirt. Style: cozy tech, children's book illustration, bright and inviting, 16:9.]**
+![[Illustration: A friendly cartoon robot display panel showing a weather input screen. A dropdown enum selector points to a suggested shirt popping out of a slot. Ferris stands beside holding a rainbow-colored shirt. Style: cozy tech, children's book illustration, bright and inviting, 16:9.]](../assets/images/6.5.png)
 
 ---
 
@@ -352,10 +352,4 @@ fn main() {
 
 Now you know how to manage different states beautifully with `enum` and `match`. In the next chapter, we'll learn how to organize our code into files and modules, turning our program into a tidy, professional library! 📚✨
 
-**[Illustration: Ferris wearing a graduation cap, holding a glowing "Chapter 6 Complete" badge. Floating around him are colorful enum tags, match arms, Option/Result boxes, and a small weather remote. Encouraging, bright lighting, children's book style, 16:9.]**
-
----
-
-> 🔚 **End of Chapter 6**
-
----
+![[Illustration: Ferris wearing a graduation cap, holding a glowing "Chapter 6 Complete" badge. Floating around him are colorful enum tags, match arms, Option/Result boxes, and a small weather remote. Encouraging, bright lighting, children's book style, 16:9.]](../assets/images/6.6.png)
