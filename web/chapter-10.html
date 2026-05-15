@@ -1,1349 +1,985 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 10</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #1e293b;
+            --crt-bg: #0f172a;
+            --accent-primary: #f97316;
+            --accent-secondary: #eab308;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(249, 115, 22, 0.1) 2px, transparent 40px), radial-gradient(rgba(234, 179, 8, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and factory controls */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .machine-input, #factory-terminal, .conveyor-belt {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #475569;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(249, 115, 22, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 255, 0, 0.01), rgba(249, 115, 22, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(255, 247, 237, 0.95);
+            color: #431407;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(255, 247, 237, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(255, 247, 237, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #fff7ed; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: var(--accent-secondary); background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(249, 115, 22, 0.2); color: #fed7aa; }
+        .code-option {
+            background: #334155; border: 2px solid #475569;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #475569; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #fdba74; color: white; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .machine-input {
+            background-color: #1e293b; border: 2px solid #475569;
+            color: white; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer; outline: none;
+        }
+        .machine-input:focus { border-color: var(--accent-primary); }
+        .conveyor-belt {
+            background: #334155; height: 60px; border-radius: 10px; border: 2px solid #475569;
+            display: flex; align-items: center; justify-content: flex-start; padding: 0 10px;
+            overflow: hidden; position: relative; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
+        }
+        .conveyor-belt::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0,0,0,0.2) 20px, rgba(0,0,0,0.2) 40px);
+            pointer-events: none;
+        }
+        .toy-item {
+            font-size: 2rem; margin-right: 15px; margin-left: 15px; z-index: 10;
+            animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes slideIn {
+            0% { transform: translateX(50px) scale(0); opacity: 0; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        html[dir="ltr"] @keyframes slideIn {
+            0% { transform: translateX(-50px) scale(0); opacity: 0; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .machine-input { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+            .toy-item { font-size: 1.5rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #1e293b; /* Slate 800 */
-                --crt-bg: #0f172a; /* Slate 900 */
-                --accent-primary: #f97316; /* Orange 500 */
-                --accent-secondary: #eab308; /* Yellow 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(249, 115, 22, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(234, 179, 8, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Factory Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 30px rgba(249, 115, 22, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.7);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-                border: 4px solid #475569;
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(249, 115, 22, 0.03) 50%,
-                        rgba(0, 0, 0, 0.25) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(0, 255, 0, 0.01),
-                        rgba(249, 115, 22, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(255, 247, 237, 0.95); /* Orange 50 */
-                color: #431407; /* Orange 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(255, 247, 237, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(255, 247, 237, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #fff7ed;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed var(--accent-secondary);
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: var(--accent-secondary);
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-primary);
-                background: rgba(249, 115, 22, 0.2);
-                color: #fed7aa;
-            }
-
-            .code-option {
-                background: #334155;
-                border: 2px solid #475569;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #e2e8f0;
-            }
-            .code-option:hover {
-                background: #475569;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-primary);
-                border-color: #fdba74;
-                color: white;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(249, 115, 22, 0.3);
-            }
-
-            /* Factory Machine Styles */
-            .machine-input {
-                background-color: #1e293b;
-                border: 2px solid #475569;
-                color: white;
-                padding: 0.5rem;
-                border-radius: 0.5rem;
-                font-weight: bold;
-                cursor: pointer;
-                outline: none;
-            }
-            .machine-input:focus {
-                border-color: var(--accent-primary);
-            }
-
-            .conveyor-belt {
-                background: #334155;
-                height: 60px;
-                border-radius: 10px;
-                border: 2px solid #475569;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                padding: 0 10px;
-                overflow: hidden;
-                position: relative;
-                box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.5);
-            }
-            .conveyor-belt::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: repeating-linear-gradient(
-                    90deg,
-                    transparent,
-                    transparent 20px,
-                    rgba(0, 0, 0, 0.2) 20px,
-                    rgba(0, 0, 0, 0.2) 40px
-                );
-                pointer-events: none;
-            }
-            .toy-item {
-                font-size: 2rem;
-                margin-right: 15px;
-                margin-left: 15px;
-                z-index: 10;
-                animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes slideIn {
-                0% {
-                    transform: translateX(50px) scale(0);
-                    opacity: 0;
-                }
-                100% {
-                    transform: translateX(0) scale(1);
-                    opacity: 1;
-                }
-            }
-            html[dir="ltr"] @keyframes slideIn {
-                0% {
-                    transform: translateX(-50px) scale(0);
-                    opacity: 0;
-                }
-                100% {
-                    transform: translateX(0) scale(1);
-                    opacity: 1;
-                }
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-orange-500 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-orange-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-orange-400" id="hud-toys"><i class="fa-solid fa-robot"></i> <span id="toys-label"></span> <span id="toys-count">0 / 3</span></div>
+                <div class="text-yellow-400" id="hud-certs"><i class="fa-solid fa-award"></i> <span id="certs-label"></span> <span id="certs-count">0</span></div>
             </div>
+            <div class="text-slate-400 code-font text-xs md:text-sm opacity-70">FACTORY-OS v10.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-orange-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-orange-400" id="hud-toys">
-                        <i class="fa-solid fa-robot"></i>
-                        <span class="lang-fa">اسباب‌بازی‌ها:</span
-                        ><span class="lang-en">Toys Built:</span>
-                        <span class="text-white">۰ / ۳</span>
-                    </div>
-                    <div class="text-yellow-400" id="hud-certs">
-                        <i class="fa-solid fa-award"></i>
-                        <span class="lang-fa">گواهینامه‌ها (Traits):</span
-                        ><span class="lang-en">Certificates (Traits):</span>
-                        <span class="text-white">۰</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-orange-500">
+                <h3 id="ferris-name" class="font-bold text-orange-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-orange-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-slate-400 code-font text-sm opacity-70">
-                    FACTORY-OS v10.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-orange-500"
-                >
-                    <h3 class="font-bold text-orange-700 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-orange-700 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-orange-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-orange-200 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: Generics -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-orange-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۰: کارخانه اسباب‌بازی (Generics) 🏭
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 10: The Toy Factory (Generics) 🏭
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-orange-300">
-                                > در کارخانه من یک «قالب خمیربازی» وجود دارد.
-                                می‌توانیم پلاستیک، چوب یا فلز داخل آن بریزیم.
-                                نیازی نیست برای هر جنس یک دستگاه جدید بسازیم!
-                            </p>
-                            <p class="text-slate-300">
-                                > در برنامه‌نویسی به این قابلیت
-                                <strong>Generics</strong> می‌گویند. یعنی کدی
-                                بنویسیم که با هر نوع داده‌ای کار کند.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                برای تعریف یک جای خالی (قالب) در توابع یا
-                                Structها، معمولا از چه حرفی بین علامت‌های &lt;
-                                &gt; استفاده می‌کنیم؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-orange-300">
-                                > In my factory, we have a "Play-Doh mold". We
-                                can pour plastic, wood, or metal into it. We
-                                don't need a new machine for every material!
-                            </p>
-                            <p class="text-slate-300">
-                                > In programming, this is called
-                                <strong>Generics</strong>. It means writing code
-                                that works with any data type.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                To define a placeholder (mold) in functions or
-                                Structs, which letter do we usually use between
-                                &lt; &gt; brackets?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-pink-400">struct</span>
-                            Point&lt;<span
-                                id="slot1"
-                                class="code-slot text-orange-400"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            >&gt; {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;x:
-                            <span class="text-orange-400">T</span>,<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;y:
-                            <span class="text-orange-400">T</span>,<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-orange-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'X')"
-                                >
-                                    X
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'Type')"
-                                >
-                                    Type
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'T')"
-                                >
-                                    T
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'Gen')"
-                                >
-                                    Gen
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa">تایید قالب 🧩</span
-                                ><span class="lang-en">Confirm Mold 🧩</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: Traits -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: گواهینامه‌های اسباب‌بازی
-                                (Traits)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Toy Certificates (Traits)</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                بعضی اسباب‌بازی‌ها گواهینامه «تولید صدا» دارند و
-                                بعضی گواهینامه «پرواز». این گواهینامه‌ها مشخص
-                                می‌کنند یک وسیله چه کارهایی می‌تواند انجام دهد.
-                            </p>
-                            <p class="text-white font-bold">
-                                در زبان راست برای تعریف این گواهینامه‌ها
-                                (رفتارهای مشترک) از چه کلمه‌ای استفاده می‌کنیم؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                Some toys have a "Makes Sound" certificate, and
-                                others have a "Flies" certificate. They define
-                                what an item can DO.
-                            </p>
-                            <p class="text-white font-bold">
-                                In Rust, what keyword do we use to define these
-                                certificates (shared behaviors)?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span
-                                class="text-pink-400"
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >
-                            MakeSound {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400"
-                                >fn</span
-                            >
-                            <span class="text-blue-300">make_sound</span
-                            >(&self);<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-orange-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 2, 'struct')"
-                                >
-                                    struct
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 2, 'impl')"
-                                >
-                                    impl
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 2, 'trait')"
-                                >
-                                    trait
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 2, 'cert')"
-                                >
-                                    cert
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">صدور گواهینامه 🏅</span
-                                ><span class="lang-en"
-                                    >Issue Certificate 🏅</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: Lifetimes -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: برچسب تاریخ انقضا (Lifetimes)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Expiration Date Stickers
-                                (Lifetimes)</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            مثل ماست که تاریخ انقضا دارد، رفرنس‌ها (کارت‌های
-                            امانت) هم در راست یک عمر مشخص دارند تا به اطلاعات
-                            حذف شده اشاره نکنند. برای نشان دادن این طول عمر، از
-                            چه علامتی استفاده می‌کنیم؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            Just like yogurt has an expiration date, references
-                            in Rust have a specific lifetime so they don't point
-                            to dead data. What symbol do we use to show this
-                            lifetime?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">fn</span>
-                            <span class="text-blue-300">longest</span>&lt;<span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >&gt;(x: &<span class="text-orange-400">'a</span>
-                            str, y: &<span class="text-orange-400">'a</span>
-                            str) -&gt; &<span class="text-orange-400">'a</span>
-                            str {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span
-                                class="text-slate-400 text-sm"
-                                >// Ensures references live long enough!</span
-                            ><br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-orange-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 3, '&a')"
-                                >
-                                    &amp;a
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 3, '@a')"
-                                >
-                                    @a
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 3, '#a')"
-                                >
-                                    #a
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 3, '\'a')"
-                                >
-                                    'a
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >چسباندن برچسب ایمنی ⏳</span
-                                ><span class="lang-en"
-                                    >Attach Safety Sticker ⏳</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Toy Factory Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-yellow-400 mb-2 border-b border-orange-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: شبیه‌ساز خط تولید</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: Factory Line Simulator</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-orange-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۰.۴</span
-                                ><span class="lang-en">Project 10.4</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            برای پیروزی، دستگاه را تنظیم کن و با ترکیب‌های مختلف
-                            متریال (Generics) و گواهینامه‌ها (Traits)
-                            <strong>سه اسباب‌بازی مختلف</strong> تولید کن!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            To win, configure the machine and build
-                            <strong>three different toys</strong> using various
-                            combinations of materials (Generics) and
-                            certificates (Traits)!
-                        </div>
-
-                        <!-- Factory Controls -->
-                        <div
-                            class="bg-black/50 p-3 rounded-lg border border-orange-900 mb-4 flex flex-col md:flex-row gap-4 items-center"
-                        >
-                            <div class="flex flex-col gap-1 w-full md:w-auto">
-                                <label class="text-xs text-slate-400"
-                                    ><span class="lang-fa">نوع ماده (T)</span
-                                    ><span class="lang-en"
-                                        >Material (T)</span
-                                    ></label
-                                >
-                                <select
-                                    id="factory-mat"
-                                    class="machine-input code-font"
-                                >
-                                    <option value="wood">
-                                        <span class="lang-fa">چوب (i32)</span
-                                        ><span class="lang-en">Wood (i32)</span>
-                                    </option>
-                                    <option value="metal">
-                                        <span class="lang-fa">فلز (f64)</span
-                                        ><span class="lang-en"
-                                            >Metal (f64)</span
-                                        >
-                                    </option>
-                                    <option value="plastic">
-                                        <span class="lang-fa"
-                                            >پلاستیک (String)</span
-                                        ><span class="lang-en"
-                                            >Plastic (String)</span
-                                        >
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="flex flex-col gap-1 w-full md:w-auto">
-                                <label class="text-xs text-slate-400"
-                                    ><span class="lang-fa"
-                                        >گواهینامه (Trait)</span
-                                    ><span class="lang-en"
-                                        >Certificate (Trait)</span
-                                    ></label
-                                >
-                                <select
-                                    id="factory-trait"
-                                    class="machine-input code-font"
-                                >
-                                    <option value="sound">
-                                        <span class="lang-fa"
-                                            >صدا دار (MakeSound)</span
-                                        ><span class="lang-en"
-                                            >Makes Sound (MakeSound)</span
-                                        >
-                                    </option>
-                                    <option value="fly">
-                                        <span class="lang-fa">پروازی (Fly)</span
-                                        ><span class="lang-en"
-                                            >Flying (Fly)</span
-                                        >
-                                    </option>
-                                    <option value="light">
-                                        <span class="lang-fa"
-                                            >درخشان (Glow)</span
-                                        ><span class="lang-en"
-                                            >Glowing (Glow)</span
-                                        >
-                                    </option>
-                                </select>
-                            </div>
-
-                            <button
-                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto mt-auto"
-                                onclick="buildToy()"
-                            >
-                                <i class="fa-solid fa-industry"></i>
-                                <span class="lang-fa"
-                                    >تولید Box&lt;dyn Toy&gt;</span
-                                ><span class="lang-en"
-                                    >Build Box&lt;dyn Toy&gt;</span
-                                >
-                            </button>
-                        </div>
-
-                        <!-- Conveyor Belt -->
-                        <div class="conveyor-belt" id="conveyor">
-                            <!-- Toys will appear here -->
-                        </div>
-
-                        <div
-                            id="factory-terminal"
-                            class="terminal-block flex-grow mt-3 overflow-y-auto text-xs"
-                            style="max-height: 80px"
-                        >
-                            <div class="text-slate-400 italic">
-                                <span class="lang-fa"
-                                    >> منتظر تنظیمات دستگاه...</span
-                                >
-                                <span class="lang-en"
-                                    >> Waiting for machine
-                                    configuration...</span
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">🏭🌟🤖</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa"
-                        >کارخانه با موفقیت راه‌اندازی شد!</span
-                    >
-                    <span class="lang-en">Factory Running Successfully!</span>
-                </h2>
-                <p class="text-xl text-orange-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما ابزارهای حرفه‌ای Generics و Traits را برای ساخت
-                        کدهای همه‌منظوره یاد گرفتید!</span
-                    >
-                    <span class="lang-en"
-                        >You learned professional tools Generics and Traits for
-                        universal code!</span
-                    >
-                </p>
-                <button
-                    class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۰ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 10 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-orange-200 code-font min-h-[400px] flex flex-col">
 
-            // Factory Objectives
-            let toysBuilt = 0;
-            let certsIssued = 0;
+                <!-- Mission 1: Generics -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-orange-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-pink-400">struct</span> Point&lt;<span id="slot1" class="code-slot text-orange-400" onclick="clearSlot(1)">---</span>&gt; {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;x: <span class="text-orange-400">T</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;y: <span class="text-orange-400">T</span>,<br>
+                        }
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-orange-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'X')">X</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'Type')">Type</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'T')">T</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'Gen')">Gen</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: Traits -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400" id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> MakeSound {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400">fn</span> <span class="text-blue-300">make_sound</span>(&self);<br>
+                        }
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-orange-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'struct')">struct</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'impl')">impl</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'trait')">trait</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'cert')">cert</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: Lifetimes -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">fn</span> <span class="text-blue-300">longest</span>&lt;<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>&gt;(x: &<span class="text-orange-400">'a</span> str, y: &<span class="text-orange-400">'a</span> str) -&gt; &<span class="text-orange-400">'a</span> str {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-slate-400 text-sm">// Ensures references live long enough!</span><br>
+                        }
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-orange-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 3, '&a')">&amp;a</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 3, '@a')">@a</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 3, '#a')">#a</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 3, '\'a')">'a</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Factory Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-yellow-400 mb-2 border-b border-orange-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-orange-900 px-2 py-1 rounded text-white">Project 10.4</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="bg-black/50 p-3 rounded-lg border border-orange-900 mb-4 flex flex-col md:flex-row gap-4 items-center">
+                        <div class="flex flex-col gap-1 w-full md:w-auto">
+                            <label id="mat-label" class="text-xs text-slate-400"></label>
+                            <select id="factory-mat" class="machine-input code-font">
+                                <option value="wood"><span id="mat-wood"></span></option>
+                                <option value="metal"><span id="mat-metal"></span></option>
+                                <option value="plastic"><span id="mat-plastic"></span></option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1 w-full md:w-auto">
+                            <label id="trait-label" class="text-xs text-slate-400"></label>
+                            <select id="factory-trait" class="machine-input code-font">
+                                <option value="sound"><span id="trait-sound"></span></option>
+                                <option value="fly"><span id="trait-fly"></span></option>
+                                <option value="light"><span id="trait-light"></span></option>
+                            </select>
+                        </div>
+                        <button id="build-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto mt-auto" onclick="buildToy()">
+                            <i class="fa-solid fa-industry"></i> <span id="build-btn-text"></span>
+                        </button>
+                    </div>
+                    <div class="conveyor-belt" id="conveyor"></div>
+                    <div id="factory-terminal" class="terminal-block flex-grow mt-3 overflow-y-auto text-xs" style="max-height: 80px;">
+                        <div id="factory-initial-msg" class="text-slate-400 italic"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🏭🌟🤖</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-orange-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(249,115,22,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                toysLabel: "اسباب‌بازی‌ها:",
+                certsLabel: "گواهینامه‌ها (Traits):",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
                     "سلام! به کارخانه اسباب‌بازی سازی من خوش اومدی! 🏭 اینجا چیزای هیجان‌انگیزی می‌سازیم.",
                     "اینجا ما از قالب‌های خمیربازی استفاده می‌کنیم. یه قالب ستاره می‌تونه با پلاستیک، چوب یا فلز پر بشه.",
                     "تو زبان راست به این قابلیت که یک کد با انواع مختلف داده کار کنه، Generics می‌گیم! 🌟",
-                    "اسباب‌بازی‌ها گواهینامه هم دارن! مثلا گواهینامه «تولید صدا». تو زبان راست به اینا میگیم Traits. بیا با هم دستگاه‌های کارخونه رو تنظیم کنیم! 🛠️",
+                    "اسباب‌بازی‌ها گواهینامه هم دارن! مثلا گواهینامه «تولید صدا». تو زبان راست به اینا میگیم Traits. بیا با هم دستگاه‌های کارخونه رو تنظیم کنیم! 🛠️"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا اولین قالب (Generic) رو تنظیم کنیم.",
+                mission1Title: "فصل ۱۰: کارخانه اسباب‌بازی (Generics) 🏭",
+                mission1Text: `
+                    <p class="text-orange-300">> در کارخانه من یک «قالب خمیربازی» وجود دارد. می‌توانیم پلاستیک، چوب یا فلز داخل آن بریزیم. نیازی نیست برای هر جنس یک دستگاه جدید بسازیم!</p>
+                    <p class="text-slate-300">> در برنامه‌نویسی به این قابلیت <strong>Generics</strong> می‌گویند. یعنی کدی بنویسیم که با هر نوع داده‌ای کار کند.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">برای تعریف یک جای خالی (قالب) در توابع یا Structها، معمولا از چه حرفی بین علامت‌های &lt; &gt; استفاده می‌کنیم؟</p>
+                `,
+                puzzle1Btn: "تایید قالب 🧩",
+                puzzle1Success: "> قالب T با موفقیت تعریف شد!",
+                puzzle1Error: "خطا: در راست به صورت استاندارد از حرف T برای Types (Generics) استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: گواهینامه‌های اسباب‌بازی (Traits)",
+                mission2Desc: "<p>بعضی اسباب‌بازی‌ها گواهینامه «تولید صدا» دارند و بعضی گواهینامه «پرواز». این گواهینامه‌ها مشخص می‌کنند یک وسیله چه کارهایی می‌تواند انجام دهد.</p><p class='text-white font-bold'>در زبان راست برای تعریف این گواهینامه‌ها (رفتارهای مشترک) از چه کلمه‌ای استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "صدور گواهینامه 🏅",
+                puzzle2Success: "> گواهینامه رفتار مشترک ایجاد شد.",
+                puzzle2Error: "خطا: برای تعریف رفتارهای مشترک و گواهینامه‌ها از کلمه کلیدی trait استفاده می‌کنیم.",
+                mission3Step: ">> مرحله ۲: برچسب تاریخ انقضا (Lifetimes)",
+                mission3Desc: "مثل ماست که تاریخ انقضا دارد، رفرنس‌ها (کارت‌های امانت) هم در راست یک عمر مشخص دارند تا به اطلاعات حذف شده اشاره نکنند. برای نشان دادن این طول عمر، از چه علامتی استفاده می‌کنیم؟",
+                puzzle3Btn: "چسباندن برچسب ایمنی ⏳",
+                puzzle3Success: "> برچسب عمر 'a با موفقیت چسبانده شد!",
+                puzzle3Error: "خطا: در زبان راست برای نشان دادن طول عمر (Lifetime) از نماد 'a استفاده می‌شود.",
+                mission4Step: ">> مرحله نهایی: شبیه‌ساز خط تولید",
+                mission4Desc: "برای پیروزی، دستگاه را تنظیم کن و با ترکیب‌های مختلف متریال (Generics) و گواهینامه‌ها (Traits) <strong>سه اسباب‌بازی مختلف</strong> تولید کن!",
+                matLabel: "نوع ماده (T)",
+                traitLabel: "گواهینامه (Trait)",
+                matWood: "چوب (i32)",
+                matMetal: "فلز (f64)",
+                matPlastic: "پلاستیک (String)",
+                traitSound: "صدا دار (MakeSound)",
+                traitFly: "پروازی (Fly)",
+                traitLight: "درخشان (Glow)",
+                buildBtn: "تولید Box&lt;dyn Toy&gt;",
+                factoryInitial: "> منتظر تنظیمات دستگاه...",
+                factoryLog: (typeStr, traitStr) => `> build&lt;${typeStr}&gt;(): Created toy implementing <span class="text-amber-400">${traitStr}</span>!`,
+                winTitle: "کارخانه با موفقیت راه‌اندازی شد!",
+                winMessage: "شما ابزارهای حرفه‌ای Generics و Traits را برای ساخت کدهای همه‌منظوره یاد گرفتید!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                toysLabel: "Toys Built:",
+                certsLabel: "Certificates (Traits):",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
                     "Welcome to my Toy Factory! 🏭 We build exciting things here.",
                     "Here we use Play-Doh molds. A star mold can be filled with plastic, wood, or metal.",
                     "In Rust, writing code that works with multiple data types is called Generics! 🌟",
-                    "Toys also have certificates! Like a 'Makes Sound' cert. In Rust, we call these Traits. Let's configure the factory machines together! 🛠️",
+                    "Toys also have certificates! Like a 'Makes Sound' cert. In Rust, we call these Traits. Let's configure the factory machines together! 🛠️"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-orange-500 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-toys").innerHTML =
-                        `<i class="fa-solid fa-robot"></i> اسباب‌بازی‌ها: <span class="text-white">${toysBuilt.toLocaleString("fa-IR")} / ۳</span>`;
-                    document.getElementById("hud-certs").innerHTML =
-                        `<i class="fa-solid fa-award"></i> گواهینامه‌ها: <span class="text-white">${certsIssued.toLocaleString("fa-IR")}</span>`;
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-orange-500 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-toys").innerHTML =
-                        `<i class="fa-solid fa-robot"></i> Toys Built: <span class="text-white">${toysBuilt} / 3</span>`;
-                    document.getElementById("hud-certs").innerHTML =
-                        `<i class="fa-solid fa-award"></i> Certificates: <span class="text-white">${certsIssued}</span>`;
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below to configure our first Generic mold.",
+                mission1Title: "Chapter 10: The Toy Factory (Generics) 🏭",
+                mission1Text: `
+                    <p class="text-orange-300">> In my factory, we have a "Play-Doh mold". We can pour plastic, wood, or metal into it. We don't need a new machine for every material!</p>
+                    <p class="text-slate-300">> In programming, this is called <strong>Generics</strong>. It means writing code that works with any data type.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">To define a placeholder (mold) in functions or Structs, which letter do we usually use between &lt; &gt; brackets?</p>
+                `,
+                puzzle1Btn: "Confirm Mold 🧩",
+                puzzle1Success: "> Mold T defined successfully!",
+                puzzle1Error: "Error: In Rust, we standardly use the letter T for Types (Generics).",
+                mission2Step: ">> Step 1: Toy Certificates (Traits)",
+                mission2Desc: "<p>Some toys have a 'Makes Sound' certificate, and others have a 'Flies' certificate. They define what an item can DO.</p><p class='text-white font-bold'>In Rust, what keyword do we use to define these certificates (shared behaviors)?</p>",
+                puzzle2Btn: "Issue Certificate 🏅",
+                puzzle2Success: "> Shared behavior certificate created.",
+                puzzle2Error: "Error: We use the 'trait' keyword to define shared behaviors and certificates.",
+                mission3Step: ">> Step 2: Expiration Date Stickers (Lifetimes)",
+                mission3Desc: "Just like yogurt has an expiration date, references in Rust have a specific lifetime so they don't point to dead data. What symbol do we use to show this lifetime?",
+                puzzle3Btn: "Attach Safety Sticker ⏳",
+                puzzle3Success: "> Lifetime sticker 'a successfully attached!",
+                puzzle3Error: "Error: In Rust, we use the 'a symbol to denote a Lifetime.",
+                mission4Step: ">> Final Step: Factory Line Simulator",
+                mission4Desc: "To win, configure the machine and build <strong>three different toys</strong> using various combinations of materials (Generics) and certificates (Traits)!",
+                matLabel: "Material (T)",
+                traitLabel: "Certificate (Trait)",
+                matWood: "Wood (i32)",
+                matMetal: "Metal (f64)",
+                matPlastic: "Plastic (String)",
+                traitSound: "Makes Sound (MakeSound)",
+                traitFly: "Flying (Fly)",
+                traitLight: "Glowing (Glow)",
+                buildBtn: "Build Box&lt;dyn Toy&gt;",
+                factoryInitial: "> Waiting for machine configuration...",
+                factoryLog: (typeStr, traitStr) => `> build&lt;${typeStr}&gt;(): Created toy implementing <span class="text-amber-400">${traitStr}</span>!`,
+                winTitle: "Factory Running Successfully!",
+                winMessage: "You learned professional tools Generics and Traits for universal code!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                toysLabel: "Juguetes construidos:",
+                certsLabel: "Certificados (Traits):",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Bienvenido a mi fábrica de juguetes! 🏭 Aquí construimos cosas emocionantes.",
+                    "Aquí usamos moldes de Play-Doh. Un molde de estrella se puede llenar con plástico, madera o metal.",
+                    "En Rust, escribir código que funcione con múltiples tipos de datos se llama ¡Generics! 🌟",
+                    "¡Los juguetes también tienen certificados! Como un certificado 'Hace sonido'. En Rust, los llamamos Traits. ¡Configuremos juntos las máquinas de la fábrica! 🛠️"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para configurar nuestro primer molde Genérico.",
+                mission1Title: "Capítulo 10: La fábrica de juguetes (Generics) 🏭",
+                mission1Text: `
+                    <p class="text-orange-300">> En mi fábrica, tenemos un "molde de Play-Doh". Podemos verter plástico, madera o metal en él. ¡No necesitamos una máquina nueva para cada material!</p>
+                    <p class="text-slate-300">> En programación, esto se llama <strong>Generics</strong>. Significa escribir código que funciona con cualquier tipo de dato.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Para definir un marcador de posición (molde) en funciones o Structs, ¿qué letra usamos normalmente entre los corchetes &lt; &gt;?</p>
+                `,
+                puzzle1Btn: "Confirmar molde 🧩",
+                puzzle1Success: "> ¡Molde T definido exitosamente!",
+                puzzle1Error: "Error: En Rust, usamos estándarmente la letra T para Tipos (Generics).",
+                mission2Step: ">> Paso 1: Certificados de juguetes (Traits)",
+                mission2Desc: "<p>Algunos juguetes tienen un certificado 'Hace sonido', y otros tienen 'Vuela'. Definen lo que un elemento puede HACER.</p><p class='text-white font-bold'>En Rust, ¿qué palabra clave usamos para definir estos certificados (comportamientos compartidos)?</p>",
+                puzzle2Btn: "Emitir certificado 🏅",
+                puzzle2Success: "> Certificado de comportamiento compartido creado.",
+                puzzle2Error: "Error: Usamos la palabra clave 'trait' para definir comportamientos compartidos y certificados.",
+                mission3Step: ">> Paso 2: Etiquetas de fecha de caducidad (Lifetimes)",
+                mission3Desc: "Al igual que el yogur tiene una fecha de caducidad, las referencias en Rust tienen una vida útil específica para que no apunten a datos muertos. ¿Qué símbolo usamos para mostrar esta vida útil?",
+                puzzle3Btn: "Pegar etiqueta de seguridad ⏳",
+                puzzle3Success: "> ¡Etiqueta de vida 'a pegada exitosamente!",
+                puzzle3Error: "Error: En Rust, usamos el símbolo 'a para denotar una Lifetime.",
+                mission4Step: ">> Paso final: Simulador de línea de fábrica",
+                mission4Desc: "¡Para ganar, configura la máquina y construye <strong>tres juguetes diferentes</strong> usando varias combinaciones de materiales (Generics) y certificados (Traits)!",
+                matLabel: "Material (T)",
+                traitLabel: "Certificado (Trait)",
+                matWood: "Madera (i32)",
+                matMetal: "Metal (f64)",
+                matPlastic: "Plástico (String)",
+                traitSound: "Hace sonido (MakeSound)",
+                traitFly: "Volador (Fly)",
+                traitLight: "Luminoso (Glow)",
+                buildBtn: "Construir Box&lt;dyn Toy&gt;",
+                factoryInitial: "> Esperando configuración de la máquina...",
+                factoryLog: (typeStr, traitStr) => `> build&lt;${typeStr}&gt;(): ¡Juguete creado implementando <span class="text-amber-400">${traitStr}</span>!`,
+                winTitle: "¡Fábrica funcionando exitosamente!",
+                winMessage: "¡Aprendiste las herramientas profesionales Generics y Traits para código universal!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                toysLabel: "Gebaute Spielzeuge:",
+                certsLabel: "Zertifikate (Traits):",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Willkommen in meiner Spielzeugfabrik! 🏭 Hier bauen wir aufregende Dinge.",
+                    "Wir verwenden Play-Doh-Formen. Eine Sternform kann mit Kunststoff, Holz oder Metall gefüllt werden.",
+                    "In Rust nennt man Code, der mit mehreren Datentypen funktioniert, Generics! 🌟",
+                    "Spielzeuge haben auch Zertifikate! Wie ein 'Macht Geräusche'-Zertifikat. In Rust nennen wir diese Traits. Lassen Sie uns gemeinsam die Fabrikanlagen konfigurieren! 🛠️"
+                ],
+                afterDialog: "Los geht's! Schauen Sie auf den Monitor unten, um unsere erste Generic-Form zu konfigurieren.",
+                mission1Title: "Kapitel 10: Die Spielzeugfabrik (Generics) 🏭",
+                mission1Text: `
+                    <p class="text-orange-300">> In meiner Fabrik haben wir eine "Play-Doh-Form". Wir können Kunststoff, Holz oder Metall hineingießen. Wir brauchen keine neue Maschine für jedes Material!</p>
+                    <p class="text-slate-300">> In der Programmierung nennt man das <strong>Generics</strong>. Das bedeutet, Code zu schreiben, der mit jedem Datentyp funktioniert.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Um einen Platzhalter (Form) in Funktionen oder Strukturen zu definieren, welchen Buchstaben verwenden wir normalerweise zwischen &lt; &gt;?</p>
+                `,
+                puzzle1Btn: "Form bestätigen 🧩",
+                puzzle1Success: "> Form T erfolgreich definiert!",
+                puzzle1Error: "Fehler: In Rust verwenden wir standardmäßig den Buchstaben T für Typen (Generics).",
+                mission2Step: ">> Schritt 1: Spielzeugzertifikate (Traits)",
+                mission2Desc: "<p>Einige Spielzeuge haben ein 'Macht Geräusche'-Zertifikat, andere ein 'Fliegt'-Zertifikat. Sie definieren, was ein Element TUN kann.</p><p class='text-white font-bold'>Welches Schlüsselwort verwenden wir in Rust, um diese Zertifikate (gemeinsame Verhaltensweisen) zu definieren?</p>",
+                puzzle2Btn: "Zertifikat ausstellen 🏅",
+                puzzle2Success: "> Zertifikat für gemeinsames Verhalten erstellt.",
+                puzzle2Error: "Fehler: Wir verwenden das Schlüsselwort 'trait', um gemeinsame Verhaltensweisen und Zertifikate zu definieren.",
+                mission3Step: ">> Schritt 2: Verfallsdatum-Aufkleber (Lifetimes)",
+                mission3Desc: "Genau wie Joghurt ein Verfallsdatum hat, haben Referenzen in Rust eine bestimmte Lebensdauer, damit sie nicht auf tote Daten zeigen. Welches Symbol verwenden wir, um diese Lebensdauer anzuzeigen?",
+                puzzle3Btn: "Sicherheitsaufkleber anbringen ⏳",
+                puzzle3Success: "> Lebensdauer-Aufkleber 'a erfolgreich angebracht!",
+                puzzle3Error: "Fehler: In Rust verwenden wir das Symbol 'a, um eine Lebensdauer zu kennzeichnen.",
+                mission4Step: ">> Letzter Schritt: Fließbandsimulator",
+                mission4Desc: "Um zu gewinnen, konfiguriere die Maschine und baue <strong>drei verschiedene Spielzeuge</strong> mit verschiedenen Kombinationen von Materialien (Generics) und Zertifikaten (Traits)!",
+                matLabel: "Material (T)",
+                traitLabel: "Zertifikat (Trait)",
+                matWood: "Holz (i32)",
+                matMetal: "Metall (f64)",
+                matPlastic: "Kunststoff (String)",
+                traitSound: "Macht Geräusche (MakeSound)",
+                traitFly: "Fliegend (Fly)",
+                traitLight: "Leuchtend (Glow)",
+                buildBtn: "Box&lt;dyn Toy&gt; bauen",
+                factoryInitial: "> Warten auf Maschinenkonfiguration...",
+                factoryLog: (typeStr, traitStr) => `> build&lt;${typeStr}&gt;(): Spielzeug erstellt, das <span class="text-amber-400">${traitStr}</span> implementiert!`,
+                winTitle: "Fabrik läuft erfolgreich!",
+                winMessage: "Du hast die professionellen Werkzeuge Generics und Traits für universellen Code gelernt!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                toysLabel: "Gebouwd speelgoed:",
+                certsLabel: "Certificaten (Traits):",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Welkom in mijn speelgoedfabriek! 🏭 Hier bouwen we spannende dingen.",
+                    "We gebruiken Play-Doh-vormen. Een sterrenvorm kan gevuld worden met plastic, hout of metaal.",
+                    "In Rust noemen we code die met meerdere datatypes werkt, Generics! 🌟",
+                    "Speelgoed heeft ook certificaten! Zoals een 'Maakt geluid'-certificaat. In Rust noemen we dit Traits. Laten we samen de fabrieksmachines configureren! 🛠️"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om onze eerste Generic-vorm te configureren.",
+                mission1Title: "Hoofdstuk 10: De speelgoedfabriek (Generics) 🏭",
+                mission1Text: `
+                    <p class="text-orange-300">> In mijn fabriek hebben we een "Play-Doh-vorm". We kunnen er plastic, hout of metaal in gieten. We hebben geen nieuwe machine nodig voor elk materiaal!</p>
+                    <p class="text-slate-300">> In programmeren noemen we dit <strong>Generics</strong>. Het betekent code schrijven die werkt met elk gegevenstype.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Om een placeholder (vorm) te definiëren in functies of Structs, welke letter gebruiken we normaal gesproken tussen &lt; &gt;?</p>
+                `,
+                puzzle1Btn: "Vorm bevestigen 🧩",
+                puzzle1Success: "> Vorm T succesvol gedefinieerd!",
+                puzzle1Error: "Fout: In Rust gebruiken we standaard de letter T voor Types (Generics).",
+                mission2Step: ">> Stap 1: Speelgoedcertificaten (Traits)",
+                mission2Desc: "<p>Sommig speelgoed heeft een 'Maakt geluid'-certificaat, ander heeft een 'Vliegt'-certificaat. Ze definiëren wat een item kan DOEN.</p><p class='text-white font-bold'>Welk trefwoord gebruiken we in Rust om deze certificaten (gedeeld gedrag) te definiëren?</p>",
+                puzzle2Btn: "Certificaat uitgeven 🏅",
+                puzzle2Success: "> Certificaat voor gedeeld gedrag aangemaakt.",
+                puzzle2Error: "Fout: We gebruiken het trefwoord 'trait' om gedeeld gedrag en certificaten te definiëren.",
+                mission3Step: ">> Stap 2: Vervaldatumstickers (Lifetimes)",
+                mission3Desc: "Net zoals yoghurt een houdbaarheidsdatum heeft, hebben referenties in Rust een specifieke levensduur, zodat ze niet naar dode gegevens verwijzen. Welk symbool gebruiken we om deze levensduur aan te geven?",
+                puzzle3Btn: "Veiligheidssticker plakken ⏳",
+                puzzle3Success: "> Levensduursticker 'a succesvol aangebracht!",
+                puzzle3Error: "Fout: In Rust gebruiken we het symbool 'a om een Levensduur aan te duiden.",
+                mission4Step: ">> Laatste stap: Fabriekslijnsimulator",
+                mission4Desc: "Om te winnen, configureer je de machine en bouw je <strong>drie verschillende speeltjes</strong> met verschillende combinaties van materialen (Generics) en certificaten (Traits)!",
+                matLabel: "Materiaal (T)",
+                traitLabel: "Certificaat (Trait)",
+                matWood: "Hout (i32)",
+                matMetal: "Metaal (f64)",
+                matPlastic: "Plastic (String)",
+                traitSound: "Maakt geluid (MakeSound)",
+                traitFly: "Vliegend (Fly)",
+                traitLight: "Gloeiend (Glow)",
+                buildBtn: "Box&lt;dyn Toy&gt; bouwen",
+                factoryInitial: "> Wachten op machineconfiguratie...",
+                factoryLog: (typeStr, traitStr) => `> build&lt;${typeStr}&gt;(): Speelgoed gemaakt dat <span class="text-amber-400">${traitStr}</span> implementeert!`,
+                winTitle: "Fabriek draait succesvol!",
+                winMessage: "Je hebt de professionele tools Generics en Traits geleerd voor universele code!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let toysBuilt = 0;
+        let certsIssued = 0;
+
+        // DOM elements
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-orange-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
-
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
-                } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا اولین قالب (Generic) رو تنظیم کنیم."
-                            : "Let's go! Look at the monitor below to configure our first Generic mold.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
-                }
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
             }
-
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
-
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
-
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
-
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
-                runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
-            }
-
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
-            }
-
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "T") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> قالب T با موفقیت تعریف شد!"
-                            : "> Mold T defined successfully!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: در راست به صورت استاندارد از حرف T برای Types (Generics) استفاده می‌کنیم.",
-                        "Error: In Rust, we standardly use the letter T for Types (Generics).",
-                    );
-                }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "trait") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> گواهینامه رفتار مشترک ایجاد شد."
-                            : "> Shared behavior certificate created.";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: برای تعریف رفتارهای مشترک و گواهینامه‌ها از کلمه کلیدی trait استفاده می‌کنیم.",
-                        "Error: We use the 'trait' keyword to define shared behaviors and certificates.",
-                    );
-                }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "'a") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> برچسب عمر 'a با موفقیت چسبانده شد!"
-                            : "> Lifetime sticker 'a successfully attached!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: در زبان راست برای نشان دادن طول عمر (Lifetime) از نماد 'a استفاده می‌شود.",
-                        "Error: In Rust, we use the 'a symbol to denote a Lifetime.",
-                    );
-                }
-            }
-
-            // --- Factory Simulator ---
-            function appendToTerminal(htmlContent) {
-                const term = document.getElementById("factory-terminal");
-                if (
-                    term.innerHTML.includes("منتظر تنظیمات دستگاه") ||
-                    term.innerHTML.includes("Waiting for machine")
-                ) {
-                    term.innerHTML = "";
-                }
-                const div = document.createElement("div");
-                div.className = "mb-1";
-                div.innerHTML = htmlContent;
-                term.appendChild(div);
-                term.scrollTop = term.scrollHeight;
-            }
-
-            function buildToy() {
-                const mat = document.getElementById("factory-mat").value;
-                const trait = document.getElementById("factory-trait").value;
-
-                let emoji = "🧸";
-                let typeStr = "T";
-                let traitStr = "Trait";
-
-                if (mat === "wood") {
-                    typeStr = "i32";
-                }
-                if (mat === "metal") {
-                    typeStr = "f64";
-                }
-                if (mat === "plastic") {
-                    typeStr = "String";
-                }
-
-                if (trait === "sound") {
-                    traitStr = "MakeSound";
-                    emoji = "🥁";
-                }
-                if (trait === "fly") {
-                    traitStr = "Fly";
-                    emoji = "🚁";
-                }
-                if (trait === "light") {
-                    traitStr = "Glow";
-                    emoji = "🏮";
-                }
-
-                // Add to conveyor belt
-                const belt = document.getElementById("conveyor");
-                const toyEl = document.createElement("div");
-                toyEl.className = "toy-item";
-                toyEl.innerText = emoji;
-                belt.appendChild(toyEl);
-
-                toysBuilt++;
-                certsIssued++;
-
-                // Update HUD
-                setLang(currentLang); // refreshes hud strings
-
-                appendToTerminal(
-                    `<span class="text-emerald-400">> build&lt;${typeStr}&gt;():</span> Created toy implementing <span class="text-amber-400">${traitStr}</span>!`,
-                );
-
-                if (toysBuilt >= 3) {
-                    setTimeout(() => {
-                        triggerConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
-                    }, 1000);
-                }
-            }
-
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#f97316",
-                "#eab308",
-                "#fcd34d",
-                "#fdba74",
-                "#ffffff",
-            ]; // Orange, Yellow
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
-            }, 500);
-        </script>
-    </body>
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            document.getElementById('toys-label').innerHTML = pack.toysLabel;
+            document.getElementById('certs-label').innerHTML = pack.certsLabel;
+            document.getElementById('toys-count').innerHTML = currentLang === 'fa' ? `${formatNumber(toysBuilt, currentLang)} / ۳` : `${toysBuilt} / 3`;
+            document.getElementById('certs-count').innerHTML = formatNumber(certsIssued, currentLang);
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('mat-label').innerHTML = pack.matLabel;
+            document.getElementById('trait-label').innerHTML = pack.traitLabel;
+            document.getElementById('mat-wood').innerHTML = pack.matWood;
+            document.getElementById('mat-metal').innerHTML = pack.matMetal;
+            document.getElementById('mat-plastic').innerHTML = pack.matPlastic;
+            document.getElementById('trait-sound').innerHTML = pack.traitSound;
+            document.getElementById('trait-fly').innerHTML = pack.traitFly;
+            document.getElementById('trait-light').innerHTML = pack.traitLight;
+            document.getElementById('build-btn-text').innerHTML = pack.buildBtn;
+            document.getElementById('factory-initial-msg').innerHTML = pack.factoryInitial;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-orange-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
+
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
+
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'T') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
+            }
+        }
+
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'trait') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
+            }
+        }
+
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === '\'a') {
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
+
+        // Factory Simulator
+        function appendToTerminal(htmlContent) {
+            const term = document.getElementById('factory-terminal');
+            if (term.innerHTML.includes(languagePack[currentLang].factoryInitial)) {
+                term.innerHTML = '';
+            }
+            const div = document.createElement('div');
+            div.className = "mb-1";
+            div.innerHTML = htmlContent;
+            term.appendChild(div);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function buildToy() {
+            const pack = languagePack[currentLang];
+            const mat = document.getElementById('factory-mat').value;
+            const trait = document.getElementById('factory-trait').value;
+
+            let typeStr = '';
+            let emoji = '🧸';
+            let traitStr = '';
+
+            if (mat === 'wood') { typeStr = 'i32'; emoji = '🪵'; }
+            if (mat === 'metal') { typeStr = 'f64'; emoji = '⚙️'; }
+            if (mat === 'plastic') { typeStr = 'String'; emoji = '🧴'; }
+
+            if (trait === 'sound') { traitStr = 'MakeSound'; emoji = '🥁'; }
+            if (trait === 'fly') { traitStr = 'Fly'; emoji = '🚁'; }
+            if (trait === 'light') { traitStr = 'Glow'; emoji = '🏮'; }
+
+            // Add to conveyor belt
+            const belt = document.getElementById('conveyor');
+            const toyEl = document.createElement('div');
+            toyEl.className = 'toy-item';
+            toyEl.innerText = emoji;
+            belt.appendChild(toyEl);
+            setTimeout(() => toyEl.classList.add('pop-in'), 10);
+
+            toysBuilt++;
+            certsIssued++;
+            document.getElementById('toys-count').innerHTML = currentLang === 'fa' ? `${formatNumber(toysBuilt, currentLang)} / ۳` : `${toysBuilt} / 3`;
+            document.getElementById('certs-count').innerHTML = formatNumber(certsIssued, currentLang);
+
+            appendToTerminal(pack.factoryLog(typeStr, traitStr));
+
+            if (toysBuilt >= 3) {
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        function goToNextChapter() {
+            window.location.href = 'chapter-11.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#f97316", "#eab308", "#fcd34d", "#fdba74", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
+
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>

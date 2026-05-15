@@ -1,53 +1,44 @@
 <!DOCTYPE html>
-
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 15</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --bg-color: #020617; /* Slate 950 */
-            --crt-bg: #170229; /* Deep Fuchsia/Purple dark */
-            --accent-primary: #d946ef; /* Fuchsia 500 */
-            --accent-secondary: #06b6d4; /* Cyan 500 */
+            --bg-color: #020617;
+            --crt-bg: #170229;
+            --accent-primary: #d946ef;
+            --accent-secondary: #06b6d4;
         }
-
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(rgba(217, 70, 239, 0.1) 2px, transparent 40px),
-                radial-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 30px);
+            background-image: radial-gradient(rgba(217, 70, 239, 0.1) 2px, transparent 40px), radial-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
         html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
         html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
         .code-font { font-family: 'JetBrains Mono', monospace !important; }
-
-        /* Spaceship Dashboard UI - Data Vault Edition */
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .action-select, #sim-terminal {
+            direction: ltr !important;
+            text-align: left !important;
+        }
         .dashboard {
             background: linear-gradient(180deg, #2e1065 0%, #020617 100%);
             border: 4px solid var(--accent-primary);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(217, 70, 239, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-            border: 4px solid #86198f; /* Fuchsia 800 */
+            border: 4px solid #86198f;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
@@ -63,11 +54,9 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
-            background: rgba(253, 244, 255, 0.95); /* Fuchsia 50 */
-            color: #4a044e; /* Fuchsia 900 */
+            background: rgba(253, 244, 255, 0.95);
+            color: #4a044e;
             border-radius: 15px;
             border: 3px solid var(--accent-primary);
             position: relative;
@@ -80,7 +69,6 @@
             content: ''; position: absolute; bottom: -15px; left: 40px;
             border-width: 15px 15px 0; border-style: solid; border-color: rgba(253, 244, 255, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #fae8ff; border-radius: 50%;
@@ -88,14 +76,11 @@
             font-size: 2.5rem; border: 4px solid var(--accent-primary);
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Interactive Elements */
         .code-slot {
             display: inline-block; min-width: 60px; height: 30px;
             border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
@@ -104,7 +89,6 @@
             border-radius: 5px; cursor: pointer; transition: all 0.3s;
         }
         .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(217, 70, 239, 0.2); color: #f5d0fe; }
-
         .code-option {
             background: #2e1065; border: 2px solid #701a75;
             padding: 8px 15px; border-radius: 8px; cursor: pointer;
@@ -112,8 +96,6 @@
         }
         .code-option:hover { background: #4a044e; transform: scale(1.05); }
         .code-option.selected { background: var(--accent-primary); border-color: #f0abfc; color: white; font-weight: bold; }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); background-color: #831843; }
@@ -122,6 +104,13 @@
             60% { transform: skew(-5deg); background-color: #be185d; }
             80% { transform: skew(5deg); }
             100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
         }
         .fade-in { animation: fadeIn 0.5s ease-in forwards; }
         @keyframes fadeIn {
@@ -133,17 +122,9 @@
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(217, 70, 239, 0.3);
         }
-
-        /* Simulator Styles */
         .planet-node {
             background: #4a044e; border: 2px solid #d946ef;
             border-radius: 50%; width: 70px; height: 70px;
@@ -152,7 +133,6 @@
             transition: all 0.3s; z-index: 10;
         }
         .planet-node.active { background: #86198f; box-shadow: 0 0 25px rgba(6, 182, 212, 0.8); border-color: #06b6d4; }
-
         .rc-badge {
             position: absolute; top: -10px; right: -10px;
             background: #06b6d4; color: #083344; font-weight: bold;
@@ -160,13 +140,23 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 0.8rem; border: 2px solid #083344;
         }
-
         .action-select {
             background-color: #2e1065; border: 2px solid #86198f;
             color: white; padding: 0.5rem; border-radius: 0.5rem;
             outline: none; font-family: 'JetBrains Mono', monospace; cursor: pointer;
         }
         .action-select:focus { border-color: #d946ef; }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .planet-node { width: 50px; height: 50px; }
+            .rc-badge { width: 18px; height: 18px; font-size: 0.6rem; top: -6px; right: -6px; }
+            .action-select { padding: 0.25rem; font-size: 0.8rem; }
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
@@ -175,71 +165,48 @@
 
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-fuchsia-600 text-white">فارسی</button>
-        </div>
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD -->
+        <!-- HUD -->
         <div class="flex justify-between items-center mb-6 border-b border-fuchsia-900 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-fuchsia-400"><i class="fa-solid fa-link"></i> <span class="lang-fa">اتصالات:</span><span class="lang-en">Connections:</span> <span class="text-white" id="hud-links">۰ / ۳</span></div>
-                <div class="text-cyan-400"><i class="fa-solid fa-memory"></i> <span class="lang-fa">وضعیت حافظه:</span><span class="lang-en">Memory Status:</span> <span class="text-emerald-400" id="hud-mem">Safe ✅</span></div>
+                <div class="text-fuchsia-400"><i class="fa-solid fa-link"></i> <span id="connections-label"></span> <span id="hud-links">0 / 3</span></div>
+                <div class="text-cyan-400"><i class="fa-solid fa-memory"></i> <span id="memory-label"></span> <span id="hud-mem">Safe ✅</span></div>
             </div>
-            <div class="text-fuchsia-300 code-font text-sm opacity-70">VAULT-OS v15.0</div>
+            <div class="text-fuchsia-300 code-font text-xs md:text-sm opacity-70">VAULT-OS v15.0</div>
         </div>
 
-        <!-- Story Section -->
+        <!-- Dialog Box -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">📦🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-fuchsia-500">
-                <h3 class="font-bold text-fuchsia-700 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-fuchsia-700 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold text-fuchsia-950"></p>
-
+                <h3 id="ferris-name" class="font-bold text-fuchsia-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-fuchsia-950"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Screen -->
+        <!-- Game Area -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-fuchsia-200 code-font min-h-[400px] flex flex-col">
 
-                <!-- Mission 1: Box<T> -->
+                <!-- Mission 1: Box::new -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-fuchsia-900 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۱۵: راز جعبه‌های تو در تو 📦</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 15: The Secret of Nested Boxes 📦</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa leading-relaxed space-y-3">
-                        <p class="text-fuchsia-300">> بعضی داده‌ها خیلی بزرگ هستند و روی میز کار (Stack) جا نمی‌شوند. ما آن‌ها را در انبار بزرگ (Heap) می‌گذاریم.</p>
-                        <p class="text-slate-300">> برای این کار از «جعبه هدیه» یعنی `Box<T>` استفاده می‌کنیم. جعبه روی میز است، اما کادوی سنگین داخل انبار است!</p>
-                        <p class="text-cyan-300 mt-4 font-bold">برای ساختن یک جعبه و فرستادن داده به انبار، از کدام متد استفاده می‌کنیم؟</p>
-                    </div>
-
-                    <div class="lang-en leading-relaxed space-y-3">
-                        <p class="text-fuchsia-300">> Some data is too large to fit on our workbench (Stack). We store it in the massive warehouse (Heap).</p>
-                        <p class="text-slate-300">> We use a "Gift Box" called `Box<T>` for this. The box stays on the desk, but the heavy gift is in the warehouse!</p>
-                        <p class="text-cyan-300 mt-4 font-bold">To create a box and send data to the warehouse, which method do we use?</p>
-                    </div>
-
-                    <div class="terminal-block mt-4 text-emerald-300 text-lg">
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
                         <span class="text-slate-400 text-sm">// Move number 5 to the Heap</span><br>
                         <span class="text-pink-400">let</span> b = Box::<span id="slot1" class="code-slot text-cyan-400" onclick="clearSlot(1)">---</span>(<span class="text-orange-300">5</span>);<br>
                         <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Value: {}"</span>, b);
                     </div>
-
-                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"></div>
-
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-fuchsia-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'create')">create</div>
@@ -248,39 +215,24 @@
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'alloc')">alloc</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle1-btn" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
-                            <span class="lang-fa">بسته‌بندی جعبه 🎁</span><span class="lang-en">Pack the Box 🎁</span>
+                            <span id="puzzle1-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 2: Rc<T> -->
+                <!-- Mission 2: Rc::clone -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-cyan-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: کتاب اشتراکی (Rc)</span>
-                        <span class="lang-en">>> Step 1: The Shared Book (Rc)</span>
-                    </div>
-
-                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
-                        <p>گاهی چند نفر می‌خواهند همزمان مالک یک کتاب باشند! `Rc<T>` به ما اجازه می‌دهد قانون «یک مالک» را دور بزنیم. او تعداد خواننده‌ها را می‌شمارد.</p>
-                        <p class="text-white font-bold">وقتی می‌خواهیم کتاب را به نفر دوم بدهیم، از چه متدی برای افزایش شمارنده استفاده می‌کنیم؟</p>
-                    </div>
-                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
-                        <p>Sometimes multiple people want to own the same book! `Rc<T>` lets us bypass the "one owner" rule by counting readers.</p>
-                        <p class="text-white font-bold">When we want to give the book to a second person, which method do we use to increase the counter?</p>
-                    </div>
-
-                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                    <div id="mission2-step" class="text-cyan-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-pink-400">use</span> std::rc::Rc;<br><br>
                         <span class="text-pink-400">let</span> book1 = Rc::new(String::from(<span class="text-yellow-300">"Rust Guide"</span>));<br>
                         <span class="text-slate-400 text-sm">// Give ownership to a second variable</span><br>
                         <span class="text-pink-400">let</span> book2 = Rc::<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(&book1);
                     </div>
-
-                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-fuchsia-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font" onclick="selectOption(this, 2, 'copy')">copy</div>
@@ -289,33 +241,24 @@
                             <div class="code-option code-font" onclick="selectOption(this, 2, 'dup')">dup</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle2-btn" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
-                            <span class="lang-fa">تکثیر مالکیت 📚</span><span class="lang-en">Duplicate Ownership 📚</span>
+                            <span id="puzzle2-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 3: RefCell<T> -->
+                <!-- Mission 3: borrow_mut -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-cyan-400 mb-2 font-bold">
-                        <span class="lang-fa">>> مرحله ۲: دفترچه گروهی (RefCell)</span>
-                        <span class="lang-en">>> Step 2: Group Notebook (RefCell)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-slate-300 mb-4">`Rc` فقط اجازه خواندن می‌دهد. اگر بخواهیم محتوای درون آن را تغییر دهیم، آن را درون `RefCell<T>` قرار می‌دهیم تا قفل نوشتن باز شود. با کدام متد قفل نوشتن (تغییر) را باز می‌کنیم؟</p>
-                    <p class="lang-en text-sm text-slate-300 mb-4">`Rc` only allows reading. If we want to change its contents, we wrap it in a `RefCell<T>` to unlock writing. Which method opens the lock for writing (modifying)?</p>
-
+                    <div id="mission3-step" class="text-cyan-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
                     <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-pink-400">use</span> std::cell::RefCell;<br><br>
                         <span class="text-pink-400">let</span> note = RefCell::new(<span class="text-orange-300">5</span>);<br>
                         <span class="text-slate-400 text-sm">// Open write lock, modify, close lock</span><br>
                         *note.<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>() += <span class="text-orange-300">10</span>;
                     </div>
-
-                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-fuchsia-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'get_mut')">get_mut</div>
@@ -324,10 +267,9 @@
                             <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'write')">write</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle3-btn" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
-                            <span class="lang-fa">باز کردن قفل نوشتن ✍️</span><span class="lang-en">Unlock for Writing ✍️</span>
+                            <span id="puzzle3-btn-text"></span>
                         </button>
                     </div>
                 </div>
@@ -335,48 +277,28 @@
                 <!-- Mission 4: Graph Network Simulator -->
                 <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
                     <div class="text-cyan-400 mb-2 border-b border-fuchsia-800 pb-2 flex justify-between items-center">
-                        <div>
-                            <span class="lang-fa">>> مرحله نهایی: شبکه‌ی سیارات</span>
-                            <span class="lang-en">>> Final Step: Planetary Network</span>
-                        </div>
-                        <div class="text-xs bg-fuchsia-900 px-2 py-1 rounded text-white">
-                            <span class="lang-fa">پروژه ۱۵.۴</span><span class="lang-en">Project 15.4</span>
-                        </div>
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-fuchsia-900 px-2 py-1 rounded text-white">Project 15.4</div>
                     </div>
-
-                    <div class="lang-fa text-sm mb-3 text-slate-300">
-                        ما از `Rc<RefCell<Node>>` استفاده کرده‌ایم. با وصل کردن سیارات به هم، شبکه را فعال کن! <strong>۳ اتصال</strong> ایجاد کن تا برنده شوی. مواظب ایجاد حلقه (A->B->A) باش!
-                    </div>
-                    <div class="lang-en text-sm mb-3 text-slate-300">
-                        We used `Rc<RefCell<Node>>`. Connect the planets to activate the network! Make <strong>3 connections</strong> to win. Watch out for loops (A->B->A)!
-                    </div>
-
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
                     <div class="flex flex-col gap-4 flex-grow">
-
-                        <!-- Network Graph Display -->
                         <div class="relative bg-black/40 rounded-xl border border-fuchsia-800/50 p-4 h-[180px] flex items-center justify-around overflow-hidden" id="graph-container">
-                            <!-- Background connecting lines will be drawn here simply via borders or absolute divs in JS -->
-
                             <div class="planet-node" id="node-A">
                                 <div class="rc-badge" id="rc-A">1</div>
                                 <span class="text-2xl">🪐</span>
                                 <span class="text-xs font-bold text-fuchsia-200">A</span>
                             </div>
-
                             <div class="planet-node" id="node-B">
                                 <div class="rc-badge" id="rc-B">1</div>
                                 <span class="text-2xl">🌕</span>
                                 <span class="text-xs font-bold text-fuchsia-200">B</span>
                             </div>
-
                             <div class="planet-node" id="node-C">
                                 <div class="rc-badge" id="rc-C">1</div>
                                 <span class="text-2xl">🌍</span>
                                 <span class="text-xs font-bold text-fuchsia-200">C</span>
                             </div>
                         </div>
-
-                        <!-- Control Panel -->
                         <div class="flex flex-wrap gap-2 items-center justify-center bg-fuchsia-950/40 p-3 rounded-lg border border-fuchsia-900">
                             <span class="text-xs text-slate-400 code-font">from.push(</span>
                             <select id="sel-from" class="action-select">
@@ -391,155 +313,499 @@
                                 <option value="C">Planet C</option>
                             </select>
                             <span class="text-xs text-slate-400 code-font">))</span>
-
-                            <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto" onclick="linkNodes()">
-                                <i class="fa-solid fa-link"></i> <span class="lang-fa">اتصال</span><span class="lang-en">Connect</span>
+                            <button id="connect-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto" onclick="linkNodes()">
+                                <i class="fa-solid fa-link"></i> <span id="connect-btn-text"></span>
                             </button>
                         </div>
-
                         <div id="sim-terminal" class="terminal-block text-xs overflow-y-auto" style="max-height: 80px;">
-                            <div class="text-slate-500 italic">
-                                <span class="lang-fa">> منتظر دستورات شبکه...</span>
-                                <span class="lang-en">> Waiting for network commands...</span>
-                            </div>
+                            <div id="sim-initial-msg" class="text-slate-500 italic"></div>
                         </div>
-
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- Success overlay -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
-            <div class="text-7xl mb-4 animate-bounce">🌌🚀✨</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">شبکه فضایی راه‌اندازی شد!</span>
-                <span class="lang-en">Space Network Online!</span>
-            </h2>
-            <p class="text-xl text-cyan-400 mb-6 text-center px-4">
-                <span class="lang-fa">شما ابزارهای پیشرفته مدیریت حافظه (Smart Pointers) را یاد گرفتید! حالا می‌توانید ساختارهای داده پیچیده بسازید.</span>
-                <span class="lang-en">You mastered advanced memory management (Smart Pointers)! Now you can build complex data structures.</span>
-            </p>
-            <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(217,70,239,0.6)]" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۱۵ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 15 - Play Again</span>
-            </button>
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🌌🚀✨</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-cyan-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(217,70,239,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State & Logic ---
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                connectionsLabel: "اتصالات:",
+                memoryLabel: "وضعیت حافظه:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "سلام! به خزانه‌ی مخفی داده‌های من خوش اومدی! 📦",
+                    "تا الان یاد گرفتیم که هر مقدار توی Rust فقط یک مالک (Owner) داره.",
+                    "اما گاهی وقتا برای ساختن نقشه‌ها، گراف‌ها و شبکه‌ها، نیاز داریم چند نفر همزمان مالک یک داده باشن.",
+                    "با استفاده از جادوی اشاره‌گرهای هوشمند (مثل Rc و RefCell) می‌تونیم قوانین رو با رعایت ایمنی کامل دور بزنیم! بیا شروع کنیم. 🚀"
+                ],
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا اولین جعبه جادویی (Box) رو بشناسیم.",
+                mission1Title: "فصل ۱۵: راز جعبه‌های تو در تو 📦",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> بعضی داده‌ها خیلی بزرگ هستند و روی میز کار (Stack) جا نمی‌شوند. ما آن‌ها را در انبار بزرگ (Heap) می‌گذاریم.</p>
+                    <p class="text-slate-300">> برای این کار از «جعبه هدیه» یعنی `Box<T>` استفاده می‌کنیم. جعبه روی میز است، اما کادوی سنگین داخل انبار است!</p>
+                    <p class="text-cyan-300 mt-4 font-bold">برای ساختن یک جعبه و فرستادن داده به انبار، از کدام متد استفاده می‌کنیم؟</p>
+                `,
+                puzzle1Btn: "بسته‌بندی جعبه 🎁",
+                puzzle1Success: "> جعبه با موفقیت ساخته شد و در Heap قرار گرفت!",
+                puzzle1Error: "خطا: برای ساختن Box از متد Box::new() استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: کتاب اشتراکی (Rc)",
+                mission2Desc: "<p>گاهی چند نفر می‌خواهند همزمان مالک یک کتاب باشند! `Rc<T>` به ما اجازه می‌دهد قانون «یک مالک» را دور بزنیم. او تعداد خواننده‌ها را می‌شمارد.</p><p class='text-white font-bold'>وقتی می‌خواهیم کتاب را به نفر دوم بدهیم، از چه متدی برای افزایش شمارنده استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "تکثیر مالکیت 📚",
+                puzzle2Success: "> عالی! شمارنده‌ی ارجاع (Rc) افزایش یافت.",
+                puzzle2Error: "خطا: برای افزایش شمارنده در Rc، باید از متد Rc::clone استفاده کنیم.",
+                mission3Step: ">> مرحله ۲: دفترچه گروهی (RefCell)",
+                mission3Desc: "`Rc` فقط اجازه خواندن می‌دهد. اگر بخواهیم محتوای درون آن را تغییر دهیم، آن را درون `RefCell<T>` قرار می‌دهیم تا قفل نوشتن باز شود. با کدام متد قفل نوشتن (تغییر) را باز می‌کنیم؟",
+                puzzle3Btn: "باز کردن قفل نوشتن ✍️",
+                puzzle3Success: "> قفل نوشتن با موفقیت باز شد!",
+                puzzle3Error: "خطا: برای گرفتن دسترسیِ تغییرپذیر (نوشتن) در RefCell، از borrow_mut استفاده می‌شود.",
+                mission4Step: ">> مرحله نهایی: شبکه‌ی سیارات",
+                mission4Desc: "ما از `Rc<RefCell<Node>>` استفاده کرده‌ایم. با وصل کردن سیارات به هم، شبکه را فعال کن! <strong>۳ اتصال</strong> ایجاد کن تا برنده شوی. مواظب ایجاد حلقه (A->B->A) باش!",
+                connectBtn: "اتصال",
+                simInitial: "> منتظر دستورات شبکه...",
+                errorSelfConnect: "خطا: نمی‌توانی یک سیاره را به خودش وصل کنی!",
+                errorAlreadyConnected: (from, to) => `خطا: اتصال ${from} به ${to} از قبل وجود دارد!`,
+                successConnect: (from, to, rcVal) => `> Node ${from} به Node ${to} متصل شد. Rc(${to}) = ${rcVal}`,
+                warningCycle: "هشدار! حلقه (Cycle) ایجاد شد. این باعث Memory Leak می‌شود. در برنامه‌های واقعی باید از Weak Pointer استفاده کنیم!",
+                memorySafe: "Safe ✅",
+                memoryLeak: "Leak! ⚠️",
+                winTitle: "شبکه فضایی راه‌اندازی شد!",
+                winMessage: "شما ابزارهای پیشرفته مدیریت حافظه (Smart Pointers) را یاد گرفتید! حالا می‌توانید ساختارهای داده پیچیده بسازید.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                connectionsLabel: "Connections:",
+                memoryLabel: "Memory Status:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hi! Welcome to my secret Data Vault! 📦",
+                    "Until now, we learned that every value in Rust has exactly one Owner.",
+                    "But sometimes, to build maps, graphs, and networks, we need multiple people to own the same data at once.",
+                    "Using the magic of Smart Pointers (like Rc and RefCell), we can safely bend the rules! Let's get started. 🚀"
+                ],
+                afterDialog: "Let's go! Look at the monitor below to meet our first magic Box.",
+                mission1Title: "Chapter 15: The Secret of Nested Boxes 📦",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> Some data is too large to fit on our workbench (Stack). We store it in the massive warehouse (Heap).</p>
+                    <p class="text-slate-300">> We use a "Gift Box" called `Box<T>` for this. The box stays on the desk, but the heavy gift is in the warehouse!</p>
+                    <p class="text-cyan-300 mt-4 font-bold">To create a box and send data to the warehouse, which method do we use?</p>
+                `,
+                puzzle1Btn: "Pack the Box 🎁",
+                puzzle1Success: "> Box created successfully and placed in Heap!",
+                puzzle1Error: "Error: To create a Box, we use the Box::new() method.",
+                mission2Step: ">> Step 1: The Shared Book (Rc)",
+                mission2Desc: "<p>Sometimes multiple people want to own the same book! `Rc<T>` lets us bypass the 'one owner' rule by counting readers.</p><p class='text-white font-bold'>When we want to give the book to a second person, which method do we use to increase the counter?</p>",
+                puzzle2Btn: "Duplicate Ownership 📚",
+                puzzle2Success: "> Great! Reference count (Rc) increased.",
+                puzzle2Error: "Error: To increase the counter in Rc, we must use the Rc::clone method.",
+                mission3Step: ">> Step 2: Group Notebook (RefCell)",
+                mission3Desc: "`Rc` only allows reading. If we want to change its contents, we wrap it in a `RefCell<T>` to unlock writing. Which method opens the lock for writing (modifying)?",
+                puzzle3Btn: "Unlock for Writing ✍️",
+                puzzle3Success: "> Write lock opened successfully!",
+                puzzle3Error: "Error: To get mutable (write) access in a RefCell, we use borrow_mut.",
+                mission4Step: ">> Final Step: Planetary Network",
+                mission4Desc: "We used `Rc<RefCell<Node>>`. Connect the planets to activate the network! Make <strong>3 connections</strong> to win. Watch out for loops (A->B->A)!",
+                connectBtn: "Connect",
+                simInitial: "> Waiting for network commands...",
+                errorSelfConnect: "Error: Cannot connect a planet to itself!",
+                errorAlreadyConnected: (from, to) => `Error: Connection ${from} to ${to} already exists!`,
+                successConnect: (from, to, rcVal) => `> Node ${from} linked to Node ${to}. Rc(${to}) = ${rcVal}`,
+                warningCycle: "Warning! Cycle detected. This causes a Memory Leak. In real apps, we must use Weak Pointers!",
+                memorySafe: "Safe ✅",
+                memoryLeak: "Leak! ⚠️",
+                winTitle: "Space Network Online!",
+                winMessage: "You mastered advanced memory management (Smart Pointers)! Now you can build complex data structures.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                connectionsLabel: "Conexiones:",
+                memoryLabel: "Estado de memoria:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! ¡Bienvenido a mi bóveda secreta de datos! 📦",
+                    "Hasta ahora, aprendimos que cada valor en Rust tiene exactamente un Propietario.",
+                    "Pero a veces, para construir mapas, gráficos y redes, necesitamos que varias personas posean los mismos datos a la vez.",
+                    "¡Usando la magia de los Punteros Inteligentes (como Rc y RefCell), podemos doblar las reglas de manera segura! ¡Empecemos! 🚀"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para conocer nuestra primera caja mágica (Box).",
+                mission1Title: "Capítulo 15: El secreto de las cajas anidadas 📦",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> Algunos datos son demasiado grandes para caber en nuestro banco de trabajo (Stack). Los almacenamos en el enorme almacén (Heap).</p>
+                    <p class="text-slate-300">> Para esto usamos una "Caja de regalo" llamada `Box<T>`. La caja permanece en el escritorio, ¡pero el regalo pesado está en el almacén!</p>
+                    <p class="text-cyan-300 mt-4 font-bold">Para crear una caja y enviar datos al almacén, ¿qué método usamos?</p>
+                `,
+                puzzle1Btn: "Empaquetar la caja 🎁",
+                puzzle1Success: "> ¡Caja creada exitosamente y colocada en el Heap!",
+                puzzle1Error: "Error: Para crear un Box, usamos el método Box::new().",
+                mission2Step: ">> Paso 1: El libro compartido (Rc)",
+                mission2Desc: "<p>¡A veces varias personas quieren poseer el mismo libro! `Rc<T>` nos permite omitir la regla de 'un propietario' contando lectores.</p><p class='text-white font-bold'>Cuando queremos dar el libro a una segunda persona, ¿qué método usamos para aumentar el contador?</p>",
+                puzzle2Btn: "Duplicar propiedad 📚",
+                puzzle2Success: "> ¡Genial! El contador de referencias (Rc) aumentó.",
+                puzzle2Error: "Error: Para aumentar el contador en Rc, debemos usar el método Rc::clone.",
+                mission3Step: ">> Paso 2: Cuaderno grupal (RefCell)",
+                mission3Desc: "`Rc` solo permite lectura. Si queremos cambiar su contenido, lo envolvemos en un `RefCell<T>` para desbloquear la escritura. ¿Qué método abre el candado para escribir (modificar)?",
+                puzzle3Btn: "Desbloquear para escritura ✍️",
+                puzzle3Success: "> ¡Candado de escritura abierto exitosamente!",
+                puzzle3Error: "Error: Para obtener acceso mutable (escritura) en un RefCell, usamos borrow_mut.",
+                mission4Step: ">> Paso final: Red planetaria",
+                mission4Desc: "Usamos `Rc<RefCell<Node>>`. ¡Conecta los planetas para activar la red! Haz <strong>3 conexiones</strong> para ganar. ¡Cuidado con los bucles (A->B->A)!",
+                connectBtn: "Conectar",
+                simInitial: "> Esperando comandos de red...",
+                errorSelfConnect: "¡Error: No se puede conectar un planeta a sí mismo!",
+                errorAlreadyConnected: (from, to) => `Error: ¡La conexión ${from} a ${to} ya existe!`,
+                successConnect: (from, to, rcVal) => `> Nodo ${from} enlazado al Nodo ${to}. Rc(${to}) = ${rcVal}`,
+                warningCycle: "¡Advertencia! Ciclo detectado. Esto causa una fuga de memoria. En aplicaciones reales, ¡debemos usar Weak Pointers!",
+                memorySafe: "Seguro ✅",
+                memoryLeak: "¡Fuga! ⚠️",
+                winTitle: "¡Red espacial en línea!",
+                winMessage: "¡Dominaste la gestión avanzada de memoria (Punteros Inteligentes)! ¡Ahora puedes construir estructuras de datos complejas!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                connectionsLabel: "Verbindungen:",
+                memoryLabel: "Speicherstatus:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Willkommen in meinem geheimen Datentresor! 📦",
+                    "Bis jetzt haben wir gelernt, dass jeder Wert in Rust genau einen Besitzer hat.",
+                    "Aber manchmal, um Karten, Graphen und Netzwerke zu bauen, brauchen wir mehrere Leute, die gleichzeitig denselben Daten besitzen.",
+                    "Mit der Magie der Smart Pointer (wie Rc und RefCell) können wir die Regeln sicher biegen! Los geht's! 🚀"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um unsere erste magische Box kennenzulernen.",
+                mission1Title: "Kapitel 15: Das Geheimnis der verschachtelten Kisten 📦",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> Manche Daten sind zu groß für unsere Werkbank (Stack). Wir lagern sie im massiven Lagerhaus (Heap).</p>
+                    <p class="text-slate-300">> Dafür verwenden wir eine "Geschenkbox" namens `Box<T>`. Die Box bleibt auf dem Schreibtisch, aber das schwere Geschenk ist im Lagerhaus!</p>
+                    <p class="text-cyan-300 mt-4 font-bold">Um eine Box zu erstellen und Daten ins Lagerhaus zu senden, welche Methode verwenden wir?</p>
+                `,
+                puzzle1Btn: "Box verpacken 🎁",
+                puzzle1Success: "> Box erfolgreich erstellt und im Heap platziert!",
+                puzzle1Error: "Fehler: Um eine Box zu erstellen, verwenden wir die Methode Box::new().",
+                mission2Step: ">> Schritt 1: Das gemeinsame Buch (Rc)",
+                mission2Desc: "<p>Manchmal wollen mehrere Leute dasselbe Buch besitzen! `Rc<T>` erlaubt uns, die 'Ein-Besitzer'-Regel zu umgehen, indem es die Leser zählt.</p><p class='text-white font-bold'>Wenn wir das Buch einer zweiten Person geben wollen, welche Methode verwenden wir, um den Zähler zu erhöhen?</p>",
+                puzzle2Btn: "Eigentum vervielfachen 📚",
+                puzzle2Success: "> Großartig! Der Referenzzähler (Rc) wurde erhöht.",
+                puzzle2Error: "Fehler: Um den Zähler in Rc zu erhöhen, müssen wir die Methode Rc::clone verwenden.",
+                mission3Step: ">> Schritt 2: Gruppennotizbuch (RefCell)",
+                mission3Desc: "`Rc` erlaubt nur Lesen. Wenn wir seinen Inhalt ändern wollen, verpacken wir es in ein `RefCell<T>`, um das Schreiben zu entsperren. Welche Methode öffnet das Schloss zum Schreiben (Ändern)?",
+                puzzle3Btn: "Zum Schreiben entsperren ✍️",
+                puzzle3Success: "> Schreibschloss erfolgreich geöffnet!",
+                puzzle3Error: "Fehler: Um veränderbaren (Schreib-)Zugriff in einem RefCell zu erhalten, verwenden wir borrow_mut.",
+                mission4Step: ">> Letzter Schritt: Planetares Netzwerk",
+                mission4Desc: "Wir haben `Rc<RefCell<Node>>` verwendet. Verbinde die Planeten, um das Netzwerk zu aktivieren! Mache <strong>3 Verbindungen</strong>, um zu gewinnen. Achte auf Schleifen (A->B->A)!",
+                connectBtn: "Verbinden",
+                simInitial: "> Warten auf Netzwerkbefehle...",
+                errorSelfConnect: "Fehler: Ein Planet kann nicht mit sich selbst verbunden werden!",
+                errorAlreadyConnected: (from, to) => `Fehler: Verbindung ${from} zu ${to} existiert bereits!`,
+                successConnect: (from, to, rcVal) => `> Knoten ${from} mit Knoten ${to} verbunden. Rc(${to}) = ${rcVal}`,
+                warningCycle: "Warnung! Zyklus erkannt. Dies verursacht ein Speicherleck. In echten Anwendungen müssen wir Weak Pointers verwenden!",
+                memorySafe: "Sicher ✅",
+                memoryLeak: "Leck! ⚠️",
+                winTitle: "Weltraum-Netzwerk online!",
+                winMessage: "Du hast fortgeschrittenes Speichermanagement (Smart Pointer) gemeistert! Jetzt kannst du komplexe Datenstrukturen bauen.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                connectionsLabel: "Verbindingen:",
+                memoryLabel: "Geheugenstatus:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Welkom in mijn geheime datakluis! 📦",
+                    "Tot nu toe hebben we geleerd dat elke waarde in Rust precies één Eigenaar heeft.",
+                    "Maar soms, om kaarten, grafieken en netwerken te bouwen, hebben we meerdere mensen nodig die tegelijkertijd dezelfde gegevens bezitten.",
+                    "Met de magie van Smart Pointers (zoals Rc en RefCell) kunnen we de regels veilig buigen! Laten we beginnen! 🚀"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om onze eerste magische doos (Box) te ontmoeten.",
+                mission1Title: "Hoofdstuk 15: Het geheim van geneste dozen 📦",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> Sommige gegevens zijn te groot voor onze werkbank (Stack). We slaan ze op in het enorme magazijn (Heap).</p>
+                    <p class="text-slate-300">> Hiervoor gebruiken we een "Cadeaudoos" genaamd `Box<T>`. De doos blijft op het bureau, maar het zware cadeau ligt in het magazijn!</p>
+                    <p class="text-cyan-300 mt-4 font-bold">Om een doos te maken en gegevens naar het magazijn te sturen, welke methode gebruiken we?</p>
+                `,
+                puzzle1Btn: "Doos inpakken 🎁",
+                puzzle1Success: "> Doos succesvol aangemaakt en in de Heap geplaatst!",
+                puzzle1Error: "Fout: Om een Box te maken, gebruiken we de methode Box::new().",
+                mission2Step: ">> Stap 1: Het gedeelde boek (Rc)",
+                mission2Desc: "<p>Soms willen meerdere mensen hetzelfde boek bezitten! `Rc<T>` stelt ons in staat de 'één eigenaar'-regel te omzeilen door lezers te tellen.</p><p class='text-white font-bold'>Wanneer we het boek aan een tweede persoon willen geven, welke methode gebruiken we om de teller te verhogen?</p>",
+                puzzle2Btn: "Eigendom dupliceren 📚",
+                puzzle2Success: "> Geweldig! De referentieteller (Rc) is verhoogd.",
+                puzzle2Error: "Fout: Om de teller in Rc te verhogen, moeten we de methode Rc::clone gebruiken.",
+                mission3Step: ">> Stap 2: Groepsnotitieboekje (RefCell)",
+                mission3Desc: "`Rc` staat alleen lezen toe. Als we de inhoud willen wijzigen, wikkelen we het in een `RefCell<T>` om schrijven te ontgrendelen. Welke methode opent het slot voor schrijven (wijzigen)?",
+                puzzle3Btn: "Ontgrendelen voor schrijven ✍️",
+                puzzle3Success: "> Schrijfslot succesvol geopend!",
+                puzzle3Error: "Fout: Om veranderbare (schrijf-)toegang in een RefCell te krijgen, gebruiken we borrow_mut.",
+                mission4Step: ">> Laatste stap: Planetair netwerk",
+                mission4Desc: "We gebruikten `Rc<RefCell<Node>>`. Verbind de planeten om het netwerk te activeren! Maak <strong>3 verbindingen</strong> om te winnen. Pas op voor lussen (A->B->A)!",
+                connectBtn: "Verbinding maken",
+                simInitial: "> Wachten op netwerkcommando's...",
+                errorSelfConnect: "Fout: Kan een planeet niet met zichzelf verbinden!",
+                errorAlreadyConnected: (from, to) => `Fout: Verbinding ${from} naar ${to} bestaat al!`,
+                successConnect: (from, to, rcVal) => `> Knooppunt ${from} gekoppeld aan knooppunt ${to}. Rc(${to}) = ${rcVal}`,
+                warningCycle: "Waarschuwing! Cyclus gedetecteerd. Dit veroorzaakt een geheugenlek. In echte apps moeten we Weak Pointers gebruiken!",
+                memorySafe: "Veilig ✅",
+                memoryLeak: "Lek! ⚠️",
+                winTitle: "Ruimtenetwerk online!",
+                winMessage: "Je hebt geavanceerd geheugenbeheer (Smart Pointers) onder de knie! Nu kun je complexe datastructuren bouwen.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
+        };
+
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
         let currentLang = 'fa';
         let currentStep = 0;
         let currentDialogIndex = 0;
-        let typeInterval;
-
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
         let linksCreated = 0;
-        let nodes = {
-            A: { rc: 1, connections: [] },
-            B: { rc: 1, connections: [] },
-            C: { rc: 1, connections: [] }
-        };
+        let nodes = { A: { rc: 1, connections: [] }, B: { rc: 1, connections: [] }, C: { rc: 1, connections: [] } };
 
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "سلام! به خزانه‌ی مخفی داده‌های من خوش اومدی! 📦",
-                "تا الان یاد گرفتیم که هر مقدار توی Rust فقط یک مالک (Owner) داره.",
-                "اما گاهی وقتا برای ساختن نقشه‌ها، گراف‌ها و شبکه‌ها، نیاز داریم چند نفر همزمان مالک یک داده باشن.",
-                "با استفاده از جادوی اشاره‌گرهای هوشمند (مثل Rc و RefCell) می‌تونیم قوانین رو با رعایت ایمنی کامل دور بزنیم! بیا شروع کنیم. 🚀"
-            ],
-            en: [
-                "Hi! Welcome to my secret Data Vault! 📦",
-                "Until now, we learned that every value in Rust has exactly one Owner.",
-                "But sometimes, to build maps, graphs, and networks, we need multiple people to own the same data at once.",
-                "Using the magic of Smart Pointers (like Rc and RefCell), we can safely bend the rules! Let's get started. 🚀"
-            ]
-        };
+        // DOM elements
+        const connectionsLabelSpan = document.getElementById('connections-label');
+        const memoryLabelSpan = document.getElementById('memory-label');
+        const hudLinksSpan = document.getElementById('hud-links');
+        const hudMemSpan = document.getElementById('hud-mem');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
 
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-fuchsia-600 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hud-links').innerText = `${linksCreated.toLocaleString('fa-IR')} / ۳`;
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-fuchsia-600 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hud-links').innerText = `${linksCreated} / 3`;
-            }
-
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-fuchsia-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
-            } else {
-                cb();
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
             }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
-            const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
-            nextBtn.classList.add('hidden');
-
-            typeWriter(text, 0, () => {
-                nextBtn.classList.remove('hidden');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
             });
         }
 
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "بزن بریم! به مانیتور پایین نگاه کن تا اولین جعبه جادویی (Box) رو بشناسیم." :
-                    "Let's go! Look at the monitor below to meet our first magic Box.";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            connectionsLabelSpan.innerText = pack.connectionsLabel;
+            memoryLabelSpan.innerText = pack.memoryLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            hudLinksSpan.innerText = currentLang === 'fa' ? `${formatNumber(linksCreated, currentLang)} / ۳` : `${linksCreated} / 3`;
+            hudMemSpan.innerText = pack.memorySafe;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('connect-btn-text').innerHTML = pack.connectBtn;
+            document.getElementById('sim-initial-msg').innerHTML = pack.simInitial;
+
+            // Dropdown options translation
+            const fromSelect = document.getElementById('sel-from');
+            const toSelect = document.getElementById('sel-to');
+            for (let i = 0; i < fromSelect.options.length; i++) {
+                const val = fromSelect.options[i].value;
+                fromSelect.options[i].innerHTML = `Planet ${val}`;
+                toSelect.options[i].innerHTML = `Planet ${val}`;
+            }
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-fuchsia-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
         }
 
         function startMission(missionNum) {
             document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
             document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            if (missionNum === 4) {
+                // Reset graph simulator state
+                linksCreated = 0;
+                nodes = { A: { rc: 1, connections: [] }, B: { rc: 1, connections: [] }, C: { rc: 1, connections: [] } };
+                hudLinksSpan.innerText = currentLang === 'fa' ? `۰ / ۳` : `0 / 3`;
+                document.getElementById('rc-A').innerText = '1';
+                document.getElementById('rc-B').innerText = '1';
+                document.getElementById('rc-C').innerText = '1';
+                document.getElementById('node-A').classList.remove('active');
+                document.getElementById('node-B').classList.remove('active');
+                document.getElementById('node-C').classList.remove('active');
+                hudMemSpan.innerHTML = languagePack[currentLang].memorySafe;
+                // Clear lines
+                const container = document.getElementById('graph-container');
+                const lines = container.querySelectorAll('div[style*="position: absolute; background-color"]');
+                lines.forEach(line => line.remove());
+                const term = document.getElementById('sim-terminal');
+                term.innerHTML = `<div id="sim-initial-msg" class="text-slate-500 italic">${languagePack[currentLang].simInitial}</div>`;
+            }
         }
 
-        // --- Puzzle System ---
+        // Puzzle handlers
         function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
-
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
@@ -548,9 +814,9 @@
         }
 
         function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
@@ -559,57 +825,69 @@
             document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
         }
 
-        function triggerError(puzzleNum, msgFa, msgEn) {
+        function triggerError(puzzleNum, msg) {
             const crt = document.getElementById('crt-monitor');
             const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
             crt.classList.add('glitch');
             setTimeout(() => crt.classList.remove('glitch'), 300);
-            feedback.innerText = currentLang === 'fa' ? msgFa : msgEn;
+            feedback.innerText = msg;
         }
 
         function checkPuzzle1() {
+            if (puzzle1Completed) return;
             const slotText = document.getElementById('slot1').innerText;
-            const feedback = document.getElementById('puzzle1-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'new') {
-                feedback.className = "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> جعبه با موفقیت ساخته شد و در Heap قرار گرفت!" : "> Box created successfully and placed in Heap!";
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(2), 1500);
             } else {
-                triggerError(1, "خطا: برای ساختن Box از متد Box::new() استفاده می‌کنیم.", "Error: To create a Box, we use the Box::new() method.");
+                triggerError(1, pack.puzzle1Error);
             }
         }
 
         function checkPuzzle2() {
+            if (puzzle2Completed) return;
             const slotText = document.getElementById('slot2').innerText;
-            const feedback = document.getElementById('puzzle2-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'clone') {
-                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> عالی! شمارنده‌ی ارجاع (Rc) افزایش یافت." : "> Great! Reference count (Rc) increased.";
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(3), 1500);
             } else {
-                triggerError(2, "خطا: برای افزایش شمارنده در Rc، باید از متد Rc::clone استفاده کنیم.", "Error: To increase the counter in Rc, we must use the Rc::clone method.");
+                triggerError(2, pack.puzzle2Error);
             }
         }
 
         function checkPuzzle3() {
+            if (puzzle3Completed) return;
             const slotText = document.getElementById('slot3').innerText;
-            const feedback = document.getElementById('puzzle3-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'borrow_mut') {
-                feedback.className = "text-cyan-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> قفل نوشتن با موفقیت باز شد!" : "> Write lock opened successfully!";
+                document.getElementById('puzzle3-feedback').className = "text-cyan-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
-                triggerError(3, "خطا: برای گرفتن دسترسیِ تغییرپذیر (نوشتن) در RefCell، از borrow_mut استفاده می‌شود.", "Error: To get mutable (write) access in a RefCell, we use borrow_mut.");
+                triggerError(3, pack.puzzle3Error);
             }
         }
 
-        // --- Graph Network Simulator ---
+        // Graph Network Simulator
         function appendToTerminal(htmlContent) {
             const term = document.getElementById('sim-terminal');
-            if(term.innerHTML.includes("منتظر دستورات") || term.innerHTML.includes("Waiting for network")) {
+            if (term.innerHTML.includes(languagePack[currentLang].simInitial)) {
                 term.innerHTML = '';
             }
             const div = document.createElement('div');
@@ -619,52 +897,83 @@
             term.scrollTop = term.scrollHeight;
         }
 
+        function drawConnection(from, to) {
+            const container = document.getElementById('graph-container');
+            const el1 = document.getElementById(`node-${from}`);
+            const el2 = document.getElementById(`node-${to}`);
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            const contRect = container.getBoundingClientRect();
+            const x1 = rect1.left - contRect.left + (rect1.width / 2);
+            const y1 = rect1.top - contRect.top + (rect1.height / 2);
+            const x2 = rect2.left - contRect.left + (rect2.width / 2);
+            const y2 = rect2.top - contRect.top + (rect2.height / 2);
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            const line = document.createElement('div');
+            line.style.position = 'absolute';
+            line.style.backgroundColor = '#06b6d4';
+            line.style.height = '2px';
+            line.style.zIndex = '1';
+            line.style.boxShadow = '0 0 10px #06b6d4';
+            line.style.width = `${length}px`;
+            line.style.left = `${x1}px`;
+            line.style.top = `${y1}px`;
+            line.style.transformOrigin = '0 0';
+            line.style.transform = `rotate(${angle}deg)`;
+            line.innerHTML = `<div style="width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:-2px;box-shadow:0 0 5px #fff;animation:flow 1.5s infinite linear;"></div>`;
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes flow { 0% { left: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }`;
+            document.head.appendChild(style);
+            container.appendChild(line);
+        }
+
+        function checkForCycle() {
+            const pack = languagePack[currentLang];
+            const a = nodes['A'].connections;
+            const b = nodes['B'].connections;
+            const c = nodes['C'].connections;
+            let hasCycle = false;
+            if (a.includes('B') && b.includes('A')) hasCycle = true;
+            if (b.includes('C') && c.includes('B')) hasCycle = true;
+            if (c.includes('A') && a.includes('C')) hasCycle = true;
+            if (a.includes('B') && b.includes('C') && c.includes('A')) hasCycle = true;
+            if (a.includes('C') && c.includes('B') && b.includes('A')) hasCycle = true;
+            if (hasCycle) {
+                hudMemSpan.innerHTML = pack.memoryLeak;
+                hudMemSpan.className = 'text-rose-400 animate-pulse';
+                appendToTerminal(`<span class="text-yellow-400 font-bold">⚠️ ${pack.warningCycle}</span>`);
+            } else {
+                hudMemSpan.innerHTML = pack.memorySafe;
+                hudMemSpan.className = '';
+            }
+        }
+
         function linkNodes() {
+            const pack = languagePack[currentLang];
             const from = document.getElementById('sel-from').value;
             const to = document.getElementById('sel-to').value;
-
             if (from === to) {
-                const msg = currentLang === 'fa' ? "خطا: نمی‌توانی یک سیاره را به خودش وصل کنی!" : "Error: Cannot connect a planet to itself!";
-                appendToTerminal(`<span class="text-rose-400">❌ ${msg}</span>`);
-
+                appendToTerminal(`<span class="text-rose-400">❌ ${pack.errorSelfConnect}</span>`);
                 const crt = document.getElementById('crt-monitor');
                 crt.classList.add('glitch');
                 setTimeout(() => crt.classList.remove('glitch'), 300);
                 return;
             }
-
-            // Check if link already exists
             if (nodes[from].connections.includes(to)) {
-                const msg = currentLang === 'fa' ? `خطا: اتصال ${from} به ${to} از قبل وجود دارد!` : `Error: Connection ${from} to ${to} already exists!`;
-                appendToTerminal(`<span class="text-yellow-400">⚠️ ${msg}</span>`);
+                appendToTerminal(`<span class="text-yellow-400">⚠️ ${pack.errorAlreadyConnected(from, to)}</span>`);
                 return;
             }
-
-            // Update State
             nodes[from].connections.push(to);
             nodes[to].rc++;
             linksCreated++;
-
-            // Update UI
             document.getElementById(`rc-${to}`).innerText = nodes[to].rc;
             document.getElementById(`node-${from}`).classList.add('active');
             document.getElementById(`node-${to}`).classList.add('active');
-
-            // Draw visual line (CSS trick)
             drawConnection(from, to);
-
-            // Update HUD
-            setLang(currentLang);
-
-            const msg = currentLang === 'fa' ?
-                `> Node ${from} به Node ${to} متصل شد. Rc(${to}) = ${nodes[to].rc}` :
-                `> Node ${from} linked to Node ${to}. Rc(${to}) = ${nodes[to].rc}`;
-            appendToTerminal(`<span class="text-emerald-300">${msg}</span>`);
-
-            // Check for Memory Leak (Cycle)
+            hudLinksSpan.innerText = currentLang === 'fa' ? `${formatNumber(linksCreated, currentLang)} / ۳` : `${linksCreated} / 3`;
+            appendToTerminal(`<span class="text-emerald-300">${pack.successConnect(from, to, nodes[to].rc)}</span>`);
             checkForCycle();
-
-            // Win Condition
             if (linksCreated >= 3) {
                 setTimeout(() => {
                     triggerConfetti();
@@ -673,88 +982,18 @@
             }
         }
 
-        function drawConnection(from, to) {
-            const container = document.getElementById('graph-container');
-            const el1 = document.getElementById(`node-${from}`);
-            const el2 = document.getElementById(`node-${to}`);
-
-            const line = document.createElement('div');
-            line.style.position = 'absolute';
-            line.style.backgroundColor = '#06b6d4'; // Cyan 500
-            line.style.height = '2px';
-            line.style.zIndex = '1';
-            line.style.boxShadow = '0 0 10px #06b6d4';
-
-            // Simple positioning logic assuming horizontal flex layout
-            const rect1 = el1.getBoundingClientRect();
-            const rect2 = el2.getBoundingClientRect();
-            const contRect = container.getBoundingClientRect();
-
-            const x1 = rect1.left - contRect.left + (rect1.width/2);
-            const y1 = rect1.top - contRect.top + (rect1.height/2);
-            const x2 = rect2.left - contRect.left + (rect2.width/2);
-            const y2 = rect2.top - contRect.top + (rect2.height/2);
-
-            const length = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
-            const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
-
-            line.style.width = `${length}px`;
-            line.style.left = `${x1}px`;
-            line.style.top = `${y1}px`;
-            line.style.transformOrigin = '0 0';
-            line.style.transform = `rotate(${angle}deg)`;
-
-            // Add a little moving dot animation for data flow
-            line.innerHTML = `<div style="width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:-2px;box-shadow:0 0 5px #fff;animation:flow 1.5s infinite linear;"></div>`;
-            const style = document.createElement('style');
-            style.innerHTML = `@keyframes flow { 0% { left: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }`;
-            document.head.appendChild(style);
-
-            container.appendChild(line);
+        function goToNextChapter() {
+            window.location.href = 'chapter-16.html';
         }
 
-        function checkForCycle() {
-            // Very simple hardcoded cycle check for 3 nodes
-            const a = nodes['A'].connections;
-            const b = nodes['B'].connections;
-            const c = nodes['C'].connections;
-
-            let hasCycle = false;
-
-            // A <-> B
-            if(a.includes('B') && b.includes('A')) hasCycle = true;
-            // B <-> C
-            if(b.includes('C') && c.includes('B')) hasCycle = true;
-            // C <-> A
-            if(c.includes('A') && a.includes('C')) hasCycle = true;
-            // A -> B -> C -> A
-            if(a.includes('B') && b.includes('C') && c.includes('A')) hasCycle = true;
-            // A -> C -> B -> A
-            if(a.includes('C') && c.includes('B') && b.includes('A')) hasCycle = true;
-
-            if(hasCycle) {
-                const hudMem = document.getElementById('hud-mem');
-                hudMem.innerHTML = 'Leak! ⚠️';
-                hudMem.className = 'text-rose-400 animate-pulse';
-
-                const msg = currentLang === 'fa' ?
-                    "هشدار! حلقه (Cycle) ایجاد شد. این باعث Memory Leak می‌شود. در برنامه‌های واقعی باید از Weak Pointer استفاده کنیم!" :
-                    "Warning! Cycle detected. This causes a Memory Leak. In real apps, we must use Weak Pointers!";
-                appendToTerminal(`<span class="text-yellow-400 font-bold">⚠️ ${msg}</span>`);
-            }
-        }
-
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
-        const possibleColors = ["#d946ef", "#06b6d4", "#a855f7", "#22d3ee", "#ffffff"]; // Fuchsia, Cyan, Violet
-
+        const possibleColors = ["#d946ef", "#06b6d4", "#a855f7", "#22d3ee", "#ffffff"];
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -764,7 +1003,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -774,46 +1012,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
-            if(!animationId) Draw();
+            if (!animationId) Draw();
         }
 
-        // Initialize Game
+        // Initialization
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

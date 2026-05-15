@@ -1,1343 +1,994 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 13</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 13</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --crt-bg: #064e3b;
+            --accent-primary: #10b981;
+            --accent-secondary: #ec4899;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(16, 185, 129, 0.1) 2px, transparent 40px), radial-gradient(rgba(236, 72, 153, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .filter-select, #log-output {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #047857;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(16, 185, 129, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(236, 72, 153, 0.02), rgba(16, 185, 129, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(236, 253, 245, 0.95);
+            color: #064e3b;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(236, 253, 245, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(236, 253, 245, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #ecfdf5; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed #fbbf24; margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: #fbbf24; background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(16, 185, 129, 0.2); color: #a7f3d0; }
+        .code-slot.filled.pink-accent { border-color: var(--accent-secondary); background: rgba(236, 72, 153, 0.2); color: #fbcfe8; }
+        .code-option {
+            background: #0f172a; border: 2px solid #334155;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #1e293b; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #6ee7b7; color: #022c22; font-weight: bold; }
+        .code-option.pink-mode.selected { background: var(--accent-secondary); border-color: #f9a8d4; color: #4c0519; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .filter-select {
+            background-color: #064e3b; border: 2px solid #059669;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            outline: none; transition: border-color 0.3s; font-family: 'JetBrains Mono', monospace;
+            cursor: pointer; font-weight: bold;
+        }
+        .filter-select:focus { border-color: #34d399; }
+        .log-line {
+            padding: 4px; border-bottom: 1px dashed rgba(255,255,255,0.1);
+            animation: slideIn 0.3s ease-out forwards; opacity: 0;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .filter-select { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #0f172a; /* Slate 900 */
-                --crt-bg: #064e3b; /* Emerald 950 */
-                --accent-primary: #10b981; /* Emerald 500 */
-                --accent-secondary: #ec4899; /* Pink 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(16, 185, 129, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(236, 72, 153, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Factory Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 30px rgba(16, 185, 129, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.7);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-                border: 4px solid #047857; /* Emerald 700 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(16, 185, 129, 0.03) 50%,
-                        rgba(0, 0, 0, 0.25) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(236, 72, 153, 0.02),
-                        rgba(16, 185, 129, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(236, 253, 245, 0.95); /* Emerald 50 */
-                color: #064e3b; /* Emerald 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(236, 253, 245, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(236, 253, 245, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #ecfdf5;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed #fbbf24;
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: #fbbf24;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-primary);
-                background: rgba(16, 185, 129, 0.2);
-                color: #a7f3d0;
-            }
-            .code-slot.filled.pink-accent {
-                border-color: var(--accent-secondary);
-                background: rgba(236, 72, 153, 0.2);
-                color: #fbcfe8;
-            }
-
-            .code-option {
-                background: #0f172a;
-                border: 2px solid #334155;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #e2e8f0;
-            }
-            .code-option:hover {
-                background: #1e293b;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-primary);
-                border-color: #6ee7b7;
-                color: #022c22;
-                font-weight: bold;
-            }
-            .code-option.pink-mode.selected {
-                background: var(--accent-secondary);
-                border-color: #f9a8d4;
-                color: #4c0519;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(16, 185, 129, 0.3);
-            }
-
-            /* Simulator Styles */
-            .filter-select {
-                background-color: #064e3b;
-                border: 2px solid #059669;
-                color: white;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                outline: none;
-                transition: border-color 0.3s;
-                font-family: "JetBrains Mono", monospace;
-                cursor: pointer;
-                font-weight: bold;
-            }
-            .filter-select:focus {
-                border-color: #34d399;
-            }
-
-            .log-line {
-                padding: 4px;
-                border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-                animation: slideIn 0.3s ease-out forwards;
-                opacity: 0;
-            }
-            @keyframes slideIn {
-                from {
-                    transform: translateX(20px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-emerald-600 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-emerald-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-emerald-400"><i class="fa-solid fa-train-tram"></i> <span id="wagons-label"></span> <span id="hud-wagons">0 / 5</span></div>
+                <div class="text-pink-400"><i class="fa-solid fa-bug"></i> <span id="errors-label"></span> <span id="hud-errors">0</span></div>
             </div>
+            <div class="text-emerald-300 code-font text-xs md:text-sm opacity-70">ITER-OS v13.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-emerald-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-emerald-400">
-                        <i class="fa-solid fa-train-tram"></i>
-                        <span class="lang-fa">واگن‌های بررسی شده:</span
-                        ><span class="lang-en">Wagons Processed:</span>
-                        <span class="text-white" id="hud-wagons">۰ / ۵</span>
-                    </div>
-                    <div class="text-pink-400">
-                        <i class="fa-solid fa-bug"></i>
-                        <span class="lang-fa">خطاهای یافت شده:</span
-                        ><span class="lang-en">Errors Found:</span>
-                        <span id="hud-errors" class="text-white">۰</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🚂🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-emerald-500">
+                <h3 id="ferris-name" class="font-bold text-emerald-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-emerald-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-emerald-300 code-font text-sm opacity-70">
-                    ITER-OS v13.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🚂🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-emerald-500"
-                >
-                    <h3 class="font-bold text-emerald-700 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-emerald-700 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-emerald-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-emerald-200 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: The Iterator Train -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-emerald-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۳: قطار باربری (Iterators) 🚂
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 13: The Cargo Train (Iterators) 🚂
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-emerald-300">
-                                > ما یک قطار پر از سنگ‌های معدنی داریم. برای
-                                پردازش آن‌ها نمی‌توانیم همه را یکجا خالی کنیم!
-                            </p>
-                            <p class="text-slate-300">
-                                > ابزاری به نام **Iterator** دقیقاً مثل یک ریل
-                                قطار عمل می‌کند؛ هر بار که درخواست کنیم، فقط
-                                **یک واگن** را به ما تحویل می‌دهد.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                نام متدی که یک وکتور را به یک ریل قطار
-                                (Iterator) تبدیل می‌کند چیست؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-emerald-300">
-                                > We have a train full of glowing gems. We can't
-                                process them all at once!
-                            </p>
-                            <p class="text-slate-300">
-                                > A tool called an **Iterator** acts like a
-                                train track; every time we ask, it delivers
-                                exactly **one wagon** to us.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                What is the method name that turns a vector into
-                                a train track (Iterator)?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-pink-400">let</span> gems =
-                            <span class="text-blue-300">vec!</span>[<span
-                                class="text-yellow-300"
-                                >"💎"</span
-                            >,
-                            <span class="text-yellow-300">"💎"</span
-                            >];<br /><br />
-                            <span class="text-slate-400 text-sm"
-                                >// Create the train track</span
-                            ><br />
-                            <span class="text-pink-400">let mut</span> train =
-                            gems.<span
-                                id="slot1"
-                                class="code-slot text-emerald-400"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            >();<br />
-                            <span class="text-slate-400 text-sm"
-                                >// Get the first gem!</span
-                            ><br />
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"{:?}"</span
-                            >, train.next());
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-emerald-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'next')"
-                                >
-                                    next
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'get')"
-                                >
-                                    get
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'loop')"
-                                >
-                                    loop
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'iter')"
-                                >
-                                    iter
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa">راه‌اندازی ریل 🛤️</span
-                                ><span class="lang-en">Start Tracks 🛤️</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: Adapters (map, filter) -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: ماشین‌آلات کارخانه (Adapters)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Factory Machines (Adapters)</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                روی ریل قطار، ماشین‌هایی وجود دارند. ماشین
-                                `filter` فقط سنگ‌های خاصی را عبور می‌دهد. ماشین
-                                `map` شکل سنگ‌ها را تغییر می‌دهد.
-                            </p>
-                            <p class="text-white font-bold">
-                                برای اینکه در انتهای خط تولید، تمام سنگ‌های
-                                پردازش شده را در یک جعبه‌ی جدید (`Vec`) جمع‌آوری
-                                کنیم، از کدام ماشین (متد) استفاده می‌کنیم؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                There are machines on the track. `filter` only
-                                lets certain gems pass. `map` changes their
-                                shape.
-                            </p>
-                            <p class="text-white font-bold">
-                                To gather all processed gems into a new box
-                                (`Vec`) at the end of the line, which machine
-                                (method) do we use?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">let</span> processed:
-                            Vec&lt;_&gt; = gems.iter()<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;.filter(|&g| g ==
-                            <span class="text-yellow-300">"💎"</span>)<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;.map(|g|
-                            <span class="text-yellow-300">"✨"</span>)<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;.<span
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >();
-                            <span class="text-slate-400 text-sm"
-                                >// Gather them!</span
-                            >
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-emerald-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'save')"
-                                >
-                                    save
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'gather')"
-                                >
-                                    gather
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'collect')"
-                                >
-                                    collect
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'finish')"
-                                >
-                                    finish
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >روشن کردن خط تولید ⚙️</span
-                                ><span class="lang-en"
-                                    >Start Assembly Line ⚙️</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: Closures -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-pink-400 mb-2 font-bold">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: کوله‌پشتی جادویی (Closures)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Magic Backpack (Closures)</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            ماشین‌های `map` و `filter` برای کار کردن نیاز به
-                            دستورالعمل‌های کوتاه دارند. ما این دستورات را با
-                            توابع بی‌نام یا **Closure** به آن‌ها می‌دهیم. ساختار
-                            یک Closure با چه علامتی برای تعریف پارامترها شروع
-                            می‌شود؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            The `map` and `filter` machines need short
-                            instructions to work. We give them anonymous
-                            functions called **Closures**. What symbol is used
-                            to define parameters in a Closure?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-slate-400 text-sm"
-                                >// دستور: هر چیزی گرفتی ضربدر ۲ کن</span
-                            ><br />
-                            <span class="text-pink-400">let</span> double =
-                            <span
-                                id="slot3"
-                                class="code-slot pink-accent"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >
-                            x *
-                            <span class="text-orange-300">2</span>;<br /><br />
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"{}"</span
-                            >, double(<span class="text-orange-300">5</span>));
-                            <span class="text-slate-400 text-sm">// 10</span>
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-pink-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option pink-mode code-font text-2xl px-6"
-                                    onclick="selectOption(this, 3, '(x)')"
-                                >
-                                    (x)
-                                </div>
-                                <div
-                                    class="code-option pink-mode code-font text-2xl px-6"
-                                    onclick="selectOption(this, 3, '[x]')"
-                                >
-                                    [x]
-                                </div>
-                                <div
-                                    class="code-option pink-mode code-font text-2xl px-6"
-                                    onclick="selectOption(this, 3, '|x|')"
-                                >
-                                    |x|
-                                </div>
-                                <div
-                                    class="code-option pink-mode code-font text-2xl px-6"
-                                    onclick="selectOption(this, 3, '<x>')"
-                                >
-                                    &lt;x&gt;
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-pink-600 hover:bg-pink-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >ذخیره دستور در کوله 🎒</span
-                                ><span class="lang-en"
-                                    >Save Command in Backpack 🎒</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Log Processor Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-yellow-400 mb-2 border-b border-emerald-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: شبیه‌ساز پردازش لاگ</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: Log Processor
-                                    Simulator</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-emerald-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۳.۵</span
-                                ><span class="lang-en">Project 13.5</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            سیستم پر از پیام‌های مختلف است. از منوی زیر استفاده
-                            کن و ماشین `filter` را جوری تنظیم کن که **فقط خطاهای
-                            (ERROR)** سیستم را استخراج کرده و بشمارد تا برنده
-                            شوی!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            The system is full of messages. Configure the
-                            `filter` machine below to extract and count **only
-                            the system ERRORs** to win!
-                        </div>
-
-                        <div class="flex flex-col md:flex-row gap-4 flex-grow">
-                            <!-- Control Panel -->
-                            <div
-                                class="w-full md:w-1/2 flex flex-col gap-3 bg-black/40 p-4 rounded-lg border border-emerald-800"
-                            >
-                                <div
-                                    class="text-emerald-400 font-bold mb-1 code-font"
-                                >
-                                    log_lines.iter()
-                                </div>
-
-                                <div class="flex items-center gap-2">
-                                    <span class="text-pink-400 code-font"
-                                        >.filter(|msg|</span
-                                    >
-                                    <select
-                                        id="log-filter"
-                                        class="filter-select w-full"
-                                    >
-                                        <option value="ALL">
-                                            msg.contains("ALL")
-                                        </option>
-                                        <option value="INFO">
-                                            msg.contains("INFO")
-                                        </option>
-                                        <option value="WARNING">
-                                            msg.contains("WARNING")
-                                        </option>
-                                        <option value="ERROR">
-                                            msg.contains("ERROR")
-                                        </option>
-                                    </select>
-                                    <span class="text-pink-400 code-font"
-                                        >)</span
-                                    >
-                                </div>
-
-                                <div
-                                    class="text-emerald-400 font-bold mt-1 code-font"
-                                >
-                                    .collect()
-                                </div>
-
-                                <button
-                                    class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold mt-auto"
-                                    onclick="processLogs()"
-                                >
-                                    <i class="fa-solid fa-play"></i>
-                                    <span class="lang-fa">اجرای زنجیره</span
-                                    ><span class="lang-en">Run Chain</span>
-                                </button>
-                                <div
-                                    id="sim-feedback"
-                                    class="text-rose-400 text-xs text-center h-4 font-bold"
-                                ></div>
-                            </div>
-
-                            <!-- Terminal Output -->
-                            <div class="w-full md:w-1/2 flex flex-col">
-                                <div class="text-slate-400 text-xs mb-1">
-                                    Terminal Output:
-                                </div>
-                                <div
-                                    id="log-output"
-                                    class="terminal-block flex-grow overflow-y-auto"
-                                    style="min-height: 120px"
-                                >
-                                    <div class="text-slate-500 italic text-sm">
-                                        <span class="lang-fa"
-                                            >> آماده برای خواندن خطوط...</span
-                                        >
-                                        <span class="lang-en"
-                                            >> Ready to read lines...</span
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">🚂🎒✅</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa">داده‌ها با موفقیت فیلتر شدند!</span>
-                    <span class="lang-en">Data Successfully Filtered!</span>
-                </h2>
-                <p class="text-xl text-emerald-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما ابزارهای حرفه‌ای Iterator و Closure را یاد گرفتید!
-                        کدهای شما حالا بسیار تمیز و قدرتمند هستند.</span
-                    >
-                    <span class="lang-en"
-                        >You mastered the professional tools Iterator and
-                        Closure! Your code is now clean and powerful.</span
-                    >
-                </p>
-                <button
-                    class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(16,185,129,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۳ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 13 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-emerald-200 code-font min-h-[400px] flex flex-col">
 
-            let logsProcessed = 0;
-            let errorsFound = 0;
+                <!-- Mission 1: iter() -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-emerald-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-pink-400">let</span> gems = <span class="text-blue-300">vec!</span>[<span class="text-yellow-300">"💎"</span>, <span class="text-yellow-300">"💎"</span>];<br><br>
+                        <span class="text-slate-400 text-sm">// Create the train track</span><br>
+                        <span class="text-pink-400">let mut</span> train = gems.<span id="slot1" class="code-slot text-emerald-400" onclick="clearSlot(1)">---</span>();<br>
+                        <span class="text-slate-400 text-sm">// Get the first gem!</span><br>
+                        <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"{:?}"</span>, train.next());
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-emerald-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'next')">next</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'get')">get</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'loop')">loop</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'iter')">iter</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: collect() -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">let</span> processed: Vec&lt;_&gt; = gems.iter()<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;.filter(|&g| g == <span class="text-yellow-300">"💎"</span>)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;.map(|g| <span class="text-yellow-300">"✨"</span>)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;.<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>();
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-emerald-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'save')">save</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'gather')">gather</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'collect')">collect</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'finish')">finish</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: Closure syntax -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-pink-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-slate-400 text-sm">// Instruction: double whatever you get</span><br>
+                        <span class="text-pink-400">let</span> double = <span id="slot3" class="code-slot pink-accent" onclick="clearSlot(3)">---</span> x * <span class="text-orange-300">2</span>;<br><br>
+                        <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"{}"</span>, double(<span class="text-orange-300">5</span>));
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-pink-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option pink-mode code-font text-2xl px-6" onclick="selectOption(this, 3, '(x)')">(x)</div>
+                            <div class="code-option pink-mode code-font text-2xl px-6" onclick="selectOption(this, 3, '[x]')">[x]</div>
+                            <div class="code-option pink-mode code-font text-2xl px-6" onclick="selectOption(this, 3, '|x|')">|x|</div>
+                            <div class="code-option pink-mode code-font text-2xl px-6" onclick="selectOption(this, 3, '<x>')">&lt;x&gt;</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-pink-600 hover:bg-pink-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Log Processor Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-yellow-400 mb-2 border-b border-emerald-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-emerald-900 px-2 py-1 rounded text-white">Project 13.5</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="flex flex-col md:flex-row gap-4 flex-grow">
+                        <div class="w-full md:w-1/2 flex flex-col gap-3 bg-black/40 p-4 rounded-lg border border-emerald-800">
+                            <div class="text-emerald-400 font-bold mb-1 code-font">log_lines.iter()</div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-pink-400 code-font">.filter(|msg|</span>
+                                <select id="log-filter" class="filter-select w-full">
+                                    <option value="ALL"><span id="opt-all"></span></option>
+                                    <option value="INFO"><span id="opt-info"></span></option>
+                                    <option value="WARNING"><span id="opt-warning"></span></option>
+                                    <option value="ERROR"><span id="opt-error"></span></option>
+                                </select>
+                                <span class="text-pink-400 code-font">)</span>
+                            </div>
+                            <div class="text-emerald-400 font-bold mt-1 code-font">.collect()</div>
+                            <button id="run-chain-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold mt-auto" onclick="processLogs()">
+                                <i class="fa-solid fa-play"></i> <span id="run-chain-text"></span>
+                            </button>
+                            <div id="sim-feedback" class="text-rose-400 text-xs text-center h-4 font-bold"></div>
+                        </div>
+                        <div class="w-full md:w-1/2 flex flex-col">
+                            <div id="terminal-label" class="text-slate-400 text-xs mb-1"></div>
+                            <div id="log-output" class="terminal-block flex-grow overflow-y-auto" style="min-height: 120px;">
+                                <div id="log-initial-msg" class="text-slate-500 italic text-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🚂🎒✅</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-emerald-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(16,185,129,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                wagonsLabel: "واگن‌های بررسی شده:",
+                errorsLabel: "خطاهای یافت شده:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
                     "سلام! من یک قطار پر از سنگ‌های فضایی درخشان پیدا کردم! 🚂💎",
                     "برای پردازش این سنگ‌ها نمی‌تونیم همه‌شون رو یکجا روی زمین بریزیم! باید دونه دونه بیاریمشون.",
                     "تو زبان راست به ابزاری که داده‌ها رو دونه دونه مثل ریل قطار به ما میده Iterator میگن.",
-                    "در کنار ریل، ماشین‌هایی داریم که با دستورات کوچیکی به اسم Closure بهمون کمک می‌کنن داده‌ها رو تبدیل یا فیلتر کنیم. بیا سیستم رو راه‌اندازی کنیم! 🎒✨",
+                    "در کنار ریل، ماشین‌هایی داریم که با دستورات کوچیکی به اسم Closure بهمون کمک می‌کنن داده‌ها رو تبدیل یا فیلتر کنیم. بیا سیستم رو راه‌اندازی کنیم! 🎒✨"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا ریل قطار رو فعال کنیم.",
+                mission1Title: "فصل ۱۳: قطار باربری (Iterators) 🚂",
+                mission1Text: `
+                    <p class="text-emerald-300">> ما یک قطار پر از سنگ‌های معدنی داریم. برای پردازش آن‌ها نمی‌توانیم همه را یکجا خالی کنیم!</p>
+                    <p class="text-slate-300">> ابزاری به نام **Iterator** دقیقاً مثل یک ریل قطار عمل می‌کند؛ هر بار که درخواست کنیم، فقط **یک واگن** را به ما تحویل می‌دهد.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">نام متدی که یک وکتور را به یک ریل قطار (Iterator) تبدیل می‌کند چیست؟</p>
+                `,
+                puzzle1Btn: "راه‌اندازی ریل 🛤️",
+                puzzle1Success: "> ریل قطار (Iterator) با موفقیت ساخته شد!",
+                puzzle1Error: "خطا: برای ساختن یک Iterator از روی یک وکتور از متد iter() استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: ماشین‌آلات کارخانه (Adapters)",
+                mission2Desc: "<p>روی ریل قطار، ماشین‌هایی وجود دارند. ماشین `filter` فقط سنگ‌های خاصی را عبور می‌دهد. ماشین `map` شکل سنگ‌ها را تغییر می‌دهد.</p><p class='text-white font-bold'>برای اینکه در انتهای خط تولید، تمام سنگ‌های پردازش شده را در یک جعبه‌ی جدید (`Vec`) جمع‌آوری کنیم، از کدام ماشین (متد) استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "روشن کردن خط تولید ⚙️",
+                puzzle2Success: "> عالی! ایستگاه آخر برای جمع‌آوری.",
+                puzzle2Error: "خطا: متدی که تمام نتایج Iterator را جمع‌آوری می‌کند collect نام دارد.",
+                mission3Step: ">> مرحله ۲: کوله‌پشتی جادویی (Closures)",
+                mission3Desc: "ماشین‌های `map` و `filter` برای کار کردن نیاز به دستورالعمل‌های کوتاه دارند. ما این دستورات را با توابع بی‌نام یا **Closure** به آن‌ها می‌دهیم. ساختار یک Closure با چه علامتی برای تعریف پارامترها شروع می‌شود؟",
+                puzzle3Btn: "ذخیره دستور در کوله 🎒",
+                puzzle3Success: "> ساختار Closure به درستی تعریف شد!",
+                puzzle3Error: "خطا: پارامترهای یک Closure در زبان راست درون علامت‌های | | قرار می‌گیرند.",
+                mission4Step: ">> مرحله نهایی: شبیه‌ساز پردازش لاگ",
+                mission4Desc: "سیستم پر از پیام‌های مختلف است. از منوی زیر استفاده کن و ماشین `filter` را جوری تنظیم کن که **فقط خطاهای (ERROR)** سیستم را استخراج کرده و بشمارد تا برنده شوی!",
+                optAll: "msg.contains(\"ALL\")",
+                optInfo: "msg.contains(\"INFO\")",
+                optWarning: "msg.contains(\"WARNING\")",
+                optError: "msg.contains(\"ERROR\")",
+                runChain: "اجرای زنجیره",
+                terminalLabel: "خروجی ترمینال:",
+                logInitial: "> آماده برای خواندن خطوط...",
+                logs: [
+                    { type: "INFO", msg: "سیستم راه‌اندازی شد" },
+                    { type: "ERROR", msg: "دیسک پر است!" },
+                    { type: "WARNING", msg: "حافظه رو به اتمام..." },
+                    { type: "ERROR", msg: "اتصال شبکه قطع شد!" },
+                    { type: "INFO", msg: "پردازش تمام شد." }
+                ],
+                missionFailed: "ماموریت شکست خورد! ما فقط به خطاهای سیستم (ERROR) نیاز داریم.",
+                winTitle: "داده‌ها با موفقیت فیلتر شدند!",
+                winMessage: "شما ابزارهای حرفه‌ای Iterator و Closure را یاد گرفتید! کدهای شما حالا بسیار تمیز و قدرتمند هستند.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                wagonsLabel: "Wagons Processed:",
+                errorsLabel: "Errors Found:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
                     "Hi! I found a cargo train full of glowing space gems! 🚂💎",
                     "To process them, we can't dump them all at once! We must handle them one by one.",
                     "In Rust, the tool that hands us data one by one like a train track is called an Iterator.",
-                    "Along the track, we have machines that use tiny commands called Closures to filter or map data. Let's set up the system! 🎒✨",
+                    "Along the track, we have machines that use tiny commands called Closures to filter or map data. Let's set up the system! 🎒✨"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-emerald-600 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-wagons").innerText =
-                        `${logsProcessed.toLocaleString("fa-IR")} / ۵`;
-                    document.getElementById("hud-errors").innerText =
-                        errorsFound.toLocaleString("fa-IR");
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-emerald-600 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-wagons").innerText =
-                        `${logsProcessed} / 5`;
-                    document.getElementById("hud-errors").innerText =
-                        errorsFound;
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below to activate the train tracks.",
+                mission1Title: "Chapter 13: The Cargo Train (Iterators) 🚂",
+                mission1Text: `
+                    <p class="text-emerald-300">> We have a train full of glowing gems. We can't process them all at once!</p>
+                    <p class="text-slate-300">> A tool called an **Iterator** acts like a train track; every time we ask, it delivers exactly **one wagon** to us.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">What is the method name that turns a vector into a train track (Iterator)?</p>
+                `,
+                puzzle1Btn: "Start Tracks 🛤️",
+                puzzle1Success: "> Train track (Iterator) created successfully!",
+                puzzle1Error: "Error: To create an Iterator from a vector, we use the iter() method.",
+                mission2Step: ">> Step 1: Factory Machines (Adapters)",
+                mission2Desc: "<p>There are machines on the track. `filter` only lets certain gems pass. `map` changes their shape.</p><p class='text-white font-bold'>To gather all processed gems into a new box (`Vec`) at the end of the line, which machine (method) do we use?</p>",
+                puzzle2Btn: "Start Assembly Line ⚙️",
+                puzzle2Success: "> Great! The final station for gathering.",
+                puzzle2Error: "Error: The method that gathers all Iterator results is called collect.",
+                mission3Step: ">> Step 2: Magic Backpack (Closures)",
+                mission3Desc: "The `map` and `filter` machines need short instructions to work. We give them anonymous functions called **Closures**. What symbol is used to define parameters in a Closure?",
+                puzzle3Btn: "Save Command in Backpack 🎒",
+                puzzle3Success: "> Closure syntax defined perfectly!",
+                puzzle3Error: "Error: Closure parameters in Rust are placed inside | | symbols.",
+                mission4Step: ">> Final Step: Log Processor Simulator",
+                mission4Desc: "The system is full of messages. Configure the `filter` machine below to extract and count **only the system ERRORs** to win!",
+                optAll: "msg.contains(\"ALL\")",
+                optInfo: "msg.contains(\"INFO\")",
+                optWarning: "msg.contains(\"WARNING\")",
+                optError: "msg.contains(\"ERROR\")",
+                runChain: "Run Chain",
+                terminalLabel: "Terminal Output:",
+                logInitial: "> Ready to read lines...",
+                logs: [
+                    { type: "INFO", msg: "System initialized" },
+                    { type: "ERROR", msg: "Disk is full!" },
+                    { type: "WARNING", msg: "Memory running low..." },
+                    { type: "ERROR", msg: "Network connection lost!" },
+                    { type: "INFO", msg: "Processing finished." }
+                ],
+                missionFailed: "Mission failed! We only need system ERRORs.",
+                winTitle: "Data Successfully Filtered!",
+                winMessage: "You mastered the professional tools Iterator and Closure! Your code is now clean and powerful.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                wagonsLabel: "Vagones procesados:",
+                errorsLabel: "Errores encontrados:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! ¡Encontré un tren de carga lleno de gemas espaciales brillantes! 🚂💎",
+                    "Para procesarlas, ¡no podemos tirarlas todas a la vez! Debemos manejarlas una por una.",
+                    "En Rust, la herramienta que nos entrega datos uno por uno como una vía de tren se llama Iterador.",
+                    "A lo largo de la vía, tenemos máquinas que usan pequeños comandos llamados Closures para filtrar o mapear datos. ¡Configuremos el sistema! 🎒✨"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para activar las vías del tren.",
+                mission1Title: "Capítulo 13: El tren de carga (Iteradores) 🚂",
+                mission1Text: `
+                    <p class="text-emerald-300">> Tenemos un tren lleno de gemas brillantes. ¡No podemos procesarlas todas a la vez!</p>
+                    <p class="text-slate-300">> Una herramienta llamada **Iterador** actúa como una vía de tren; cada vez que preguntamos, nos entrega exactamente **un vagón**.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">¿Cómo se llama el método que convierte un vector en una vía de tren (Iterador)?</p>
+                `,
+                puzzle1Btn: "Iniciar vías 🛤️",
+                puzzle1Success: "> ¡Vía de tren (Iterador) creada exitosamente!",
+                puzzle1Error: "Error: Para crear un Iterador desde un vector, usamos el método iter().",
+                mission2Step: ">> Paso 1: Máquinas de fábrica (Adaptadores)",
+                mission2Desc: "<p>Hay máquinas en la vía. `filter` solo deja pasar ciertas gemas. `map` cambia su forma.</p><p class='text-white font-bold'>Para recolectar todas las gemas procesadas en una nueva caja (`Vec`) al final de la línea, ¿qué máquina (método) usamos?</p>",
+                puzzle2Btn: "Iniciar línea de ensamblaje ⚙️",
+                puzzle2Success: "> ¡Genial! La estación final para recolectar.",
+                puzzle2Error: "Error: El método que recolecta todos los resultados del Iterador se llama collect.",
+                mission3Step: ">> Paso 2: Mochila mágica (Closures)",
+                mission3Desc: "Las máquinas `map` y `filter` necesitan instrucciones cortas para funcionar. Les damos funciones anónimas llamadas **Closures**. ¿Qué símbolo se usa para definir parámetros en un Closure?",
+                puzzle3Btn: "Guardar comando en la mochila 🎒",
+                puzzle3Success: "> ¡Sintaxis de Closure definida perfectamente!",
+                puzzle3Error: "Error: Los parámetros de un Closure en Rust se colocan dentro de símbolos | |.",
+                mission4Step: ">> Paso final: Simulador de procesamiento de registros",
+                mission4Desc: "El sistema está lleno de mensajes. ¡Configura la máquina `filter` a continuación para extraer y contar **solo los ERRORES del sistema** para ganar!",
+                optAll: "msg.contains(\"ALL\")",
+                optInfo: "msg.contains(\"INFO\")",
+                optWarning: "msg.contains(\"WARNING\")",
+                optError: "msg.contains(\"ERROR\")",
+                runChain: "Ejecutar cadena",
+                terminalLabel: "Salida del terminal:",
+                logInitial: "> Listo para leer líneas...",
+                logs: [
+                    { type: "INFO", msg: "Sistema inicializado" },
+                    { type: "ERROR", msg: "¡Disco lleno!" },
+                    { type: "WARNING", msg: "Memoria baja..." },
+                    { type: "ERROR", msg: "¡Conexión de red perdida!" },
+                    { type: "INFO", msg: "Procesamiento finalizado." }
+                ],
+                missionFailed: "¡Misión fallida! Solo necesitamos ERRORES del sistema.",
+                winTitle: "¡Datos filtrados exitosamente!",
+                winMessage: "¡Dominaste las herramientas profesionales Iterador y Closure! Tu código ahora es limpio y potente.",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                wagonsLabel: "Verarbeitete Waggons:",
+                errorsLabel: "Gefundene Fehler:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ich habe einen Güterzug voller glühender Weltraumedelsteine gefunden! 🚂💎",
+                    "Um sie zu verarbeiten, können wir sie nicht alle auf einmal auskippen! Wir müssen sie einzeln behandeln.",
+                    "In Rust nennt man das Werkzeug, das uns Daten einzeln wie eine Zugstrecke übergibt, einen Iterator.",
+                    "Entlang der Strecke haben wir Maschinen, die winzige Befehle namens Closures verwenden, um Daten zu filtern oder abzubilden. Lass uns das System einrichten! 🎒✨"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um die Zugstrecken zu aktivieren.",
+                mission1Title: "Kapitel 13: Der Güterzug (Iteratoren) 🚂",
+                mission1Text: `
+                    <p class="text-emerald-300">> Wir haben einen Zug voller glühender Edelsteine. Wir können sie nicht alle auf einmal verarbeiten!</p>
+                    <p class="text-slate-300">> Ein Werkzeug namens **Iterator** verhält sich wie eine Zugstrecke; jedes Mal, wenn wir fragen, liefert es genau **einen Waggon**.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Wie heißt die Methode, die einen Vektor in eine Zugstrecke (Iterator) verwandelt?</p>
+                `,
+                puzzle1Btn: "Gleise starten 🛤️",
+                puzzle1Success: "> Zugstrecke (Iterator) erfolgreich erstellt!",
+                puzzle1Error: "Fehler: Um einen Iterator aus einem Vektor zu erstellen, verwenden wir die Methode iter().",
+                mission2Step: ">> Schritt 1: Fabrikmaschinen (Adapter)",
+                mission2Desc: "<p>Es gibt Maschinen auf der Strecke. `filter` lässt nur bestimmte Edelsteine passieren. `map` verändert ihre Form.</p><p class='text-white font-bold'>Um alle verarbeiteten Edelsteine am Ende der Linie in einer neuen Box (`Vec`) zu sammeln, welche Maschine (Methode) verwenden wir?</p>",
+                puzzle2Btn: "Fließband starten ⚙️",
+                puzzle2Success: "> Großartig! Die letzte Station zum Sammeln.",
+                puzzle2Error: "Fehler: Die Methode, die alle Iterator-Ergebnisse sammelt, heißt collect.",
+                mission3Step: ">> Schritt 2: Magischer Rucksack (Closures)",
+                mission3Desc: "Die `map`- und `filter`-Maschinen benötigen kurze Anweisungen, um zu funktionieren. Wir geben ihnen anonyme Funktionen namens **Closures**. Welches Symbol wird verwendet, um Parameter in einer Closure zu definieren?",
+                puzzle3Btn: "Befehl im Rucksack speichern 🎒",
+                puzzle3Success: "> Closure-Syntax perfekt definiert!",
+                puzzle3Error: "Fehler: Closure-Parameter in Rust werden innerhalb von | | Symbolen platziert.",
+                mission4Step: ">> Letzter Schritt: Logverarbeitungssimulator",
+                mission4Desc: "Das System ist voller Nachrichten. Konfiguriere die `filter`-Maschine unten, um **nur die SYSTEMFEHLER** zu extrahieren und zu zählen, um zu gewinnen!",
+                optAll: "msg.contains(\"ALL\")",
+                optInfo: "msg.contains(\"INFO\")",
+                optWarning: "msg.contains(\"WARNING\")",
+                optError: "msg.contains(\"ERROR\")",
+                runChain: "Kette ausführen",
+                terminalLabel: "Terminalausgabe:",
+                logInitial: "> Bereit zum Lesen von Zeilen...",
+                logs: [
+                    { type: "INFO", msg: "System initialisiert" },
+                    { type: "ERROR", msg: "Festplatte ist voll!" },
+                    { type: "WARNING", msg: "Arbeitsspeicher wird knapp..." },
+                    { type: "ERROR", msg: "Netzwerkverbindung verloren!" },
+                    { type: "INFO", msg: "Verarbeitung abgeschlossen." }
+                ],
+                missionFailed: "Mission fehlgeschlagen! Wir brauchen nur SYSTEMFEHLER.",
+                winTitle: "Daten erfolgreich gefiltert!",
+                winMessage: "Du hast die professionellen Werkzeuge Iterator und Closure gemeistert! Dein Code ist jetzt sauber und leistungsstark.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                wagonsLabel: "Verwerkte wagons:",
+                errorsLabel: "Gevonden fouten:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ik heb een goederentrein vol gloeiende ruimte-edelstenen gevonden! 🚂💎",
+                    "Om ze te verwerken, kunnen we ze niet allemaal tegelijk dumpen! We moeten ze één voor één aanpakken.",
+                    "In Rust heet het hulpmiddel dat ons gegevens één voor één als een treinspoor geeft, een Iterator.",
+                    "Langs het spoor hebben we machines die kleine commando's genaamd Closures gebruiken om gegevens te filteren of in kaart te brengen. Laten we het systeem opzetten! 🎒✨"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om de treinsporen te activeren.",
+                mission1Title: "Hoofdstuk 13: De goederentrein (Iterators) 🚂",
+                mission1Text: `
+                    <p class="text-emerald-300">> We hebben een trein vol gloeiende edelstenen. We kunnen ze niet allemaal tegelijk verwerken!</p>
+                    <p class="text-slate-300">> Een hulpmiddel genaamd **Iterator** werkt als een treinspoor; elke keer dat we vragen, levert het precies **één wagon**.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Hoe heet de methode die een vector omzet in een treinspoor (Iterator)?</p>
+                `,
+                puzzle1Btn: "Sporen starten 🛤️",
+                puzzle1Success: "> Treinspoor (Iterator) succesvol aangemaakt!",
+                puzzle1Error: "Fout: Om een Iterator van een vector te maken, gebruiken we de methode iter().",
+                mission2Step: ">> Stap 1: Fabrieksmachines (Adapters)",
+                mission2Desc: "<p>Er zijn machines op het spoor. `filter` laat alleen bepaalde edelstenen door. `map` verandert hun vorm.</p><p class='text-white font-bold'>Om alle verwerkte edelstenen aan het einde van de lijn in een nieuwe doos (`Vec`) te verzamelen, welke machine (methode) gebruiken we?</p>",
+                puzzle2Btn: "Assemblagelijn starten ⚙️",
+                puzzle2Success: "> Geweldig! Het laatste station voor het verzamelen.",
+                puzzle2Error: "Fout: De methode die alle Iterator-resultaten verzamelt, heet collect.",
+                mission3Step: ">> Stap 2: Magische rugzak (Closures)",
+                mission3Desc: "De `map`- en `filter`-machines hebben korte instructies nodig om te werken. We geven ze anonieme functies genaamd **Closures**. Welk symbool wordt gebruikt om parameters in een Closure te definiëren?",
+                puzzle3Btn: "Commando opslaan in rugzak 🎒",
+                puzzle3Success: "> Closure-syntaxis perfect gedefinieerd!",
+                puzzle3Error: "Fout: Closure-parameters in Rust worden binnen | | symbolen geplaatst.",
+                mission4Step: ">> Laatste stap: Logverwerkingssimulator",
+                mission4Desc: "Het systeem staat vol met berichten. Configureer de `filter`-machine hieronder om **alleen de SYSTEEMFOUTEN** te extraheren en te tellen om te winnen!",
+                optAll: "msg.contains(\"ALL\")",
+                optInfo: "msg.contains(\"INFO\")",
+                optWarning: "msg.contains(\"WARNING\")",
+                optError: "msg.contains(\"ERROR\")",
+                runChain: "Ketens uitvoeren",
+                terminalLabel: "Terminaluitvoer:",
+                logInitial: "> Klaar om regels te lezen...",
+                logs: [
+                    { type: "INFO", msg: "Systeem geïnitialiseerd" },
+                    { type: "ERROR", msg: "Schijf is vol!" },
+                    { type: "WARNING", msg: "Geheugen raakt op..." },
+                    { type: "ERROR", msg: "Netwerkverbinding verbroken!" },
+                    { type: "INFO", msg: "Verwerking voltooid." }
+                ],
+                missionFailed: "Missie mislukt! We hebben alleen SYSTEEMFOUTEN nodig.",
+                winTitle: "Gegevens succesvol gefilterd!",
+                winMessage: "Je hebt de professionele tools Iterator en Closure onder de knie! Je code is nu schoon en krachtig.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+
+        // DOM elements
+        const wagonsLabelSpan = document.getElementById('wagons-label');
+        const errorsLabelSpan = document.getElementById('errors-label');
+        const hudWagonsSpan = document.getElementById('hud-wagons');
+        const hudErrorsSpan = document.getElementById('hud-errors');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-emerald-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
-
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
-                } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا ریل قطار رو فعال کنیم."
-                            : "Let's go! Look at the monitor below to activate the train tracks.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
-                }
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
             }
-
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
-
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
-
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
-
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
-                runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
-            }
-
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
-            }
-
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "iter") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> ریل قطار (Iterator) با موفقیت ساخته شد!"
-                            : "> Train track (Iterator) created successfully!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: برای ساختن یک Iterator از روی یک وکتور از متد iter() استفاده می‌کنیم.",
-                        "Error: To create an Iterator from a vector, we use the iter() method.",
-                    );
-                }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "collect") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> عالی! ایستگاه آخر برای جمع‌آوری."
-                            : "> Great! The final station for gathering.";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: متدی که تمام نتایج Iterator را جمع‌آوری می‌کند collect نام دارد.",
-                        "Error: The method that gathers all Iterator results is called collect.",
-                    );
-                }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "|x|") {
-                    feedback.className =
-                        "text-pink-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> ساختار Closure به درستی تعریف شد!"
-                            : "> Closure syntax defined perfectly!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: پارامترهای یک Closure در زبان راست درون علامت‌های | | قرار می‌گیرند.",
-                        "Error: Closure parameters in Rust are placed inside | | symbols.",
-                    );
-                }
-            }
-
-            // --- Log Processor Simulator ---
-            const rawLogs = [
-                {
-                    type: "INFO",
-                    msg: "سیستم راه‌اندازی شد",
-                    msgEn: "System initialized",
-                },
-                { type: "ERROR", msg: "دیسک پر است!", msgEn: "Disk is full!" },
-                {
-                    type: "WARNING",
-                    msg: "حافظه رو به اتمام...",
-                    msgEn: "Memory running low...",
-                },
-                {
-                    type: "ERROR",
-                    msg: "اتصال شبکه قطع شد!",
-                    msgEn: "Network connection lost!",
-                },
-                {
-                    type: "INFO",
-                    msg: "پردازش تمام شد.",
-                    msgEn: "Processing finished.",
-                },
-            ];
-
-            function processLogs() {
-                const filterVal = document.getElementById("log-filter").value;
-                const term = document.getElementById("log-output");
-                const feedback = document.getElementById("sim-feedback");
-
-                term.innerHTML = "";
-                logsProcessed = 0;
-                errorsFound = 0;
-
-                feedback.innerText = "";
-                document
-                    .getElementById("hud-wagons")
-                    .parentElement.classList.remove("text-emerald-400");
-                document
-                    .getElementById("hud-wagons")
-                    .parentElement.classList.add("text-yellow-400");
-
-                // Simulate streaming processing
-                rawLogs.forEach((log, index) => {
-                    setTimeout(() => {
-                        logsProcessed++;
-
-                        let shouldPass =
-                            filterVal === "ALL" || filterVal === log.type;
-
-                        if (shouldPass) {
-                            let colorClass =
-                                log.type === "ERROR"
-                                    ? "text-rose-400"
-                                    : log.type === "WARNING"
-                                      ? "text-amber-400"
-                                      : "text-emerald-300";
-                            let displayMsg =
-                                currentLang === "fa" ? log.msg : log.msgEn;
-
-                            let lineHtml = `<div class="log-line ${colorClass}">
-                            <span class="font-bold">[${log.type}]</span> ${displayMsg}
-                        </div>`;
-
-                            term.innerHTML += lineHtml;
-
-                            if (log.type === "ERROR") {
-                                errorsFound++;
-                            }
-                        }
-
-                        // Update HUD
-                        setLang(currentLang);
-
-                        // End of stream check
-                        if (index === rawLogs.length - 1) {
-                            document
-                                .getElementById("hud-wagons")
-                                .parentElement.classList.replace(
-                                    "text-yellow-400",
-                                    "text-emerald-400",
-                                );
-
-                            if (filterVal === "ERROR" && errorsFound === 2) {
-                                setTimeout(() => {
-                                    triggerConfetti();
-                                    document
-                                        .getElementById("success-screen")
-                                        .classList.remove("hidden");
-                                }, 1000);
-                            } else {
-                                feedback.className =
-                                    "text-rose-400 text-xs text-center h-4 font-bold mt-1";
-                                feedback.innerText =
-                                    currentLang === "fa"
-                                        ? "ماموریت شکست خورد! ما فقط به خطاهای سیستم (ERROR) نیاز داریم."
-                                        : "Mission failed! We only need system ERRORs.";
-
-                                const crt =
-                                    document.getElementById("crt-monitor");
-                                crt.classList.add("glitch");
-                                setTimeout(
-                                    () => crt.classList.remove("glitch"),
-                                    300,
-                                );
-                            }
-                        }
-                    }, index * 400); // 400ms delay per log for visual effect
-                });
-            }
-
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#10b981",
-                "#34d399",
-                "#ec4899",
-                "#f472b6",
-                "#ffffff",
-            ]; // Emerald, Pink
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
-            }, 500);
-        </script>
-    </body>
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            wagonsLabelSpan.innerText = pack.wagonsLabel;
+            errorsLabelSpan.innerText = pack.errorsLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('opt-all').innerHTML = pack.optAll;
+            document.getElementById('opt-info').innerHTML = pack.optInfo;
+            document.getElementById('opt-warning').innerHTML = pack.optWarning;
+            document.getElementById('opt-error').innerHTML = pack.optError;
+            document.getElementById('run-chain-text').innerHTML = pack.runChain;
+            document.getElementById('terminal-label').innerHTML = pack.terminalLabel;
+            document.getElementById('log-initial-msg').innerHTML = pack.logInitial;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-emerald-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
+
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
+
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'iter') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
+            }
+        }
+
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'collect') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
+            }
+        }
+
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === '|x|') {
+                document.getElementById('puzzle3-feedback').className = "text-pink-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
+
+        // Log Processor Simulator
+        let logsProcessed = 0;
+        let errorsFound = 0;
+
+        function processLogs() {
+            const pack = languagePack[currentLang];
+            const filterVal = document.getElementById('log-filter').value;
+            const term = document.getElementById('log-output');
+            const feedback = document.getElementById('sim-feedback');
+
+            term.innerHTML = '';
+            logsProcessed = 0;
+            errorsFound = 0;
+            feedback.innerText = "";
+            hudWagonsSpan.innerText = currentLang === 'fa' ? `${formatNumber(logsProcessed, currentLang)} / ۵` : `${logsProcessed} / 5`;
+            hudErrorsSpan.innerText = formatNumber(errorsFound, currentLang);
+            document.getElementById('hud-wagons').parentElement.classList.remove('text-emerald-400');
+            document.getElementById('hud-wagons').parentElement.classList.add('text-yellow-400');
+
+            const logsData = pack.logs;
+            logsData.forEach((log, index) => {
+                setTimeout(() => {
+                    logsProcessed++;
+                    let shouldPass = filterVal === 'ALL' || filterVal === log.type;
+                    if (shouldPass) {
+                        let colorClass = log.type === 'ERROR' ? 'text-rose-400' : (log.type === 'WARNING' ? 'text-amber-400' : 'text-emerald-300');
+                        let lineHtml = `<div class="log-line ${colorClass}">
+                            <span class="font-bold">[${log.type}]</span> ${log.msg}
+                        </div>`;
+                        term.innerHTML += lineHtml;
+                        if (log.type === 'ERROR') errorsFound++;
+                    }
+                    hudWagonsSpan.innerText = currentLang === 'fa' ? `${formatNumber(logsProcessed, currentLang)} / ۵` : `${logsProcessed} / 5`;
+                    hudErrorsSpan.innerText = formatNumber(errorsFound, currentLang);
+                    if (index === logsData.length - 1) {
+                        document.getElementById('hud-wagons').parentElement.classList.replace('text-yellow-400', 'text-emerald-400');
+                        if (filterVal === 'ERROR' && errorsFound === 2) {
+                            setTimeout(() => {
+                                triggerConfetti();
+                                document.getElementById('success-screen').classList.remove('hidden');
+                            }, 500);
+                        } else {
+                            feedback.className = "text-rose-400 text-xs text-center h-4 font-bold mt-1";
+                            feedback.innerText = pack.missionFailed;
+                            const crt = document.getElementById('crt-monitor');
+                            crt.classList.add('glitch');
+                            setTimeout(() => crt.classList.remove('glitch'), 300);
+                        }
+                    }
+                }, index * 400);
+            });
+        }
+
+        function goToNextChapter() {
+            window.location.href = 'chapter-14.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#10b981", "#34d399", "#ec4899", "#f472b6", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
+
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>

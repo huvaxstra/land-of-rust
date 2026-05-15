@@ -1,1337 +1,968 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 12</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --crt-bg: #082f49;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #38bdf8;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(14, 165, 233, 0.15) 2px, transparent 40px), radial-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and Minigrep elements */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .grep-input, .grep-textarea, #grep-terminal, .toggle-switch {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #0369a1;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(14, 165, 233, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 255, 0, 0.01), rgba(14, 165, 233, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(240, 249, 255, 0.95);
+            color: #0c4a6e;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 249, 255, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 249, 255, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #e0f2fe; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed #fcd34d; margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: #fcd34d; background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(14, 165, 233, 0.2); color: #bae6fd; }
+        .code-option {
+            background: #0f172a; border: 2px solid #334155;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #1e293b; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #7dd3fc; color: #082f49; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        .grep-input {
+            background-color: #082f49; border: 2px solid #0284c7;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            outline: none; transition: border-color 0.3s;
+        }
+        .grep-input:focus { border-color: #38bdf8; }
+        .grep-textarea {
+            background-color: rgba(0,0,0,0.3); border: 1px solid #0369a1;
+            color: #bae6fd; padding: 0.5rem; border-radius: 0.5rem;
+            width: 100%; height: 120px; resize: none; font-size: 0.85rem;
+        }
+        .toggle-switch {
+            position: relative; display: inline-block; width: 50px; height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155; transition: .4s; border-radius: 24px; border: 1px solid #475569;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px;
+            left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #0ea5e9; border-color: #38bdf8; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        mark { background-color: #fde047; color: #1e293b; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .grep-input { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+            .grep-textarea { font-size: 0.75rem; height: 100px; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #0f172a; /* Slate 900 */
-                --crt-bg: #082f49; /* Sky 900 */
-                --accent-primary: #0ea5e9; /* Sky 500 */
-                --accent-secondary: #38bdf8; /* Sky 400 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(14, 165, 233, 0.15) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(56, 189, 248, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Robot Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 30px rgba(14, 165, 233, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.7);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-                border: 4px solid #0369a1; /* Sky 700 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(14, 165, 233, 0.03) 50%,
-                        rgba(0, 0, 0, 0.25) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(0, 255, 0, 0.01),
-                        rgba(14, 165, 233, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(240, 249, 255, 0.95); /* Sky 50 */
-                color: #0c4a6e; /* Sky 900 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(240, 249, 255, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(240, 249, 255, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #e0f2fe;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed #fcd34d;
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: #fcd34d;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-primary);
-                background: rgba(14, 165, 233, 0.2);
-                color: #bae6fd;
-            }
-
-            .code-option {
-                background: #0f172a;
-                border: 2px solid #334155;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #e2e8f0;
-            }
-            .code-option:hover {
-                background: #1e293b;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-primary);
-                border-color: #7dd3fc;
-                color: #082f49;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(14, 165, 233, 0.3);
-            }
-
-            /* Minigrep Simulator */
-            .grep-input {
-                background-color: #082f49;
-                border: 2px solid #0284c7;
-                color: white;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                outline: none;
-                transition: border-color 0.3s;
-            }
-            .grep-input:focus {
-                border-color: #38bdf8;
-            }
-            .grep-textarea {
-                background-color: rgba(0, 0, 0, 0.3);
-                border: 1px solid #0369a1;
-                color: #bae6fd;
-                padding: 0.5rem;
-                border-radius: 0.5rem;
-                width: 100%;
-                height: 120px;
-                resize: none;
-                font-size: 0.85rem;
-            }
-
-            .toggle-switch {
-                position: relative;
-                display: inline-block;
-                width: 50px;
-                height: 24px;
-            }
-            .toggle-switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #334155;
-                transition: 0.4s;
-                border-radius: 24px;
-                border: 1px solid #475569;
-            }
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 16px;
-                width: 16px;
-                left: 4px;
-                bottom: 3px;
-                background-color: white;
-                transition: 0.4s;
-                border-radius: 50%;
-            }
-            input:checked + .slider {
-                background-color: #0ea5e9;
-                border-color: #38bdf8;
-            }
-            input:checked + .slider:before {
-                transform: translateX(24px);
-            }
-
-            /* Highlight match */
-            mark {
-                background-color: #fde047;
-                color: #1e293b;
-                font-weight: bold;
-                border-radius: 2px;
-                padding: 0 2px;
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-sky-500 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-sky-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-sky-400"><i class="fa-solid fa-robot"></i> <span id="robot-label"></span> <span id="robot-status"></span></div>
+                <div class="text-amber-400"><i class="fa-solid fa-magnifying-glass"></i> <span id="matches-label"></span> <span id="hud-matches">0</span></div>
             </div>
+            <div class="text-sky-300 code-font text-xs md:text-sm opacity-70">MINIGREP-OS v12.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-sky-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-sky-400">
-                        <i class="fa-solid fa-robot"></i>
-                        <span class="lang-fa">ربات جستجوگر:</span
-                        ><span class="lang-en">Search Robot:</span>
-                        <span class="text-emerald-400">آنلاین 🟢</span>
-                    </div>
-                    <div class="text-amber-400">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span class="lang-fa">تطابق یافت شده:</span
-                        ><span class="lang-en">Matches Found:</span>
-                        <span id="hud-matches" class="text-white">۰</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🤖🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-sky-500">
+                <h3 id="ferris-name" class="font-bold text-sky-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-sky-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-sky-300 code-font text-sm opacity-70">
-                    MINIGREP-OS v12.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🤖🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-sky-500"
-                >
-                    <h3 class="font-bold text-sky-700 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-sky-700 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-sky-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-sky-200 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: env::args -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-sky-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۲: ربات مینی‌گِرپ (Command-Line Tool) 🔍
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 12: The Mini-Robot Searcher 🔍
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-sky-300">
-                                > وقتی یک برنامه را از ترمینال اجرا می‌کنیم،
-                                می‌توانیم پیام‌هایی را مستقیماً به آن بفرستیم
-                                (مثل `cargo run -- dinosaur poem.txt`).
-                            </p>
-                            <p class="text-slate-300">
-                                > این کلمات اضافی به عنوان **آرگومان
-                                (Arguments)** شناخته می‌شوند که مثل یک یادداشت
-                                اولیه برای ربات هستند.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                در ماژول `std::env`، با کدام تابع می‌توانیم این
-                                آرگومان‌ها را دریافت کنیم؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-sky-300">
-                                > When running a program from the terminal, we
-                                can send messages directly to it (like `cargo
-                                run -- dinosaur poem.txt`).
-                            </p>
-                            <p class="text-slate-300">
-                                > These extra words are called **Arguments**,
-                                acting like an initial note for the robot.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                In the `std::env` module, which function do we
-                                use to collect these arguments?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-pink-400">use</span>
-                            std::env;<br /><br />
-                            <span class="text-pink-400">let</span> arguments:
-                            Vec&lt;String&gt; = env::<span
-                                id="slot1"
-                                class="code-slot text-sky-400"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            >().collect();
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-sky-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'inputs')"
-                                >
-                                    inputs
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'get')"
-                                >
-                                    get
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'args')"
-                                >
-                                    args
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'read')"
-                                >
-                                    read
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa">دریافت تنظیمات ⚙️</span
-                                ><span class="lang-en"
-                                    >Get Configuration ⚙️</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: fs::read_to_string -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: خواندن دفترچه خاطرات (File
-                                I/O)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Reading the Diary (File I/O)</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                ربات ما باید یک فایل متنی را باز کند و محتویات
-                                آن را کلمه به کلمه بخواند.
-                            </p>
-                            <p class="text-white font-bold">
-                                با استفاده از ماژول `std::fs`، کدام تابع
-                                راحت‌ترین راه برای تبدیل کل فایل به یک متغیر
-                                `String` است؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                Our robot needs to open a text file and read its
-                                contents word by word.
-                            </p>
-                            <p class="text-white font-bold">
-                                Using the `std::fs` module, which function is
-                                the easiest way to read the whole file into a
-                                `String`?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">use</span>
-                            std::fs;<br /><br />
-                            <span class="text-pink-400">let</span> contents =
-                            fs::<span
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >(<span class="text-yellow-300">"poem.txt"</span
-                            >)<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;.expect(<span
-                                class="text-yellow-300"
-                                >"File not found!"</span
-                            >);
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-sky-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'open_file')"
-                                >
-                                    open_file
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="
-                                        selectOption(this, 2, 'read_to_string')
-                                    "
-                                >
-                                    read_to_string
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'load')"
-                                >
-                                    load
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'get_text')"
-                                >
-                                    get_text
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">اسکن کردن فایل 📄</span
-                                ><span class="lang-en">Scan File 📄</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: search logic (.contains) -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: منطق جستجو (Search Logic)</span
-                            >
-                            <span class="lang-en">>> Step 2: Search Logic</span>
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            ربات متن را خط به خط می‌خواند. اگر کلمه مورد نظر در
-                            آن خط وجود داشته باشد، آن خط را ذخیره می‌کند. کدام
-                            متد برای بررسی «وجود یک کلمه در یک متن» استفاده
-                            می‌شود؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            The robot reads the text line by line. If the query
-                            exists in the line, it saves it. Which method checks
-                            if a word exists inside a string?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">for</span> line
-                            <span class="text-pink-400">in</span>
-                            contents.lines() {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400"
-                                >if</span
-                            >
-                            line.<span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >(query) {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results.push(line);<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;}<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-sky-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 3, 'has')"
-                                >
-                                    has
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 3, 'find')"
-                                >
-                                    find
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 3, 'match')"
-                                >
-                                    match
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 3, 'contains')"
-                                >
-                                    contains
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa">تایید الگوریتم 🧠</span
-                                ><span class="lang-en"
-                                    >Confirm Algorithm 🧠</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Minigrep Console Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-yellow-400 mb-2 border-b border-sky-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: اجرای مینی‌گرپ
-                                    (Minigrep)</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: Minigrep Execution</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-sky-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۲.۵</span
-                                ><span class="lang-en">Project 12.5</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            کلمه <strong>"dinosaur"</strong> را در فایل زیر
-                            جستجو کن. یک بار در حالت عادی، و یک بار با روشن کردن
-                            دکمه
-                            <span class="text-yellow-300"
-                                >Case Insensitive</span
-                            >
-                            (حساس نبودن به حروف بزرگ/کوچک) جستجو را انجام بده تا
-                            برنده شوی!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            Search for the word <strong>"dinosaur"</strong> in
-                            the file below. Run it normally once, and then again
-                            with the
-                            <span class="text-yellow-300"
-                                >Case Insensitive</span
-                            >
-                            toggle ON to win!
-                        </div>
-
-                        <div class="flex flex-col gap-3">
-                            <!-- File Content -->
-                            <div class="relative">
-                                <div
-                                    class="absolute top-[-10px] left-3 bg-sky-800 text-xs px-2 py-1 rounded text-sky-200"
-                                >
-                                    diary.txt
-                                </div>
-                                <textarea
-                                    id="diary-text"
-                                    class="grep-textarea code-font pt-4"
-                                    readonly
-                                ></textarea>
-                            </div>
-
-                            <!-- Console Controls -->
-                            <div
-                                class="bg-black/40 p-3 rounded border border-sky-800 flex flex-wrap gap-3 items-center"
-                            >
-                                <span class="text-slate-400 font-bold"
-                                    >$ cargo run --</span
-                                >
-
-                                <input
-                                    type="text"
-                                    id="grep-query"
-                                    class="grep-input code-font w-28 md:w-32 text-sm"
-                                    placeholder="query"
-                                    value="dinosaur"
-                                />
-                                <span class="text-slate-400 font-bold"
-                                    >diary.txt</span
-                                >
-
-                                <div
-                                    class="flex items-center gap-2 ml-auto bg-sky-950/50 px-3 py-1 rounded border border-sky-900"
-                                >
-                                    <span
-                                        class="text-xs text-slate-300 font-bold"
-                                        title="Environment Variable: CASE_INSENSITIVE=1"
-                                        >CASE_INSENSITIVE</span
-                                    >
-                                    <label class="toggle-switch">
-                                        <input
-                                            type="checkbox"
-                                            id="case-toggle"
-                                        />
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-
-                                <button
-                                    class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto"
-                                    onclick="runMiniGrep()"
-                                >
-                                    <i class="fa-solid fa-play"></i>
-                                    <span class="lang-fa">اجرا</span
-                                    ><span class="lang-en">Run</span>
-                                </button>
-                            </div>
-
-                            <!-- Output Terminal -->
-                            <div
-                                id="grep-terminal"
-                                class="terminal-block flex-grow overflow-y-auto"
-                                style="min-height: 80px"
-                            >
-                                <div class="text-slate-500 italic text-sm">
-                                    <span class="lang-fa"
-                                        >> منتظر دستور جستجو...</span
-                                    >
-                                    <span class="lang-en"
-                                        >> Waiting for search command...</span
-                                    >
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">🤖🔍🎉</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa">جستجو با موفقیت انجام شد!</span>
-                    <span class="lang-en">Search Completed Successfully!</span>
-                </h2>
-                <p class="text-xl text-sky-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما اولین برنامه کاربردی (Command-Line Tool) خود را با
-                        زبان راست ساختید!</span
-                    >
-                    <span class="lang-en"
-                        >You built your first real Command-Line Tool in
-                        Rust!</span
-                    >
-                </p>
-                <button
-                    class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(14,165,233,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۲ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 12 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-sky-200 code-font min-h-[400px] flex flex-col">
 
-            // Minigrep State
-            let normalSearchDone = false;
-            let caseInsensitiveSearchDone = false;
+                <!-- Mission 1: env::args -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-sky-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-pink-400">use</span> std::env;<br><br>
+                        <span class="text-pink-400">let</span> arguments: Vec&lt;String&gt; = env::<span id="slot1" class="code-slot text-sky-400" onclick="clearSlot(1)">---</span>().collect();
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-sky-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'inputs')">inputs</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'get')">get</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'args')">args</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'read')">read</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            const diaryEn =
-                "Day 1: I am Ferris.\nDay 2: Dinosaurs are huge!\nDay 3: I saw a space dinosaur.\nDay 4: DINOSAURS are cool.\nDay 5: Learning Rust is fun.";
-            const diaryFa =
-                "روز ۱: من فریس هستم.\nروز ۲: Dinosaurs خیلی بزرگند!\nروز ۳: یک dinosaur در فضا دیدم.\nروز ۴: DINOSAURS خیلی خفن هستند.\nروز ۵: یادگیری راست لذت‌بخش است.";
+                <!-- Mission 2: fs::read_to_string -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">use</span> std::fs;<br><br>
+                        <span class="text-pink-400">let</span> contents = fs::<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(<span class="text-yellow-300">"poem.txt"</span>)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;.expect(<span class="text-yellow-300">"File not found!"</span>);
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-sky-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'open_file')">open_file</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'read_to_string')">read_to_string</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'load')">load</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'get_text')">get_text</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 3: contains -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">for</span> line <span class="text-pink-400">in</span> contents.lines() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400">if</span> line.<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>(query) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results.push(line);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        }
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-sky-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'has')">has</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'find')">find</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'match')">match</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'contains')">contains</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Minigrep Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-yellow-400 mb-2 border-b border-sky-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-sky-900 px-2 py-1 rounded text-white">Project 12.5</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="flex flex-col gap-3">
+                        <div class="relative">
+                            <div id="diary-filename" class="absolute top-[-10px] left-3 bg-sky-800 text-xs px-2 py-1 rounded text-sky-200">diary.txt</div>
+                            <textarea id="diary-text" class="grep-textarea code-font pt-4" readonly></textarea>
+                        </div>
+                        <div class="bg-black/40 p-3 rounded border border-sky-800 flex flex-wrap gap-3 items-center">
+                            <span class="text-slate-400 font-bold">$ cargo run --</span>
+                            <input type="text" id="grep-query" class="grep-input code-font w-28 md:w-32 text-sm" placeholder="query" value="dinosaur">
+                            <span class="text-slate-400 font-bold">diary.txt</span>
+                            <div class="flex items-center gap-2 ml-auto bg-sky-950/50 px-3 py-1 rounded border border-sky-900">
+                                <span id="case-label" class="text-xs text-slate-300 font-bold">CASE_INSENSITIVE</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="case-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <button id="run-grep-btn" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto" onclick="runMiniGrep()">
+                                <i class="fa-solid fa-play"></i> <span id="run-btn-text"></span>
+                            </button>
+                        </div>
+                        <div id="grep-terminal" class="terminal-block flex-grow overflow-y-auto" style="min-height: 80px;">
+                            <div id="grep-initial-msg" class="text-slate-500 italic text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🤖🔍🎉</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-sky-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(14,165,233,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                robotLabel: "ربات جستجوگر:",
+                matchesLabel: "تطابق یافت شده:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                robotStatus: "آنلاین 🟢",
+                dialogues: [
                     "سلام! دفترچه خاطرات فضایی من خیلی قطور شده و پیدا کردن یه کلمه توش کار سختیه. 📖",
                     "برای همین یه ربات کوچولو ساختم که بتونه هر کلمه‌ای رو برام تو متن‌ها جستجو کنه! 🤖🔍",
                     "به این نوع برنامه‌ها که بدون محیط گرافیکی و تو خط فرمان (Terminal) اجرا میشن Command-Line Tool میگن.",
-                    "این یک قدم بزرگ برای تبدیل شدن به یک جادوگر کامپیوتره! بیا با هم برنامه minigrep رو بسازیم! 🚀",
+                    "این یک قدم بزرگ برای تبدیل شدن به یک جادوگر کامپیوتره! بیا با هم برنامه minigrep رو بسازیم! 🚀"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا قدم اول رو برداریم.",
+                mission1Title: "فصل ۱۲: ربات مینی‌گرپ (Command-Line Tool) 🔍",
+                mission1Text: `
+                    <p class="text-sky-300">> وقتی یک برنامه را از ترمینال اجرا می‌کنیم، می‌توانیم پیام‌هایی را مستقیماً به آن بفرستیم (مثل `cargo run -- dinosaur poem.txt`).</p>
+                    <p class="text-slate-300">> این کلمات اضافی به عنوان **آرگومان (Arguments)** شناخته می‌شوند که مثل یک یادداشت اولیه برای ربات هستند.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">در ماژول `std::env`، با کدام تابع می‌توانیم این آرگومان‌ها را دریافت کنیم؟</p>
+                `,
+                puzzle1Btn: "دریافت تنظیمات ⚙️",
+                puzzle1Success: "> آرگومان‌ها با موفقیت دریافت شدند!",
+                puzzle1Error: "خطا: در ماژول env برای دریافت آرگومان‌ها از تابع args استفاده می‌شود.",
+                mission2Step: ">> مرحله ۱: خواندن دفترچه خاطرات (File I/O)",
+                mission2Desc: "<p>ربات ما باید یک فایل متنی را باز کند و محتویات آن را کلمه به کلمه بخواند.</p><p class='text-white font-bold'>با استفاده از ماژول `std::fs`، کدام تابع راحت‌ترین راه برای تبدیل کل فایل به یک متغیر `String` است؟</p>",
+                puzzle2Btn: "اسکن کردن فایل 📄",
+                puzzle2Success: "> فایل با موفقیت اسکن شد.",
+                puzzle2Error: "خطا: راحت‌ترین روش خواندن کل فایل در یک String استفاده از read_to_string است.",
+                mission3Step: ">> مرحله ۲: منطق جستجو (Search Logic)",
+                mission3Desc: "ربات متن را خط به خط می‌خواند. اگر کلمه مورد نظر در آن خط وجود داشته باشد، آن خط را ذخیره می‌کند. کدام متد برای بررسی «وجود یک کلمه در یک متن» استفاده می‌شود؟",
+                puzzle3Btn: "تایید الگوریتم 🧠",
+                puzzle3Success: "> منطق جستجو با موفقیت پیاده‌سازی شد.",
+                puzzle3Error: "خطا: متد contains چک می‌کند که آیا یک رشته درون رشته دیگر وجود دارد یا نه.",
+                mission4Step: ">> مرحله نهایی: اجرای مینی‌گرپ (Minigrep)",
+                mission4Desc: "کلمه <strong>\"dinosaur\"</strong> را در فایل زیر جستجو کن. یک بار در حالت عادی، و یک بار با روشن کردن دکمه <span class='text-yellow-300'>Case Insensitive</span> (حساس نبودن به حروف بزرگ/کوچک) جستجو را انجام بده تا برنده شوی!",
+                diaryText: "روز ۱: من فریس هستم.\nروز ۲: Dinosaurs خیلی بزرگند!\nروز ۳: یک dinosaur در فضا دیدم.\nروز ۴: DINOSAURS خیلی خفن هستند.\nروز ۵: یادگیری راست لذت‌بخش است.",
+                caseLabel: "CASE_INSENSITIVE",
+                runBtn: "اجرا",
+                grepInitial: "> منتظر دستور جستجو...",
+                searchingMsg: (query, ignoreCase) => `> جستجوی '${query}' ${ignoreCase ? '(نادیده گرفتن حروف بزرگ/کوچک)' : ''}`,
+                noMatches: "هیچ نتیجه‌ای یافت نشد.",
+                errorQuery: "❌ خطا: لطفا کلمه مورد جستجو را وارد کنید!",
+                winTitle: "جستجو با موفقیت انجام شد!",
+                winMessage: "شما اولین برنامه کاربردی (Command-Line Tool) خود را با زبان راست ساختید!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                robotLabel: "Search Robot:",
+                matchesLabel: "Matches Found:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                robotStatus: "Online 🟢",
+                dialogues: [
                     "Hi! My space diary is too thick and finding a word in it is so hard. 📖",
                     "So I built a tiny robot to search for any word inside texts for me! 🤖🔍",
                     "Programs running in the terminal without a GUI are called Command-Line Tools.",
-                    "This is a big step toward becoming a computer wizard! Let's build the minigrep program together! 🚀",
+                    "This is a big step toward becoming a computer wizard! Let's build the minigrep program together! 🚀"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-                const diaryEl = document.getElementById("diary-text");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-sky-500 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-                    diaryEl.value = diaryFa;
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-sky-500 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-                    diaryEl.value = diaryEn;
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below for our first step.",
+                mission1Title: "Chapter 12: The Mini-Robot Searcher 🔍",
+                mission1Text: `
+                    <p class="text-sky-300">> When running a program from the terminal, we can send messages directly to it (like `cargo run -- dinosaur poem.txt`).</p>
+                    <p class="text-slate-300">> These extra words are called **Arguments**, acting like an initial note for the robot.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">In the `std::env` module, which function do we use to collect these arguments?</p>
+                `,
+                puzzle1Btn: "Get Configuration ⚙️",
+                puzzle1Success: "> Arguments collected successfully!",
+                puzzle1Error: "Error: In the env module, the args() function is used to collect arguments.",
+                mission2Step: ">> Step 1: Reading the Diary (File I/O)",
+                mission2Desc: "<p>Our robot needs to open a text file and read its contents word by word.</p><p class='text-white font-bold'>Using the `std::fs` module, which function is the easiest way to read the whole file into a `String`?</p>",
+                puzzle2Btn: "Scan File 📄",
+                puzzle2Success: "> File scanned successfully.",
+                puzzle2Error: "Error: The easiest way to read a file into a String is using read_to_string.",
+                mission3Step: ">> Step 2: Search Logic",
+                mission3Desc: "The robot reads the text line by line. If the query exists in the line, it saves it. Which method checks if a word exists inside a string?",
+                puzzle3Btn: "Confirm Algorithm 🧠",
+                puzzle3Success: "> Search logic implemented successfully.",
+                puzzle3Error: "Error: The contains method checks if a string exists within another string.",
+                mission4Step: ">> Final Step: Minigrep Execution",
+                mission4Desc: "Search for the word <strong>\"dinosaur\"</strong> in the file below. Run it normally once, and then again with the <span class='text-yellow-300'>Case Insensitive</span> toggle ON to win!",
+                diaryText: "Day 1: I am Ferris.\nDay 2: Dinosaurs are huge!\nDay 3: I saw a space dinosaur.\nDay 4: DINOSAURS are cool.\nDay 5: Learning Rust is fun.",
+                caseLabel: "CASE_INSENSITIVE",
+                runBtn: "Run",
+                grepInitial: "> Waiting for search command...",
+                searchingMsg: (query, ignoreCase) => `> Searching for '${query}' ${ignoreCase ? '(IGNORE CASE)' : ''}`,
+                noMatches: "No matches found.",
+                errorQuery: "❌ Error: Please provide a query!",
+                winTitle: "Search Completed Successfully!",
+                winMessage: "You built your first real Command-Line Tool in Rust!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                robotLabel: "Robot buscador:",
+                matchesLabel: "Coincidencias encontradas:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                robotStatus: "En línea 🟢",
+                dialogues: [
+                    "¡Hola! Mi diario espacial es demasiado grueso y encontrar una palabra en él es muy difícil. 📖",
+                    "¡Así que construí un pequeño robot para buscar cualquier palabra en textos por mí! 🤖🔍",
+                    "Los programas que se ejecutan en la terminal sin una interfaz gráfica se llaman Herramientas de Línea de Comandos.",
+                    "¡Este es un gran paso para convertirte en un mago de la informática! ¡Construyamos el programa minigrep juntos! 🚀"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor de abajo para nuestro primer paso.",
+                mission1Title: "Capítulo 12: El robot buscador mini 🧪",
+                mission1Text: `
+                    <p class="text-sky-300">> Cuando ejecutamos un programa desde la terminal, podemos enviarle mensajes directamente (como `cargo run -- dinosaurio poema.txt`).</p>
+                    <p class="text-slate-300">> Estas palabras adicionales se llaman **Argumentos**, actuando como una nota inicial para el robot.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">En el módulo `std::env`, ¿qué función usamos para recopilar estos argumentos?</p>
+                `,
+                puzzle1Btn: "Obtener configuración ⚙️",
+                puzzle1Success: "> ¡Argumentos recopilados exitosamente!",
+                puzzle1Error: "Error: En el módulo env, la función args() se usa para recopilar argumentos.",
+                mission2Step: ">> Paso 1: Leyendo el diario (E/S de archivos)",
+                mission2Desc: "<p>Nuestro robot necesita abrir un archivo de texto y leer su contenido palabra por palabra.</p><p class='text-white font-bold'>Usando el módulo `std::fs`, ¿qué función es la forma más fácil de leer todo el archivo en un `String`?</p>",
+                puzzle2Btn: "Escanear archivo 📄",
+                puzzle2Success: "> Archivo escaneado exitosamente.",
+                puzzle2Error: "Error: La forma más fácil de leer un archivo en un String es usando read_to_string.",
+                mission3Step: ">> Paso 2: Lógica de búsqueda",
+                mission3Desc: "El robot lee el texto línea por línea. Si la consulta existe en la línea, la guarda. ¿Qué método verifica si una palabra existe dentro de una cadena?",
+                puzzle3Btn: "Confirmar algoritmo 🧠",
+                puzzle3Success: "> Lógica de búsqueda implementada exitosamente.",
+                puzzle3Error: "Error: El método contains verifica si una cadena existe dentro de otra cadena.",
+                mission4Step: ">> Paso final: Ejecución de Minigrep",
+                mission4Desc: "Busca la palabra <strong>\"dinosaurio\"</strong> en el archivo a continuación. ¡Ejecútalo normalmente una vez, y luego otra vez con el interruptor <span class='text-yellow-300'>Case Insensitive</span> activado para ganar!",
+                diaryText: "Día 1: Soy Ferris.\nDía 2: ¡Los dinosaurios son enormes!\nDía 3: Vi un dinosaurio espacial.\nDía 4: Los DINOSAURIOS son geniales.\nDía 5: Aprender Rust es divertido.",
+                caseLabel: "CASE_INSENSITIVE",
+                runBtn: "Ejecutar",
+                grepInitial: "> Esperando comando de búsqueda...",
+                searchingMsg: (query, ignoreCase) => `> Buscando '${query}' ${ignoreCase ? '(IGNORAR MAYÚSCULAS/MINÚSCULAS)' : ''}`,
+                noMatches: "No se encontraron coincidencias.",
+                errorQuery: "❌ Error: ¡Proporciona una consulta!",
+                winTitle: "¡Búsqueda completada exitosamente!",
+                winMessage: "¡Construiste tu primera herramienta de línea de comandos real en Rust!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                robotLabel: "Suchroboter:",
+                matchesLabel: "Gefundene Übereinstimmungen:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                robotStatus: "Online 🟢",
+                dialogues: [
+                    "Hallo! Mein Weltraumtagebuch ist zu dick und ein Wort darin zu finden ist so schwer. 📖",
+                    "Also habe ich einen kleinen Roboter gebaut, der für mich nach jedem Wort in Texten suchen kann! 🤖🔍",
+                    "Programme, die in der Terminal ohne GUI ausgeführt werden, heißen Befehlszeilentools.",
+                    "Das ist ein großer Schritt, um ein Computerzauberer zu werden! Lasst uns gemeinsam das minigrep-Programm bauen! 🚀"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten für unseren ersten Schritt.",
+                mission1Title: "Kapitel 12: Der Mini-Robot-Sucher 🔍",
+                mission1Text: `
+                    <p class="text-sky-300">> Wenn wir ein Programm aus dem Terminal ausführen, können wir ihm direkt Nachrichten senden (wie `cargo run -- dinosaurier gedicht.txt`).</p>
+                    <p class="text-slate-300">> Diese zusätzlichen Wörter werden **Argumente** genannt und dienen als erste Notiz für den Roboter.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Im Modul `std::env`, welche Funktion verwenden wir, um diese Argumente zu sammeln?</p>
+                `,
+                puzzle1Btn: "Konfiguration abrufen ⚙️",
+                puzzle1Success: "> Argumente erfolgreich gesammelt!",
+                puzzle1Error: "Fehler: Im env-Modul wird die args()-Funktion verwendet, um Argumente zu sammeln.",
+                mission2Step: ">> Schritt 1: Das Tagebuch lesen (Datei-I/O)",
+                mission2Desc: "<p>Unser Roboter muss eine Textdatei öffnen und ihren Inhalt Wort für Wort lesen.</p><p class='text-white font-bold'>Mit dem Modul `std::fs`, welche Funktion ist der einfachste Weg, die gesamte Datei in einen `String` zu lesen?</p>",
+                puzzle2Btn: "Datei scannen 📄",
+                puzzle2Success: "> Datei erfolgreich gescannt.",
+                puzzle2Error: "Fehler: Der einfachste Weg, eine Datei in einen String zu lesen, ist read_to_string.",
+                mission3Step: ">> Schritt 2: Suchlogik",
+                mission3Desc: "Der Roboter liest den Text Zeile für Zeile. Wenn die Abfrage in der Zeile existiert, speichert er sie. Welche Methode überprüft, ob ein Wort in einem String existiert?",
+                puzzle3Btn: "Algorithmus bestätigen 🧠",
+                puzzle3Success: "> Suchlogik erfolgreich implementiert.",
+                puzzle3Error: "Fehler: Die contains-Methode prüft, ob ein String in einem anderen String existiert.",
+                mission4Step: ">> Letzter Schritt: Minigrep-Ausführung",
+                mission4Desc: "Suche nach dem Wort <strong>\"dinosaur\"</strong> in der Datei unten. Führe es einmal normal aus und dann erneut mit dem <span class='text-yellow-300'>Case Insensitive</span>-Schalter EIN, um zu gewinnen!",
+                diaryText: "Tag 1: Ich bin Ferris.\nTag 2: Dinosaurier sind riesig!\nTag 3: Ich sah einen Weltraumdinosaurier.\nTag 4: DINOSAURIER sind cool.\nTag 5: Rust zu lernen macht Spaß.",
+                caseLabel: "CASE_INSENSITIVE",
+                runBtn: "Ausführen",
+                grepInitial: "> Warte auf Suchbefehl...",
+                searchingMsg: (query, ignoreCase) => `> Suche nach '${query}' ${ignoreCase ? '(GROSS-/KLEINSCHREIBUNG IGNORIEREN)' : ''}`,
+                noMatches: "Keine Übereinstimmungen gefunden.",
+                errorQuery: "❌ Fehler: Bitte geben Sie eine Abfrage ein!",
+                winTitle: "Suche erfolgreich abgeschlossen!",
+                winMessage: "Du hast dein erstes echtes Befehlszeilentool in Rust gebaut!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                robotLabel: "Zoekrobot:",
+                matchesLabel: "Gevonden overeenkomsten:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                robotStatus: "Online 🟢",
+                dialogues: [
+                    "Hallo! Mijn ruimtedagboek is te dik en een woord erin vinden is zo moeilijk. 📖",
+                    "Dus heb ik een kleine robot gebouwd die voor mij naar elk woord in teksten kan zoeken! 🤖🔍",
+                    "Programma's die in de terminal worden uitgevoerd zonder GUI worden Command-Line Tools genoemd.",
+                    "Dit is een grote stap richting het worden van een computertovenaar! Laten we samen het minigrep-programma bouwen! 🚀"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder voor onze eerste stap.",
+                mission1Title: "Hoofdstuk 12: De mini-robotzoeker 🔍",
+                mission1Text: `
+                    <p class="text-sky-300">> Wanneer we een programma uitvoeren vanuit de terminal, kunnen we er direct berichten naar sturen (zoals `cargo run -- dinosaurus gedicht.txt`).</p>
+                    <p class="text-slate-300">> Deze extra woorden worden **Argumenten** genoemd, die als een eerste notitie voor de robot dienen.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">In de module `std::env`, welke functie gebruiken we om deze argumenten te verzamelen?</p>
+                `,
+                puzzle1Btn: "Configuratie ophalen ⚙️",
+                puzzle1Success: "> Argumenten succesvol verzameld!",
+                puzzle1Error: "Fout: In de env-module wordt de args()-functie gebruikt om argumenten te verzamelen.",
+                mission2Step: ">> Stap 1: Het dagboek lezen (Bestand I/O)",
+                mission2Desc: "<p>Onze robot moet een tekstbestand openen en de inhoud woord voor woord lezen.</p><p class='text-white font-bold'>Met de module `std::fs`, welke functie is de eenvoudigste manier om het hele bestand in een `String` te lezen?</p>",
+                puzzle2Btn: "Bestand scannen 📄",
+                puzzle2Success: "> Bestand succesvol gescand.",
+                puzzle2Error: "Fout: De eenvoudigste manier om een bestand in een String te lezen is read_to_string.",
+                mission3Step: ">> Stap 2: Zoeklogica",
+                mission3Desc: "De robot leest de tekst regel voor regel. Als de zoekopdracht in de regel bestaat, slaat hij deze op. Welke methode controleert of een woord in een string bestaat?",
+                puzzle3Btn: "Algoritme bevestigen 🧠",
+                puzzle3Success: "> Zoeklogica succesvol geïmplementeerd.",
+                puzzle3Error: "Fout: De contains-methode controleert of een string in een andere string bestaat.",
+                mission4Step: ">> Laatste stap: Minigrep-uitvoering",
+                mission4Desc: "Zoek naar het woord <strong>\"dinosaurus\"</strong> in het onderstaande bestand. Voer het één keer normaal uit, en dan opnieuw met de <span class='text-yellow-300'>Case Insensitive</span>-schakelaar AAN om te winnen!",
+                diaryText: "Dag 1: Ik ben Ferris.\nDag 2: Dinosaurussen zijn enorm!\nDag 3: Ik zag een ruimtedinosaurus.\nDag 4: DINOSAURUSSEN zijn cool.\nDag 5: Rust leren is leuk.",
+                caseLabel: "CASE_INSENSITIVE",
+                runBtn: "Uitvoeren",
+                grepInitial: "> Wachten op zoekopdracht...",
+                searchingMsg: (query, ignoreCase) => `> Zoeken naar '${query}' ${ignoreCase ? '(HOOFDLETTERGEVOELIGHEID UITSCHAKELEN)' : ''}`,
+                noMatches: "Geen overeenkomsten gevonden.",
+                errorQuery: "❌ Fout: Voer een zoekopdracht in!",
+                winTitle: "Zoekopdracht succesvol voltooid!",
+                winMessage: "Je hebt je eerste echte Command-Line Tool in Rust gebouwd!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let normalSearchDone = false;
+        let caseInsensitiveSearchDone = false;
+
+        // DOM elements
+        const robotLabelSpan = document.getElementById('robot-label');
+        const matchesLabelSpan = document.getElementById('matches-label');
+        const robotStatusSpan = document.getElementById('robot-status');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-sky-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake-danger');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake-danger'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
-
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
-                } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا قدم اول رو برداریم."
-                            : "Let's go! Look at the monitor below for our first step.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
-                }
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
             }
-
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
-
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
-
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
-
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
-                runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
-            }
-
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
-            }
-
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "args") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> آرگومان‌ها با موفقیت دریافت شدند!"
-                            : "> Arguments collected successfully!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: در ماژول env برای دریافت آرگومان‌ها از تابع args استفاده می‌شود.",
-                        "Error: In the env module, the args() function is used to collect arguments.",
-                    );
-                }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "read_to_string") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> فایل با موفقیت اسکن شد."
-                            : "> File scanned successfully.";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: راحت‌ترین روش خواندن کل فایل در یک String استفاده از read_to_string است.",
-                        "Error: The easiest way to read a file into a String is using read_to_string.",
-                    );
-                }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "contains") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> منطق جستجو با موفقیت پیاده‌سازی شد."
-                            : "> Search logic implemented successfully.";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: متد contains چک می‌کند که آیا یک رشته درون رشته دیگر وجود دارد یا نه.",
-                        "Error: The contains method checks if a string exists within another string.",
-                    );
-                }
-            }
-
-            // --- Minigrep Console Simulator ---
-            function escapeHtml(text) {
-                return text
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
-            }
-
-            function runMiniGrep() {
-                const query = document
-                    .getElementById("grep-query")
-                    .value.trim();
-                const textContent = document.getElementById("diary-text").value;
-                const isCaseInsensitive =
-                    document.getElementById("case-toggle").checked;
-                const terminal = document.getElementById("grep-terminal");
-
-                if (!query) {
-                    terminal.innerHTML = `<div class="text-rose-400 text-sm">❌ Error: Please provide a query!</div>`;
-                    return;
-                }
-
-                let matchesCount = 0;
-                let outputHtml = `<div class="text-slate-400 mb-2">> Searching for '${escapeHtml(query)}' ${isCaseInsensitive ? "(IGNORE CASE)" : ""}</div>`;
-
-                const lines = textContent.split("\n");
-                const searchTarget = isCaseInsensitive
-                    ? query.toLowerCase()
-                    : query;
-
-                for (let i = 0; i < lines.length; i++) {
-                    const originalLine = lines[i];
-                    const compareLine = isCaseInsensitive
-                        ? originalLine.toLowerCase()
-                        : originalLine;
-
-                    if (compareLine.includes(searchTarget)) {
-                        matchesCount++;
-
-                        // Basic highlight implementation (just for visual flair)
-                        // Note: Case insensitive replace can be tricky with HTML, keeping it simple for the demo.
-                        let highlightedLine = "";
-                        if (isCaseInsensitive) {
-                            // Regex case-insensitive replace
-                            const regex = new RegExp(escapeHtml(query), "gi");
-                            highlightedLine = escapeHtml(originalLine).replace(
-                                regex,
-                                (match) => `<mark>${match}</mark>`,
-                            );
-                        } else {
-                            highlightedLine = escapeHtml(originalLine)
-                                .split(escapeHtml(query))
-                                .join(`<mark>${escapeHtml(query)}</mark>`);
-                        }
-
-                        outputHtml += `<div class="text-emerald-300 text-sm mb-1">${i + 1}: ${highlightedLine}</div>`;
-                    }
-                }
-
-                if (matchesCount === 0) {
-                    outputHtml += `<div class="text-yellow-400 text-sm">No matches found.</div>`;
-                }
-
-                terminal.innerHTML = outputHtml;
-                document.getElementById("hud-matches").innerText =
-                    currentLang === "fa"
-                        ? matchesCount.toLocaleString("fa-IR")
-                        : matchesCount;
-
-                // Check Win Condition
-                const queryLower = query.toLowerCase();
-                if (queryLower === "dinosaur") {
-                    if (isCaseInsensitive) {
-                        caseInsensitiveSearchDone = true;
-                    } else {
-                        normalSearchDone = true;
-                    }
-                }
-
-                if (normalSearchDone && caseInsensitiveSearchDone) {
-                    setTimeout(() => {
-                        triggerConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
-                    }, 1000);
-                }
-            }
-
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#0ea5e9",
-                "#38bdf8",
-                "#7dd3fc",
-                "#0284c7",
-                "#ffffff",
-            ]; // Sky colors
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
-            }, 500);
-        </script>
-    </body>
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            robotLabelSpan.innerText = pack.robotLabel;
+            matchesLabelSpan.innerText = pack.matchesLabel;
+            robotStatusSpan.innerHTML = pack.robotStatus;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('diary-text').value = pack.diaryText;
+            document.getElementById('case-label').innerHTML = pack.caseLabel;
+            document.getElementById('run-btn-text').innerHTML = pack.runBtn;
+            document.getElementById('grep-initial-msg').innerHTML = pack.grepInitial;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-sky-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
+
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
+
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'args') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
+            }
+        }
+
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'read_to_string') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
+            }
+        }
+
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'contains') {
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
+
+        // Minigrep Simulator
+        function runMiniGrep() {
+            const pack = languagePack[currentLang];
+            const query = document.getElementById('grep-query').value.trim();
+            const textContent = document.getElementById('diary-text').value;
+            const isCaseInsensitive = document.getElementById('case-toggle').checked;
+            const terminal = document.getElementById('grep-terminal');
+
+            if (!query) {
+                terminal.innerHTML = `<div class="text-rose-400 text-sm">${pack.errorQuery}</div>`;
+                return;
+            }
+
+            let matchesCount = 0;
+            let outputHtml = `<div class="text-slate-400 mb-2">${pack.searchingMsg(escapeHtml(query), isCaseInsensitive)}</div>`;
+
+            const lines = textContent.split('\n');
+            const searchTarget = isCaseInsensitive ? query.toLowerCase() : query;
+
+            for (let i = 0; i < lines.length; i++) {
+                const originalLine = lines[i];
+                const compareLine = isCaseInsensitive ? originalLine.toLowerCase() : originalLine;
+
+                if (compareLine.includes(searchTarget)) {
+                    matchesCount++;
+                    let highlightedLine = "";
+                    if (isCaseInsensitive) {
+                        const regex = new RegExp(escapeHtml(query), "gi");
+                        highlightedLine = escapeHtml(originalLine).replace(regex, match => `<mark>${match}</mark>`);
+                    } else {
+                        highlightedLine = escapeHtml(originalLine).split(escapeHtml(query)).join(`<mark>${escapeHtml(query)}</mark>`);
+                    }
+                    outputHtml += `<div class="text-emerald-300 text-sm mb-1">${i + 1}: ${highlightedLine}</div>`;
+                }
+            }
+
+            if (matchesCount === 0) {
+                outputHtml += `<div class="text-yellow-400 text-sm">${pack.noMatches}</div>`;
+            }
+
+            terminal.innerHTML = outputHtml;
+            document.getElementById('hud-matches').innerText = formatNumber(matchesCount, currentLang);
+
+            const queryLower = query.toLowerCase();
+            if (queryLower === 'dinosaur' || queryLower === 'dinosaurio' || queryLower === 'dinosaurier' || queryLower === 'dinosaurus') {
+                if (isCaseInsensitive) {
+                    caseInsensitiveSearchDone = true;
+                } else {
+                    normalSearchDone = true;
+                }
+            }
+
+            if (normalSearchDone && caseInsensitiveSearchDone) {
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        function goToNextChapter() {
+            window.location.href = 'chapter-13.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#0ea5e9", "#38bdf8", "#7dd3fc", "#0284c7", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
+
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>

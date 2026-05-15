@@ -2,49 +2,41 @@
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 6</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --bg-color: #082f49; /* Sky 900 */
-            --crt-bg: #083344; /* Cyan 950 */
+            --bg-color: #082f49;
+            --crt-bg: #083344;
         }
-
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(rgba(6, 182, 212, 0.15) 2px, transparent 40px),
-                radial-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 30px);
+            background-image: radial-gradient(rgba(6, 182, 212, 0.15) 2px, transparent 40px), radial-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
         html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
         html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
         .code-font { font-family: 'JetBrains Mono', monospace !important; }
-
-        /* Spaceship Dashboard UI - Weather Station Edition */
+        /* Force LTR for code blocks */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .weather-btn .btn-label {
+            direction: ltr !important;
+            text-align: left !important;
+        }
         .dashboard {
             background: linear-gradient(180deg, #0c4a6e 0%, #082f49 100%);
-            border: 4px solid #0ea5e9; /* Sky 500 */
+            border: 4px solid #0ea5e9;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-            border: 4px solid #0369a1; /* Sky 700 */
+            border: 4px solid #0369a1;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
@@ -60,10 +52,8 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
-            background: rgba(240, 249, 255, 0.95); /* Sky 50 */
+            background: rgba(240, 249, 255, 0.95);
             color: #082f49;
             border-radius: 15px;
             border: 3px solid #0ea5e9;
@@ -77,7 +67,6 @@
             content: ''; position: absolute; bottom: -15px; left: 40px;
             border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 249, 255, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #e0f2fe; border-radius: 50%;
@@ -85,14 +74,11 @@
             font-size: 2.5rem; border: 4px solid #0ea5e9;
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Interactive Elements */
         .code-slot {
             display: inline-block; min-width: 60px; height: 30px;
             border-bottom: 3px dashed #fbbf24; margin: 0 5px;
@@ -101,7 +87,6 @@
             border-radius: 5px; cursor: pointer; transition: all 0.3s;
         }
         .code-slot.filled { border: 2px solid #22d3ee; background: rgba(34, 211, 238, 0.2); color: #cffafe; }
-
         .code-option {
             background: #082f49; border: 2px solid #0284c7;
             padding: 8px 15px; border-radius: 8px; cursor: pointer;
@@ -109,8 +94,6 @@
         }
         .code-option:hover { background: #0369a1; transform: scale(1.05); }
         .code-option.selected { background: #0ea5e9; border-color: #7dd3fc; color: #082f49; font-weight: bold; }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); background-color: #7f1d1d; }
@@ -132,17 +115,9 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.5); border-radius: 8px; padding: 12px; border: 1px solid rgba(14, 165, 233, 0.3);
         }
-
-        /* Weather Buttons */
         .weather-btn {
             background: #0f172a; border: 2px solid #0369a1;
             border-radius: 12px; padding: 10px; font-size: 2rem;
@@ -152,15 +127,22 @@
         .weather-btn:hover { background: #0c4a6e; transform: translateY(-5px); border-color: #38bdf8; }
         .weather-btn.tested { border-color: #10b981; background: #064e3b; opacity: 0.8; }
         .weather-btn .btn-label { font-size: 0.8rem; margin-top: 5px; color: #bae6fd; font-family: 'JetBrains Mono', monospace; }
-
-        .shirt-display {
-            font-size: 4rem; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 20px rgba(255,255,255,0.5);
-        }
+        .shirt-display { font-size: 4rem; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-shadow: 0 0 20px rgba(255,255,255,0.5); }
         @keyframes popIn {
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .weather-btn { font-size: 1.5rem; padding: 6px; }
+            .weather-btn .btn-label { font-size: 0.7rem; }
+            .shirt-display { font-size: 2.5rem; }
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
@@ -169,64 +151,43 @@
 
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-sky-500 text-white">فارسی</button>
-        </div>
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD -->
+        <!-- HUD -->
         <div class="flex justify-between items-center mb-6 border-b border-sky-900 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-sky-400"><i class="fa-solid fa-cloud-sun"></i> <span class="lang-fa">آب و هوا:</span><span class="lang-en">Weather:</span> <span id="hud-weather">---</span></div>
-                <div class="text-amber-400"><i class="fa-solid fa-key"></i> <span class="lang-fa">کلید سفینه:</span><span class="lang-en">Ship Key:</span> <span id="hud-key"><span class="text-slate-500">None</span></span></div>
+                <div class="text-sky-400"><i class="fa-solid fa-cloud-sun"></i> <span id="weather-label"></span> <span id="hud-weather">---</span></div>
+                <div class="text-amber-400"><i class="fa-solid fa-key"></i> <span id="key-label"></span> <span id="hud-key"><span class="text-slate-500">None</span></span></div>
             </div>
-            <div class="text-sky-300 code-font text-sm opacity-70">WARDROBE-OS v6.0 (Enum Module)</div>
+            <div class="text-sky-300 code-font text-xs md:text-sm opacity-70">WARDROBE-OS v6.0 (Enum Module)</div>
         </div>
 
-        <!-- Story Section -->
+        <!-- Dialog Box -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-sky-500">
-                <h3 class="font-bold text-sky-600 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-sky-600 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold"></p>
-
+                <h3 id="ferris-name" class="font-bold text-sky-600 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Screen -->
+        <!-- Game Area -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-cyan-300 code-font min-h-[400px] flex flex-col">
 
-                <!-- Mission 1: Defining an Enum -->
+                <!-- Mission 1: Define Enum -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-cyan-900 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۶: کمد لباس هوشمند (Enums) 🧥</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 6: The Smart Wardrobe (Enums) 🧥</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa leading-relaxed space-y-3">
-                        <p class="text-sky-300">> آب و هوا فقط یک عدد یا کلمه ساده نیست؛ می‌تواند آفتابی، بارانی، برفی یا ابری باشد.</p>
-                        <p class="text-slate-300">> برای اینکه در کدنویسی اشتباه تایپی نداشته باشیم، در زبان راست از چیزی استفاده می‌کنیم که یک لیست ثابت و محدود می‌سازد.</p>
-                        <p class="text-amber-300 mt-4 font-bold">برای ساختن این لیست محدود از وضعیت‌ها، از چه کلمه‌ای استفاده می‌کنیم؟</p>
-                    </div>
-
-                    <div class="lang-en leading-relaxed space-y-3">
-                        <p class="text-sky-300">> Weather isn't just a simple number or text; it can be Sunny, Rainy, Snowy, or Cloudy.</p>
-                        <p class="text-slate-300">> To avoid typos, Rust uses a feature that creates a fixed, limited list of options.</p>
-                        <p class="text-amber-300 mt-4 font-bold">What keyword do we use to build this limited list of states?</p>
-                    </div>
-
-                    <div class="terminal-block mt-4 text-emerald-300 text-lg">
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
                         <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span> Weather {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;Sunny,<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;Rainy,<br>
@@ -234,9 +195,7 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;Cloudy,<br>
                         }
                     </div>
-
-                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"></div>
-
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-cyan-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'struct')">struct</div>
@@ -245,40 +204,22 @@
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'type')">type</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle1-btn" class="bg-sky-700 hover:bg-sky-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
-                            <span class="lang-fa">ساخت لیست آب و هوا 🌦️</span><span class="lang-en">Create Weather List 🌦️</span>
+                            <span id="puzzle1-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 2: Option<T> Puzzle -->
+                <!-- Mission 2: Option&lt;T&gt; -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-amber-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: کیف گمشده (Option)</span>
-                        <span class="lang-en">>> Step 1: The Lost Bag (Option)</span>
+                    <div id="mission2-step" class="text-amber-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-slate-400 text-sm">// key found!</span><br>
+                        <span class="text-pink-400">let</span> key = <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(String::from(<span class="text-yellow-300">"golden key"</span>));
                     </div>
-
-                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
-                        <p>بعضی روزها فریس کلید سفینه‌اش را پیدا نمی‌کند. در زبان‌های دیگر از <code>null</code> استفاده می‌شود که باعث کرش کردن برنامه می‌شود!</p>
-                        <p>اما زبان راست به جای آن از نوع فوق‌العاده امن <code>Option</code> استفاده می‌کند که یا <code>None</code> است یا...</p>
-                        <p class="text-sky-300 font-bold">کلمه درست برای زمانی که کلید «وجود دارد» چیست؟</p>
-                    </div>
-                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
-                        <p>Some days Ferris can't find his ship key. Other languages use <code>null</code>, which crashes programs!</p>
-                        <p>Instead, Rust uses the super-safe <code>Option</code> enum, which is either <code>None</code> or...</p>
-                        <p class="text-sky-300 font-bold">What is the correct word for when the key "exists"?</p>
-                    </div>
-
-                    <div class="terminal-block text-lg mb-4 text-emerald-300">
-                        <span class="text-slate-400 text-sm">// کلید پیدا شد!</span><br>
-                        <span class="text-pink-400">let</span> key = <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(String::from(<span class="text-yellow-300">"golden key"</span>));<br>
-                        <span class="text-slate-400 text-sm">// let no_key: Option&lt;String&gt; = None;</span>
-                    </div>
-
-                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-cyan-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'Yes')">Yes</div>
@@ -287,24 +228,17 @@
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'Found')">Found</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle2-btn" class="bg-sky-700 hover:bg-sky-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
-                            <span class="lang-fa">بررسی داخل کیف 🎒</span><span class="lang-en">Check Inside Bag 🎒</span>
+                            <span id="puzzle2-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 3: Match Pattern -->
+                <!-- Mission 3: Match -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-amber-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۲: کنترل هوشمند (Match)</span>
-                        <span class="lang-en">>> Step 2: Smart Remote Control (Match)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-slate-300 mb-4">حالا که وضعیت هوا مشخص است، چگونه برای هر کدام تصمیم بگیریم؟ ابزار <code class="text-pink-400">---</code> مثل یک دستگاه دسته‌بندی است که تمام گزینه‌های ممکن را بررسی می‌کند.</p>
-                    <p class="lang-en text-sm text-slate-300 mb-4">Now that we know the weather, how do we decide what to do for each? The <code class="text-pink-400">---</code> tool is like a sorting machine that checks all possible options.</p>
-
+                    <div id="mission3-step" class="text-amber-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
                     <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span> weather {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;Weather::Sunny => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Wear a hat!"</span>),<br>
@@ -312,9 +246,7 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;_ => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Other weather..."</span>),<br>
                         }
                     </div>
-
-                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-cyan-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font" onclick="selectOption(this, 3, 'if')">if</div>
@@ -323,10 +255,9 @@
                             <div class="code-option code-font" onclick="selectOption(this, 3, 'check')">check</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle3-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
-                            <span class="lang-fa">راه‌اندازی کنترلگر 🎛️</span><span class="lang-en">Start Controller 🎛️</span>
+                            <span id="puzzle3-btn-text"></span>
                         </button>
                     </div>
                 </div>
@@ -334,19 +265,10 @@
                 <!-- Mission 4: Wardrobe Simulator -->
                 <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
                     <div class="text-amber-400 mb-2 border-b border-cyan-800 pb-2 flex justify-between items-center">
-                        <div>
-                            <span class="lang-fa">>> مرحله نهایی: شبیه‌ساز کمد لباس</span>
-                            <span class="lang-en">>> Final Step: Wardrobe Simulator</span>
-                        </div>
-                        <div class="text-xs bg-cyan-900 px-2 py-1 rounded">
-                            <span class="lang-fa">پروژه ۶.۵</span><span class="lang-en">Project 6.5</span>
-                        </div>
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-cyan-900 px-2 py-1 rounded">Project 6.5</div>
                     </div>
-
-                    <div class="lang-fa text-sm mb-3 text-slate-300">روی تمام دکمه‌های آب و هوا کلیک کن تا کمد لباس با استفاده از `match` لباس مناسب را پیشنهاد دهد.</div>
-                    <div class="lang-en text-sm mb-3 text-slate-300">Click all the weather buttons to let the wardrobe use `match` and suggest the right shirt.</div>
-
-                    <!-- Weather Buttons -->
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
                     <div class="grid grid-cols-4 gap-2 mb-4">
                         <div class="weather-btn" onclick="simulateWardrobe('Sunny', this)" id="btn-sunny">
                             ☀️ <span class="btn-label">Sunny</span>
@@ -361,134 +283,474 @@
                             ☁️ <span class="btn-label">Cloudy</span>
                         </div>
                     </div>
-
-                    <!-- Display Area -->
                     <div class="flex-grow flex flex-col items-center justify-center bg-cyan-950/50 rounded-lg border border-cyan-800 p-4 min-h-[120px]">
                         <div id="shirt-output" class="shirt-display hidden">👕</div>
-                        <div id="wardrobe-msg" class="text-cyan-200 mt-4 text-center text-sm md:text-base h-8 font-bold code-font">
-                            <span class="lang-fa">آب و هوا را انتخاب کن...</span>
-                            <span class="lang-en">Select the weather...</span>
-                        </div>
+                        <div id="wardrobe-msg" class="text-cyan-200 mt-4 text-center text-sm md:text-base h-8 font-bold code-font"></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Success overlay -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
-            <div class="text-7xl mb-4 animate-bounce">🧥🦀✨</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">آماده برای بیرون رفتن!</span>
-                <span class="lang-en">Ready to go out!</span>
-            </h2>
-            <p class="text-xl text-sky-400 mb-6 text-center px-4">
-                <span class="lang-fa">شما ابزارهای قدرتمند Enum، Option و Match را یاد گرفتید.</span>
-                <span class="lang-en">You've mastered the powerful tools of Enum, Option, and Match.</span>
-            </p>
-            <button class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(14,165,233,0.6)]" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۶ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 6 - Play Again</span>
-            </button>
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🧥🦀✨</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-sky-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(14,165,233,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State & Logic ---
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                weatherLabel: "آب و هوا:",
+                keyLabel: "کلید سفینه:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "سلام! من یه کمد لباس جادویی دارم که بر اساس آب و هوا، لباس مناسب رو پیشنهاد میده! 🧥",
+                    "تو برنامه‌نویسی برای نگه داشتن لیست چیزهایی مثل «انواع آب و هوا» نباید از عدد یا متن ساده استفاده کنیم.",
+                    "زبان راست (Rust) ابزاری به نام Enum داره که کمک می‌کنه یه لیست ثابت و ایمن بسازیم که هیچ‌وقت اشتباه نشه.",
+                    "بیا با هم سیستم این کمد لباس رو برنامه‌نویسی کنیم! ابزارهای Option و Match هم قراره بهمون کمک کنن. بریم! 🚀"
+                ],
+                afterDialog: "عالیه! به مانیتور پایین نگاه کن تا سیستم رو راه‌اندازی کنیم.",
+                mission1Title: "فصل ۶: کمد لباس هوشمند (Enums) 🧥",
+                mission1Text: `
+                    <p class="text-sky-300">> آب و هوا فقط یک عدد یا کلمه ساده نیست؛ می‌تواند آفتابی، بارانی، برفی یا ابری باشد.</p>
+                    <p class="text-slate-300">> برای اینکه در کدنویسی اشتباه تایپی نداشته باشیم، در زبان راست از چیزی استفاده می‌کنیم که یک لیست ثابت و محدود می‌سازد.</p>
+                    <p class="text-amber-300 mt-4 font-bold">برای ساختن این لیست محدود از وضعیت‌ها، از چه کلمه‌ای استفاده می‌کنیم؟</p>
+                `,
+                puzzle1Btn: "ساخت لیست آب و هوا 🌦️",
+                puzzle1Success: "> لیست (Enum) ساخته شد!",
+                puzzle1Error: "خطا: برای ساخت این لیست ثابت، باید از کلمه enum استفاده کنیم.",
+                mission2Step: ">> مرحله ۱: کیف گمشده (Option)",
+                mission2Desc: "<p>بعضی روزها فریس کلید سفینه‌اش را پیدا نمی‌کند. در زبان‌های دیگر از <code>null</code> استفاده می‌شود که باعث کرش کردن برنامه می‌شود!</p><p>اما زبان راست به جای آن از نوع فوق‌العاده امن <code>Option</code> استفاده می‌کند که یا <code>None</code> است یا...</p><p class='text-sky-300 font-bold'>کلمه درست برای زمانی که کلید «وجود دارد» چیست؟</p>",
+                puzzle2Btn: "بررسی داخل کیف 🎒",
+                puzzle2Success: "> عالی! کیف حاوی Some(key) است.",
+                puzzle2Error: "خطا: در نوع Option، زمانی که مقداری وجود دارد از کلمه Some استفاده می‌کنیم.",
+                mission3Step: ">> مرحله ۲: کنترل هوشمند (Match)",
+                mission3Desc: "حالا که وضعیت هوا مشخص است، چگونه برای هر کدام تصمیم بگیریم؟ ابزار <code class='text-pink-400'>---</code> مثل یک دستگاه دسته‌بندی است که تمام گزینه‌های ممکن را بررسی می‌کند.",
+                puzzle3Btn: "راه‌اندازی کنترلگر 🎛️",
+                puzzle3Success: "> دستگاه طبقه‌بندی (match) فعال شد!",
+                puzzle3Error: "خطا: برای بررسی تمام حالت‌های یک enum از دستور match استفاده می‌کنیم.",
+                mission4Step: ">> مرحله نهایی: شبیه‌ساز کمد لباس",
+                mission4Desc: "روی تمام دکمه‌های آب و هوا کلیک کن تا کمد لباس با استفاده از `match` لباس مناسب را پیشنهاد دهد.",
+                sunnyLabel: "Sunny",
+                rainyLabel: "Rainy",
+                snowyLabel: "Snowy",
+                cloudyLabel: "Cloudy",
+                sunnyMsg: "Weather::Sunny => تی‌شرت سفید بپوش! (خنک)",
+                rainyMsg: "Weather::Rainy => پیراهن آبی بپوش! (ست با باران)",
+                snowyMsg: "Weather::Snowy => شال‌گردن قرمز بپوش! (گرم)",
+                cloudyMsg: "Weather::Cloudy => ژاکت خاکستری بپوش! (هوای ابری)",
+                selectMsg: "آب و هوا را انتخاب کن...",
+                sunnyIcon: "🥼",
+                rainyIcon: "👕",
+                snowyIcon: "🧣",
+                cloudyIcon: "🧥",
+                winTitle: "آماده برای بیرون رفتن!",
+                winMessage: "شما ابزارهای قدرتمند Enum، Option و Match را یاد گرفتید.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                weatherLabel: "Weather:",
+                keyLabel: "Ship Key:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hi! I have a magical wardrobe that suggests the perfect outfit based on the weather! 🧥",
+                    "In programming, to keep a list of things like 'weather types', we shouldn't use simple numbers or text.",
+                    "Rust has a tool called an Enum that helps us create a fixed, safe list that never goes wrong.",
+                    "Let's program this wardrobe's system together! The Option and Match tools will help us too. Let's go! 🚀"
+                ],
+                afterDialog: "Awesome! Look at the monitor below to start the system.",
+                mission1Title: "Chapter 6: The Smart Wardrobe (Enums) 🧥",
+                mission1Text: `
+                    <p class="text-sky-300">> Weather isn't just a simple number or text; it can be Sunny, Rainy, Snowy, or Cloudy.</p>
+                    <p class="text-slate-300">> To avoid typos, Rust uses a feature that creates a fixed, limited list of options.</p>
+                    <p class="text-amber-300 mt-4 font-bold">What keyword do we use to build this limited list of states?</p>
+                `,
+                puzzle1Btn: "Create Weather List 🌦️",
+                puzzle1Success: "> List (Enum) created successfully!",
+                puzzle1Error: "Error: To create a fixed list, we must use the 'enum' keyword.",
+                mission2Step: ">> Step 1: The Lost Bag (Option)",
+                mission2Desc: "<p>Some days Ferris can't find his ship key. Other languages use <code>null</code>, which crashes programs!</p><p>Instead, Rust uses the super-safe <code>Option</code> enum, which is either <code>None</code> or...</p><p class='text-sky-300 font-bold'>What is the correct word for when the key 'exists'?</p>",
+                puzzle2Btn: "Check Inside Bag 🎒",
+                puzzle2Success: "> Great! The bag contains Some(key).",
+                puzzle2Error: "Error: In Option type, when a value exists, we use the word 'Some'.",
+                mission3Step: ">> Step 2: Smart Remote Control (Match)",
+                mission3Desc: "Now that we know the weather, how do we decide what to do for each? The <code class='text-pink-400'>---</code> tool is like a sorting machine that checks all possible options.",
+                puzzle3Btn: "Start Controller 🎛️",
+                puzzle3Success: "> Sorting machine (match) activated!",
+                puzzle3Error: "Error: To check all variants of an enum, we use the 'match' statement.",
+                mission4Step: ">> Final Step: Wardrobe Simulator",
+                mission4Desc: "Click all the weather buttons to let the wardrobe use `match` and suggest the right shirt.",
+                sunnyLabel: "Sunny",
+                rainyLabel: "Rainy",
+                snowyLabel: "Snowy",
+                cloudyLabel: "Cloudy",
+                sunnyMsg: "Weather::Sunny => Wear a white shirt! (cool)",
+                rainyMsg: "Weather::Rainy => Wear a blue shirt! (matches rain)",
+                snowyMsg: "Weather::Snowy => Wear a red scarf! (warm)",
+                cloudyMsg: "Weather::Cloudy => Wear a gray coat! (cloudy day)",
+                selectMsg: "Select the weather...",
+                sunnyIcon: "🥼",
+                rainyIcon: "👕",
+                snowyIcon: "🧣",
+                cloudyIcon: "🧥",
+                winTitle: "Ready to go out!",
+                winMessage: "You've mastered the powerful tools of Enum, Option, and Match.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                weatherLabel: "Clima:",
+                keyLabel: "Llave de la nave:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! ¡Tengo un armario mágico que sugiere el atuendo perfecto según el clima! 🧥",
+                    "En programación, para mantener una lista de cosas como 'tipos de clima', no debemos usar números o texto simples.",
+                    "Rust tiene una herramienta llamada Enum que nos ayuda a crear una lista fija y segura que nunca falla.",
+                    "¡Programemos juntos el sistema de este armario! Las herramientas Option y Match también nos ayudarán. ¡Vamos! 🚀"
+                ],
+                afterDialog: "¡Genial! Mira el monitor a continuación para iniciar el sistema.",
+                mission1Title: "Capítulo 6: El Armario Inteligente (Enums) 🧥",
+                mission1Text: `
+                    <p class="text-sky-300">> El clima no es solo un número o texto simple; puede ser Soleado, Lluvioso, Nevado o Nublado.</p>
+                    <p class="text-slate-300">> Para evitar errores tipográficos, Rust utiliza una función que crea una lista fija y limitada de opciones.</p>
+                    <p class="text-amber-300 mt-4 font-bold">¿Qué palabra clave usamos para construir esta lista limitada de estados?</p>
+                `,
+                puzzle1Btn: "Crear lista del clima 🌦️",
+                puzzle1Success: "> ¡Lista (Enum) creada exitosamente!",
+                puzzle1Error: "Error: Para crear una lista fija, debemos usar la palabra clave 'enum'.",
+                mission2Step: ">> Paso 1: La bolsa perdida (Option)",
+                mission2Desc: "<p>Algunos días Ferris no encuentra la llave de su nave. ¡Otros lenguajes usan <code>null</code>, lo que hace que los programas se bloqueen!</p><p>En cambio, Rust usa el enum súper seguro <code>Option</code>, que es <code>None</code> o...</p><p class='text-sky-300 font-bold'>¿Cuál es la palabra correcta para cuando la llave 'existe'?</p>",
+                puzzle2Btn: "Revisar dentro de la bolsa 🎒",
+                puzzle2Success: "> ¡Genial! La bolsa contiene Some(key).",
+                puzzle2Error: "Error: En el tipo Option, cuando existe un valor, usamos la palabra 'Some'.",
+                mission3Step: ">> Paso 2: Control remoto inteligente (Match)",
+                mission3Desc: "Ahora que conocemos el clima, ¿cómo decidimos qué hacer para cada uno? La herramienta <code class='text-pink-400'>---</code> es como una máquina clasificadora que revisa todas las opciones posibles.",
+                puzzle3Btn: "Iniciar controlador 🎛️",
+                puzzle3Success: "> ¡Máquina clasificadora (match) activada!",
+                puzzle3Error: "Error: Para revisar todas las variantes de un enum, usamos la declaración 'match'.",
+                mission4Step: ">> Paso final: Simulador de armario",
+                mission4Desc: "Haz clic en todos los botones del clima para que el armario use `match` y sugiera la camisa correcta.",
+                sunnyLabel: "Sunny",
+                rainyLabel: "Rainy",
+                snowyLabel: "Snowy",
+                cloudyLabel: "Cloudy",
+                sunnyMsg: "Weather::Sunny => ¡Usa una camisa blanca! (fresco)",
+                rainyMsg: "Weather::Rainy => ¡Usa una camisa azul! (combina con la lluvia)",
+                snowyMsg: "Weather::Snowy => ¡Usa una bufanda roja! (caliente)",
+                cloudyMsg: "Weather::Cloudy => ¡Usa un abrigo gris! (día nublado)",
+                selectMsg: "Selecciona el clima...",
+                sunnyIcon: "🥼",
+                rainyIcon: "👕",
+                snowyIcon: "🧣",
+                cloudyIcon: "🧥",
+                winTitle: "¡Listo para salir!",
+                winMessage: "Has dominado las poderosas herramientas de Enum, Option y Match.",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                weatherLabel: "Wetter:",
+                keyLabel: "Raumschiffschlüssel:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ich habe einen magischen Kleiderschrank, der das perfekte Outfit basierend auf dem Wetter vorschlägt! 🧥",
+                    "In der Programmierung sollten wir für eine Liste von Dingen wie 'Wettertypen' keine einfachen Zahlen oder Texte verwenden.",
+                    "Rust hat ein Werkzeug namens Enum, das uns hilft, eine feste, sichere Liste zu erstellen, die nie falsch ist.",
+                    "Lass uns das System dieses Kleiderschranks zusammen programmieren! Die Option- und Match-Werkzeuge werden uns auch helfen. Los geht's! 🚀"
+                ],
+                afterDialog: "Großartig! Schau auf den Monitor unten, um das System zu starten.",
+                mission1Title: "Kapitel 6: Der intelligente Kleiderschrank (Enums) 🧥",
+                mission1Text: `
+                    <p class="text-sky-300">> Wetter ist nicht nur eine einfache Zahl oder Text; es kann sonnig, regnerisch, verschneit oder bewölkt sein.</p>
+                    <p class="text-slate-300">> Um Tippfehler zu vermeiden, verwendet Rust eine Funktion, die eine feste, begrenzte Liste von Optionen erstellt.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Welches Schlüsselwort verwenden wir, um diese begrenzte Liste von Zuständen zu erstellen?</p>
+                `,
+                puzzle1Btn: "Wetterliste erstellen 🌦️",
+                puzzle1Success: "> Liste (Enum) erfolgreich erstellt!",
+                puzzle1Error: "Fehler: Um eine feste Liste zu erstellen, müssen wir das Schlüsselwort 'enum' verwenden.",
+                mission2Step: ">> Schritt 1: Die verlorene Tasche (Option)",
+                mission2Desc: "<p>An manchen Tagen findet Ferris seinen Raumschiffschlüssel nicht. Andere Sprachen verwenden <code>null</code>, was zum Absturz von Programmen führt!</p><p>Stattdessen verwendet Rust das superschwere <code>Option</code>-Enum, das entweder <code>None</code> ist oder...</p><p class='text-sky-300 font-bold'>Was ist das richtige Wort, wenn der Schlüssel 'existiert'?</p>",
+                puzzle2Btn: "In der Tasche nachsehen 🎒",
+                puzzle2Success: "> Großartig! Die Tasche enthält Some(key).",
+                puzzle2Error: "Fehler: Im Option-Typ verwenden wir das Wort 'Some', wenn ein Wert existiert.",
+                mission3Step: ">> Schritt 2: Intelligente Fernbedienung (Match)",
+                mission3Desc: "Jetzt, wo wir das Wetter kennen, wie entscheiden wir, was für jedes zu tun ist? Das <code class='text-pink-400'>---</code>-Tool ist wie eine Sortiermaschine, die alle möglichen Optionen überprüft.",
+                puzzle3Btn: "Controller starten 🎛️",
+                puzzle3Success: "> Sortiermaschine (match) aktiviert!",
+                puzzle3Error: "Fehler: Um alle Varianten eines Enums zu überprüfen, verwenden wir die 'match'-Anweisung.",
+                mission4Step: ">> Letzter Schritt: Kleiderschrank-Simulator",
+                mission4Desc: "Klicke auf alle Wetterknöpfe, damit der Kleiderschrank `match` verwendet und das richtige Hemd vorschlägt.",
+                sunnyLabel: "Sunny",
+                rainyLabel: "Rainy",
+                snowyLabel: "Snowy",
+                cloudyLabel: "Cloudy",
+                sunnyMsg: "Weather::Sunny => Trage ein weißes Hemd! (kühl)",
+                rainyMsg: "Weather::Rainy => Trage ein blaues Hemd! (passt zum Regen)",
+                snowyMsg: "Weather::Snowy => Trage einen roten Schal! (warm)",
+                cloudyMsg: "Weather::Cloudy => Trage einen grauen Mantel! (bewölkter Tag)",
+                selectMsg: "Wähle das Wetter...",
+                sunnyIcon: "🥼",
+                rainyIcon: "👕",
+                snowyIcon: "🧣",
+                cloudyIcon: "🧥",
+                winTitle: "Bereit zum Ausgehen!",
+                winMessage: "Du hast die mächtigen Werkzeuge Enum, Option und Match gemeistert.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                weatherLabel: "Weer:",
+                keyLabel: "Ruimteschip sleutel:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ik heb een magische kledingkast die de perfecte outfit voorstelt op basis van het weer! 🧥",
+                    "In programmeren, om een lijst van dingen zoals 'weertypes' bij te houden, moeten we geen eenvoudige getallen of tekst gebruiken.",
+                    "Rust heeft een tool genaamd Enum die ons helpt een vaste, veilige lijst te maken die nooit fout gaat.",
+                    "Laten we het systeem van deze kledingkast samen programmeren! De Option- en Match-tools zullen ons ook helpen. Laten we gaan! 🚀"
+                ],
+                afterDialog: "Geweldig! Kijk naar de monitor hieronder om het systeem te starten.",
+                mission1Title: "Hoofdstuk 6: De slimme kledingkast (Enums) 🧥",
+                mission1Text: `
+                    <p class="text-sky-300">> Weer is niet zomaar een getal of tekst; het kan Zonnig, Regenachtig, Sneeuwachtig of Bewolkt zijn.</p>
+                    <p class="text-slate-300">> Om typefouten te voorkomen, gebruikt Rust een functie die een vaste, beperkte lijst met opties maakt.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Welk trefwoord gebruiken we om deze beperkte lijst van statussen te bouwen?</p>
+                `,
+                puzzle1Btn: "Weerlijst maken 🌦️",
+                puzzle1Success: "> Lijst (Enum) succesvol aangemaakt!",
+                puzzle1Error: "Fout: Om een vaste lijst te maken, moeten we het trefwoord 'enum' gebruiken.",
+                mission2Step: ">> Stap 1: De verloren tas (Option)",
+                mission2Desc: "<p>Sommige dagen kan Ferris zijn ruimteschip sleutel niet vinden. Andere talen gebruiken <code>null</code>, wat programma's laat crashen!</p><p>In plaats daarvan gebruikt Rust de superveilige <code>Option</code> enum, die ofwel <code>None</code> is of...</p><p class='text-sky-300 font-bold'>Wat is het juiste woord voor wanneer de sleutel 'bestaat'?</p>",
+                puzzle2Btn: "In de tas kijken 🎒",
+                puzzle2Success: "> Geweldig! De tas bevat Some(key).",
+                puzzle2Error: "Fout: In het Option-type gebruiken we het woord 'Some' wanneer een waarde bestaat.",
+                mission3Step: ">> Stap 2: Slimme afstandsbediening (Match)",
+                mission3Desc: "Nu we het weer weten, hoe beslissen we wat voor elk te doen? De <code class='text-pink-400'>---</code>-tool is als een sorteermachine die alle mogelijke opties controleert.",
+                puzzle3Btn: "Controller starten 🎛️",
+                puzzle3Success: "> Sorteermachine (match) geactiveerd!",
+                puzzle3Error: "Fout: Om alle varianten van een enum te controleren, gebruiken we de 'match'-instructie.",
+                mission4Step: ">> Laatste stap: Kledingkast-simulator",
+                mission4Desc: "Klik op alle weerknoppen zodat de kledingkast `match` gebruikt en het juiste shirt voorstelt.",
+                sunnyLabel: "Sunny",
+                rainyLabel: "Rainy",
+                snowyLabel: "Snowy",
+                cloudyLabel: "Cloudy",
+                sunnyMsg: "Weather::Sunny => Draag een wit shirt! (koel)",
+                rainyMsg: "Weather::Rainy => Draag een blauw shirt! (past bij regen)",
+                snowyMsg: "Weather::Snowy => Draag een rode sjaal! (warm)",
+                cloudyMsg: "Weather::Cloudy => Draag een grijze jas! (bewolkte dag)",
+                selectMsg: "Selecteer het weer...",
+                sunnyIcon: "🥼",
+                rainyIcon: "👕",
+                snowyIcon: "🧣",
+                cloudyIcon: "🧥",
+                winTitle: "Klaar om naar buiten te gaan!",
+                winMessage: "Je hebt de krachtige tools Enum, Option en Match onder de knie.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
+        };
+
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
         let currentLang = 'fa';
         let currentStep = 0;
         let currentDialogIndex = 0;
-        let typeInterval;
-
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
         let testedWeathers = new Set();
 
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "سلام! من یه کمد لباس جادویی دارم که بر اساس آب و هوا، لباس مناسب رو پیشنهاد میده! 🧥",
-                "تو برنامه‌نویسی برای نگه داشتن لیست چیزهایی مثل «انواع آب و هوا» نباید از عدد یا متن ساده استفاده کنیم.",
-                "زبان راست (Rust) ابزاری به نام Enum داره که کمک می‌کنه یه لیست ثابت و ایمن بسازیم که هیچ‌وقت اشتباه نشه.",
-                "بیا با هم سیستم این کمد لباس رو برنامه‌نویسی کنیم! ابزارهای Option و Match هم قراره بهمون کمک کنن. بریم! 🚀"
-            ],
-            en: [
-                "Hi! I have a magical wardrobe that suggests the perfect outfit based on the weather! 🧥",
-                "In programming, to keep a list of things like 'weather types', we shouldn't use simple numbers or text.",
-                "Rust has a tool called an Enum that helps us create a fixed, safe list that never goes wrong.",
-                "Let's program this wardrobe's system together! The Option and Match tools will help us too. Let's go! 🚀"
-            ]
-        };
+        // DOM elements
+        const weatherLabelSpan = document.getElementById('weather-label');
+        const keyLabelSpan = document.getElementById('key-label');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
 
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-sky-500 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                if (document.getElementById('wardrobe-msg').innerText === "Select the weather...") {
-                    document.getElementById('wardrobe-msg').innerText = "آب و هوا را انتخاب کن...";
-                }
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-sky-500 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                if (document.getElementById('wardrobe-msg').innerText === "آب و هوا را انتخاب کن...") {
-                    document.getElementById('wardrobe-msg').innerText = "Select the weather...";
-                }
-            }
-
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-sky-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
-            } else {
-                cb();
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
             }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
-            const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
-            nextBtn.classList.add('hidden');
-
-            typeWriter(text, 0, () => {
-                nextBtn.classList.remove('hidden');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.querySelector('.dashboard').classList.add('shake');
+                setTimeout(() => document.querySelector('.dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
             });
         }
 
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "عالیه! به مانیتور پایین نگاه کن تا سیستم رو راه‌اندازی کنیم." :
-                    "Awesome! Look at the monitor below to start the system.";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            weatherLabelSpan.innerText = pack.weatherLabel;
+            keyLabelSpan.innerText = pack.keyLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('btn-sunny').querySelector('.btn-label').innerText = pack.sunnyLabel;
+            document.getElementById('btn-rainy').querySelector('.btn-label').innerText = pack.rainyLabel;
+            document.getElementById('btn-snowy').querySelector('.btn-label').innerText = pack.snowyLabel;
+            document.getElementById('btn-cloudy').querySelector('.btn-label').innerText = pack.cloudyLabel;
+            document.getElementById('wardrobe-msg').innerHTML = pack.selectMsg;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-sky-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
         }
 
         function startMission(missionNum) {
@@ -496,14 +758,13 @@
             document.getElementById('mission-' + missionNum).classList.remove('hidden');
         }
 
-        // --- Puzzle System ---
+        // Puzzle handlers
         function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
-
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
@@ -512,9 +773,9 @@
         }
 
         function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
@@ -523,59 +784,69 @@
             document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
         }
 
-        function triggerError(puzzleNum, msgFa, msgEn) {
+        function triggerError(puzzleNum, msg) {
             const crt = document.getElementById('crt-monitor');
             const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
             crt.classList.add('glitch');
             setTimeout(() => crt.classList.remove('glitch'), 300);
-            feedback.innerText = currentLang === 'fa' ? msgFa : msgEn;
+            feedback.innerText = msg;
         }
 
         function checkPuzzle1() {
+            if (puzzle1Completed) return;
             const slotText = document.getElementById('slot1').innerText;
-            const feedback = document.getElementById('puzzle1-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'enum') {
-                feedback.className = "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> لیست (Enum) ساخته شد!" : "> List (Enum) created successfully!";
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(2), 1500);
             } else {
-                triggerError(1, "خطا: برای ساخت این لیست ثابت، باید از کلمه enum استفاده کنیم.", "Error: To create a fixed list, we must use the 'enum' keyword.");
+                triggerError(1, pack.puzzle1Error);
             }
         }
 
         function checkPuzzle2() {
+            if (puzzle2Completed) return;
             const slotText = document.getElementById('slot2').innerText;
-            const feedback = document.getElementById('puzzle2-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'Some') {
-                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> عالی! کیف حاوی Some(key) است." : "> Great! The bag contains Some(key).";
-
-                // Update HUD
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
                 document.getElementById('hud-key').innerHTML = `<span class="text-yellow-400 font-bold">Some(key)</span>`;
-
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(3), 1500);
             } else {
-                triggerError(2, "خطا: در نوع Option، زمانی که مقداری وجود دارد از کلمه Some استفاده می‌کنیم.", "Error: In Option type, when a value exists, we use the word 'Some'.");
+                triggerError(2, pack.puzzle2Error);
             }
         }
 
         function checkPuzzle3() {
+            if (puzzle3Completed) return;
             const slotText = document.getElementById('slot3').innerText;
-            const feedback = document.getElementById('puzzle3-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'match') {
-                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> دستگاه طبقه‌بندی (match) فعال شد!" : "> Sorting machine (match) activated!";
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
-                triggerError(3, "خطا: برای بررسی تمام حالت‌های یک enum از دستور match استفاده می‌کنیم.", "Error: To check all variants of an enum, we use the 'match' statement.");
+                triggerError(3, pack.puzzle3Error);
             }
         }
 
-        // --- Wardrobe Simulator ---
+        // Wardrobe Simulator
         function simulateWardrobe(weather, btnElement) {
+            const pack = languagePack[currentLang];
             btnElement.classList.add('tested');
             testedWeathers.add(weather);
 
@@ -583,48 +854,38 @@
             const msgEl = document.getElementById('wardrobe-msg');
 
             outputIcon.classList.remove('hidden');
-
-            // Re-trigger animation
             outputIcon.style.animation = 'none';
-            outputIcon.offsetHeight; /* trigger reflow */
+            outputIcon.offsetHeight;
             outputIcon.style.animation = null;
 
-            // HUD update
-            document.getElementById('hud-weather').innerText = `${weather}`;
+            document.getElementById('hud-weather').innerText = weather;
 
             let iconHtml = '';
-            let msgFa = '';
-            let msgEn = '';
+            let msg = '';
 
-            // Using Match logic!
             switch(weather) {
                 case 'Sunny':
-                    iconHtml = '🥼'; // White coat/shirt
-                    msgFa = "Weather::Sunny => تی‌شرت سفید بپوش! (خنک)";
-                    msgEn = "Weather::Sunny => Wear a white shirt! (cool)";
+                    iconHtml = pack.sunnyIcon;
+                    msg = pack.sunnyMsg;
                     break;
                 case 'Rainy':
-                    iconHtml = '👕'; // Blue shirt
-                    msgFa = "Weather::Rainy => پیراهن آبی بپوش! (ست با باران)";
-                    msgEn = "Weather::Rainy => Wear a blue shirt! (matches rain)";
+                    iconHtml = pack.rainyIcon;
+                    msg = pack.rainyMsg;
                     break;
                 case 'Snowy':
-                    iconHtml = '🧣'; // Scarf/Red
-                    msgFa = "Weather::Snowy => شال‌گردن قرمز بپوش! (گرم)";
-                    msgEn = "Weather::Snowy => Wear a red scarf! (warm)";
+                    iconHtml = pack.snowyIcon;
+                    msg = pack.snowyMsg;
                     break;
                 case 'Cloudy':
-                    iconHtml = '🧥'; // Gray Coat
-                    msgFa = "Weather::Cloudy => ژاکت خاکستری بپوش! (هوای ابری)";
-                    msgEn = "Weather::Cloudy => Wear a gray coat! (cloudy day)";
+                    iconHtml = pack.cloudyIcon;
+                    msg = pack.cloudyMsg;
                     break;
             }
 
             outputIcon.innerHTML = iconHtml;
-            msgEl.innerText = currentLang === 'fa' ? msgFa : msgEn;
+            msgEl.innerText = msg;
 
-            // Check Win Condition
-            if(testedWeathers.size === 4) {
+            if (testedWeathers.size === 4) {
                 setTimeout(() => {
                     triggerConfetti();
                     document.getElementById('success-screen').classList.remove('hidden');
@@ -632,17 +893,18 @@
             }
         }
 
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        function goToNextChapter() {
+            window.location.href = 'chapter-7.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
-        const possibleColors = ["#0ea5e9", "#38bdf8", "#bae6fd", "#fcd34d", "#f8fafc"]; // Sky & Yellow
-
+        const possibleColors = ["#0ea5e9", "#38bdf8", "#bae6fd", "#fcd34d", "#f8fafc"];
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -652,7 +914,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -662,46 +923,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
-            if(!animationId) Draw();
+            if (!animationId) Draw();
         }
 
-        // Initialize Game
+        // Initialization
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

@@ -1,1414 +1,1040 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 11</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 11</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --crt-bg: #020617;
+            --accent-primary: #14b8a6;
+            --accent-secondary: #10b981;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(20, 184, 166, 0.1) 2px, transparent 40px), radial-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and test runner */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .test-btn, .test-row {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #0f766e;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(20, 184, 166, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 255, 0, 0.01), rgba(20, 184, 166, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(240, 253, 250, 0.95);
+            color: #042f2e;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 253, 250, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 253, 250, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #f0fdfa; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed #fcd34d; margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: #fcd34d; background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(20, 184, 166, 0.2); color: #ccfbf1; }
+        .code-option {
+            background: #1e293b; border: 2px solid #475569;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #334155; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #5eead4; color: #042f2e; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake-danger { animation: shake-danger 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake-danger {
+            10%, 90% { transform: translate3d(-3px, 0, 0); }
+            20%, 80% { transform: translate3d(5px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(20, 184, 166, 0.3);
+        }
+        .test-btn {
+            background: #0f766e; border: 2px solid #14b8a6; border-radius: 6px;
+            color: white; font-weight: bold; cursor: pointer; transition: all 0.2s;
+            padding: 4px 10px; font-size: 0.8rem;
+        }
+        .test-btn:hover { background: #115e59; }
+        .test-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); }
+        .test-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+        .test-ok { color: #10b981; font-weight: bold; }
+        .test-fail { color: #ef4444; font-weight: bold; }
+        .fix-btn {
+            background: #b91c1c; border: 2px solid #ef4444; border-radius: 6px;
+            color: white; font-weight: bold; cursor: pointer; transition: all 0.2s;
+            padding: 4px 10px; font-size: 0.8rem; animation: popIn 0.3s forwards;
+        }
+        .fix-btn:hover { background: #991b1b; }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .test-row { font-size: 0.8rem; flex-wrap: wrap; }
+            .test-btn, .fix-btn { padding: 2px 6px; font-size: 0.7rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #0f172a; /* Slate 900 */
-                --crt-bg: #020617; /* Slate 950 */
-                --accent-primary: #14b8a6; /* Cyan 500 */
-                --accent-secondary: #10b981; /* Emerald 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(20, 184, 166, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(16, 185, 129, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Simulator Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 30px rgba(20, 184, 166, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.7);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-                border: 4px solid #0f766e; /* Cyan 700 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(20, 184, 166, 0.03) 50%,
-                        rgba(0, 0, 0, 0.25) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(0, 255, 0, 0.01),
-                        rgba(20, 184, 166, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(240, 253, 250, 0.95); /* Teal 50 */
-                color: #042f2e; /* Teal 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(240, 253, 250, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(240, 253, 250, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #f0fdfa;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed #fcd34d;
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: #fcd34d;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-primary);
-                background: rgba(20, 184, 166, 0.2);
-                color: #ccfbf1;
-            }
-
-            .code-option {
-                background: #1e293b;
-                border: 2px solid #475569;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #e2e8f0;
-            }
-            .code-option:hover {
-                background: #334155;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-primary);
-                border-color: #5eead4;
-                color: #042f2e;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-            .shake-danger {
-                animation: shake-danger 0.5s
-                    cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            }
-            @keyframes shake-danger {
-                10%,
-                90% {
-                    transform: translate3d(-3px, 0, 0);
-                }
-                20%,
-                80% {
-                    transform: translate3d(5px, 0, 0);
-                }
-                30%,
-                50%,
-                70% {
-                    transform: translate3d(-8px, 0, 0);
-                }
-                40%,
-                60% {
-                    transform: translate3d(8px, 0, 0);
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(20, 184, 166, 0.3);
-            }
-
-            /* Test Runner Simulator */
-            .test-btn {
-                background: #0f766e;
-                border: 2px solid #14b8a6;
-                border-radius: 6px;
-                color: white;
-                font-weight: bold;
-                cursor: pointer;
-                transition: all 0.2s;
-                padding: 4px 10px;
-                font-size: 0.8rem;
-            }
-            .test-btn:hover {
-                background: #115e59;
-            }
-            .test-btn:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                filter: grayscale(100%);
-            }
-
-            .test-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 8px;
-                border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-            }
-            .test-ok {
-                color: #10b981;
-                font-weight: bold;
-            }
-            .test-fail {
-                color: #ef4444;
-                font-weight: bold;
-            }
-
-            .fix-btn {
-                background: #b91c1c;
-                border: 2px solid #ef4444;
-                border-radius: 6px;
-                color: white;
-                font-weight: bold;
-                cursor: pointer;
-                transition: all 0.2s;
-                padding: 4px 10px;
-                font-size: 0.8rem;
-                animation: popIn 0.3s forwards;
-            }
-            .fix-btn:hover {
-                background: #991b1b;
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-teal-500 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-teal-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-teal-400" id="hud-tests"><i class="fa-solid fa-flask-vial"></i> <span id="tests-label"></span> <span id="tests-count">0 / 3</span></div>
+                <div class="text-slate-400" id="hud-status"><i class="fa-solid fa-satellite-dish"></i> <span id="sim-label"></span> <span id="sim-status"></span></div>
             </div>
+            <div class="text-teal-300 code-font text-xs md:text-sm opacity-70">CARGO-TEST v11.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-teal-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-teal-400" id="hud-tests">
-                        <i class="fa-solid fa-flask-vial"></i>
-                        <span class="lang-fa">تست‌های موفق:</span
-                        ><span class="lang-en">Tests Passed:</span>
-                        <span class="text-white" id="tests-count">۰ / ۳</span>
-                    </div>
-                    <div class="text-slate-400" id="hud-status">
-                        <i class="fa-solid fa-satellite-dish"></i>
-                        <span class="lang-fa">وضعیت شبیه‌ساز:</span
-                        ><span class="lang-en">Simulator Status:</span>
-                        <span id="sim-status" class="text-yellow-400"
-                            ><span class="lang-fa">آماده به کار</span
-                            ><span class="lang-en">Standby</span></span
-                        >
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-teal-500">
+                <h3 id="ferris-name" class="font-bold text-teal-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-teal-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-teal-300 code-font text-sm opacity-70">
-                    CARGO-TEST v11.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-teal-500"
-                >
-                    <h3 class="font-bold text-teal-700 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-teal-700 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-teal-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-teal-200 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: The #[test] macro -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-teal-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۱: شبیه‌ساز پرواز (Writing Tests) 🧪
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 11: Flight Simulator (Writing Tests) 🧪
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-teal-300">
-                                > قبل از پرواز واقعی، باید همه سیستم‌ها را در
-                                «شبیه‌ساز پرواز» امتحان کنیم.
-                            </p>
-                            <p class="text-slate-300">
-                                > در برنامه‌نویسی به این کار نوشتن **تست
-                                (Test)** می‌گویند. ما کدهای کوچکی می‌نویسیم که
-                                بررسی می‌کنند آیا کدهای اصلی درست کار می‌کنند یا
-                                نه.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                برای اینکه به کامپایلر بگوییم یک تابع فقط برای
-                                تست کردن است، چه کلمه‌ای را داخل `#[ ]` بالای آن
-                                می‌نویسیم؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-teal-300">
-                                > Before the real flight, we must try all
-                                systems in the "Flight Simulator".
-                            </p>
-                            <p class="text-slate-300">
-                                > In programming, this is called writing
-                                **Tests**. We write small codes to check if our
-                                main code works correctly.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                To tell the compiler a function is only for
-                                testing, what word do we write inside the `#[ ]`
-                                above it?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-slate-400">#[</span
-                            ><span
-                                id="slot1"
-                                class="code-slot text-teal-400"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            ><span class="text-slate-400">]</span><br />
-                            <span class="text-pink-400">fn</span>
-                            <span class="text-blue-300">check_engine</span>()
-                            {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-slate-500"
-                                >// Test code here...</span
-                            ><br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-teal-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'run')"
-                                >
-                                    run
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'check')"
-                                >
-                                    check
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'test')"
-                                >
-                                    test
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl"
-                                    onclick="selectOption(this, 1, 'verify')"
-                                >
-                                    verify
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa">ثبت تابع تست ⚙️</span
-                                ><span class="lang-en"
-                                    >Register Test Function ⚙️</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: assert_eq! -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: ابزار بررسی (Assertions)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Verification Tools
-                                (Assertions)</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                داخل یک تست، ما باید نتیجه را با چیزی که انتظار
-                                داریم مقایسه کنیم. اگر ۲+۲ را محاسبه کردیم، باید
-                                مطمئن شویم جواب دقیقاً ۴ است.
-                            </p>
-                            <p class="text-white font-bold">
-                                کدام ماکرو (وِرد جادویی) برای مقایسه دقیق و
-                                بررسی «برابر بودن» دو مقدار استفاده می‌شود؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                Inside a test, we must compare the result with
-                                what we expect. If we calculate 2+2, we must
-                                ensure the answer is exactly 4.
-                            </p>
-                            <p class="text-white font-bold">
-                                Which macro (magic word) is used to strictly
-                                compare and check if two values are "equal"?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            #[test]<br />
-                            <span class="text-pink-400">fn</span>
-                            <span class="text-blue-300">math_works</span>() {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >!(<span class="text-orange-300">2</span> +
-                            <span class="text-orange-300">2</span>,
-                            <span class="text-orange-300">4</span>);<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-teal-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'check!')"
-                                >
-                                    check!
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'equal!')"
-                                >
-                                    equal!
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="
-                                        selectOption(this, 2, 'assert_eq!')
-                                    "
-                                >
-                                    assert_eq!
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'match!')"
-                                >
-                                    match!
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">تایید مقایسه ⚖️</span
-                                ><span class="lang-en"
-                                    >Confirm Comparison ⚖️</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: should_panic -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-yellow-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: تست دکمه خودتخریبی!</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Testing the Self-Destruct
-                                Button!</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            بعضی وقت‌ها برنامه ما *باید* خطا بدهد (مثل وقتی
-                            می‌خواهیم عدد را بر صفر تقسیم کنیم). چطور به
-                            کامپایلر بگوییم: «اگر این تابع منفجر شد (panic)،
-                            یعنی تست با موفقیت پاس شده است!»؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            Sometimes our program *should* error out (like
-                            dividing by zero). How do we tell the compiler: "If
-                            this function explodes (panics), it means the test
-                            passed successfully!"?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            #[test]<br />
-                            #[<span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >(expected =
-                            <span class="text-yellow-300">"Divide by zero"</span
-                            >)]<br />
-                            <span class="text-pink-400">fn</span>
-                            <span class="text-blue-300">test_bad_math</span>()
-                            {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;divide(<span
-                                class="text-orange-300"
-                                >10</span
-                            >, <span class="text-orange-300">0</span>);
-                            <span class="text-slate-400 text-sm"
-                                >// Boom! 💥</span
-                            ><br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-teal-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font"
-                                    onclick="
-                                        selectOption(this, 3, 'will_crash')
-                                    "
-                                >
-                                    will_crash
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="
-                                        selectOption(this, 3, 'should_panic')
-                                    "
-                                >
-                                    should_panic
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="
-                                        selectOption(this, 3, 'expect_err')
-                                    "
-                                >
-                                    expect_err
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="
-                                        selectOption(this, 3, 'catch_fire')
-                                    "
-                                >
-                                    catch_fire
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa">تنظیم تست انفجار 💣</span
-                                ><span class="lang-en"
-                                    >Set Explosion Test 💣</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Test Runner Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-yellow-400 mb-2 border-b border-teal-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: اجرای cargo test</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: Running cargo test</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-teal-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۱.۴</span
-                                ><span class="lang-en">Project 11.4</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            روی دکمه‌های `cargo test` کلیک کن تا سیستم‌ها را
-                            امتحان کنی. اگر کدی باگ (حشره 🐛) داشت و تست قرمز
-                            شد، دکمه «اصلاح باگ» را بزن تا سبز شود!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            Click the `cargo test` buttons to test the systems.
-                            If code has a bug (🐛) and the test turns red, click
-                            "Fix Bug" to make it green!
-                        </div>
-
-                        <div
-                            class="terminal-block flex-grow mb-4 flex flex-col gap-2"
-                        >
-                            <div class="text-slate-400 mb-2">$ cargo test</div>
-
-                            <!-- Test 1: Engine -->
-                            <div class="test-row">
-                                <span class="text-teal-200"
-                                    >test tests::engine_startup ...</span
-                                >
-                                <div class="flex items-center gap-3">
-                                    <span id="status-t1" class="text-slate-500"
-                                        >pending</span
-                                    >
-                                    <button
-                                        class="test-btn code-font"
-                                        id="btn-t1"
-                                        onclick="runTest(1)"
-                                    >
-                                        run
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Test 2: Nav Math (Buggy) -->
-                            <div class="test-row flex-wrap">
-                                <div
-                                    class="w-full flex justify-between items-center mb-1"
-                                >
-                                    <span class="text-teal-200"
-                                        >test tests::nav_math ...</span
-                                    >
-                                    <div class="flex items-center gap-3">
-                                        <span
-                                            id="status-t2"
-                                            class="text-slate-500"
-                                            >pending</span
-                                        >
-                                        <button
-                                            class="test-btn code-font"
-                                            id="btn-t2"
-                                            onclick="runTest(2)"
-                                        >
-                                            run
-                                        </button>
-                                    </div>
-                                </div>
-                                <div
-                                    id="bug-info-t2"
-                                    class="w-full text-xs text-rose-400 hidden bg-rose-950/30 p-2 rounded"
-                                >
-                                    left: `4`<br />right: `5`<br />
-                                    <span class="text-slate-300"
-                                        >🐛 Bug found: Nav calculated
-                                        2+2=5!</span
-                                    >
-                                    <button
-                                        class="fix-btn mt-2 block"
-                                        onclick="fixBug()"
-                                    >
-                                        <i class="fa-solid fa-wrench"></i>
-                                        <span class="lang-fa"
-                                            >اصلاح باگ و تست مجدد</span
-                                        ><span class="lang-en"
-                                            >Fix Bug & Retest</span
-                                        >
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Test 3: Panic -->
-                            <div class="test-row">
-                                <span class="text-teal-200"
-                                    >test tests::self_destruct ...</span
-                                >
-                                <div class="flex items-center gap-3">
-                                    <span id="status-t3" class="text-slate-500"
-                                        >pending</span
-                                    >
-                                    <button
-                                        class="test-btn code-font"
-                                        id="btn-t3"
-                                        onclick="runTest(3)"
-                                    >
-                                        run
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">✅🚀✨</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa">همه تست‌ها پاس شدند!</span>
-                    <span class="lang-en">All Tests Passed!</span>
-                </h2>
-                <p class="text-xl text-teal-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما یاد گرفتید چطور مثل مهندسان حرفه‌ای، قبل از اجرای
-                        برنامه آن را تست کنید!</span
-                    >
-                    <span class="lang-en"
-                        >You learned how to test your program before running it,
-                        just like pro engineers!</span
-                    >
-                </p>
-                <button
-                    class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(20,184,166,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۱ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 11 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-teal-200 code-font min-h-[400px] flex flex-col">
 
-            // Simulator State
-            let testsPassed = 0;
-            let bugFixed = false;
+                <!-- Mission 1: #[test] attribute -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-teal-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-slate-400">#[</span><span id="slot1" class="code-slot text-teal-400" onclick="clearSlot(1)">---</span><span class="text-slate-400">]</span><br>
+                        <span class="text-pink-400">fn</span> <span class="text-blue-300">check_engine</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-slate-500">// Test code here...</span><br>
+                        }
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-teal-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'run')">run</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'check')">check</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'test')">test</div>
+                            <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'verify')">verify</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: assert_eq! -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        #[test]<br>
+                        <span class="text-pink-400">fn</span> <span class="text-blue-300">math_works</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>!(<span class="text-orange-300">2</span> + <span class="text-orange-300">2</span>, <span class="text-orange-300">4</span>);<br>
+                        }
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-teal-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'check!')">check!</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'equal!')">equal!</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'assert_eq!')">assert_eq!</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'match!')">match!</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: should_panic -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        #[test]<br>
+                        #[<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>(expected = <span class="text-yellow-300">"Divide by zero"</span>)]<br>
+                        <span class="text-pink-400">fn</span> <span class="text-blue-300">test_bad_math</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;divide(<span class="text-orange-300">10</span>, <span class="text-orange-300">0</span>);<br>
+                        }
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-teal-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'will_crash')">will_crash</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'should_panic')">should_panic</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'expect_err')">expect_err</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 3, 'catch_fire')">catch_fire</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Test Runner Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-yellow-400 mb-2 border-b border-teal-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-teal-900 px-2 py-1 rounded text-white">Project 11.4</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="terminal-block flex-grow mb-4 flex flex-col gap-2">
+                        <div class="text-slate-400 mb-2">$ cargo test</div>
+
+                        <!-- Test 1: Engine -->
+                        <div class="test-row">
+                            <span class="text-teal-200" id="test1-name"></span>
+                            <div class="flex items-center gap-3">
+                                <span id="status-t1" class="text-slate-500">pending</span>
+                                <button class="test-btn code-font" id="btn-t1" onclick="runTest(1)">run</button>
+                            </div>
+                        </div>
+
+                        <!-- Test 2: Nav Math (Buggy) -->
+                        <div class="test-row flex-wrap">
+                            <div class="w-full flex justify-between items-center mb-1">
+                                <span class="text-teal-200" id="test2-name"></span>
+                                <div class="flex items-center gap-3">
+                                    <span id="status-t2" class="text-slate-500">pending</span>
+                                    <button class="test-btn code-font" id="btn-t2" onclick="runTest(2)">run</button>
+                                </div>
+                            </div>
+                            <div id="bug-info-t2" class="w-full text-xs text-rose-400 hidden bg-rose-950/30 p-2 rounded">
+                                <span id="bug-info-text"></span>
+                                <button class="fix-btn mt-2 block" onclick="fixBug()">
+                                    <i class="fa-solid fa-wrench"></i> <span id="fix-btn-text"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Test 3: Panic -->
+                        <div class="test-row">
+                            <span class="text-teal-200" id="test3-name"></span>
+                            <div class="flex items-center gap-3">
+                                <span id="status-t3" class="text-slate-500">pending</span>
+                                <button class="test-btn code-font" id="btn-t3" onclick="runTest(3)">run</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">✅🚀✨</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-teal-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(20,184,166,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                testsLabel: "تست‌های موفق:",
+                simLabel: "وضعیت شبیه‌ساز:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
                     "سلام! قبل از اینکه سفینه رو پرتاب کنیم، باید مطمئن بشیم همه دکمه‌ها درست کار می‌کنن! 🚀",
                     "تو برنامه‌نویسی به این کار میگن Testing. ما کدهای کوچیکی می‌نویسیم تا کدهای اصلی رو چک کنن.",
                     "اگه تست سبز بشه یعنی امنه، اگه قرمز بشه یعنی یه باگ (حشره) تو سیستم هست! 🐛",
-                    "بیا با هم وارد دستگاه شبیه‌ساز پرواز بشیم و تست‌نویسی رو تمرین کنیم! 🕹️",
+                    "بیا با هم وارد دستگاه شبیه‌ساز پرواز بشیم و تست‌نویسی رو تمرین کنیم! 🕹️"
                 ],
-                en: [
+                afterDialog: "عالیه! به مانیتور شبیه‌ساز در پایین نگاه کن تا اولین تست رو بنویسیم.",
+                mission1Title: "فصل ۱۱: شبیه‌ساز پرواز (Writing Tests) 🧪",
+                mission1Text: `
+                    <p class="text-teal-300">> قبل از پرواز واقعی، باید همه سیستم‌ها را در «شبیه‌ساز پرواز» امتحان کنیم.</p>
+                    <p class="text-slate-300">> در برنامه‌نویسی به این کار نوشتن **تست (Test)** می‌گویند. ما کدهای کوچکی می‌نویسیم که بررسی می‌کنند آیا کدهای اصلی درست کار می‌کنند یا نه.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">برای اینکه به کامپایلر بگوییم یک تابع فقط برای تست کردن است، چه کلمه‌ای را داخل `#[ ]` بالای آن می‌نویسیم؟</p>
+                `,
+                puzzle1Btn: "ثبت تابع تست ⚙️",
+                puzzle1Success: "> تابع تست با موفقیت ثبت شد!",
+                puzzle1Error: "خطا: در راست برای ساخت تست از اتریبیوت #[test] استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: ابزار بررسی (Assertions)",
+                mission2Desc: "<p>داخل یک تست، ما باید نتیجه را با چیزی که انتظار داریم مقایسه کنیم. اگر ۲+۲ را محاسبه کردیم، باید مطمئن شویم جواب دقیقاً ۴ است.</p><p class='text-white font-bold'>کدام ماکرو (وِرد جادویی) برای مقایسه دقیق و بررسی «برابر بودن» دو مقدار استفاده می‌شود؟</p>",
+                puzzle2Btn: "تایید مقایسه ⚖️",
+                puzzle2Success: "> ابزار مقایسه با موفقیت کار گذاشته شد.",
+                puzzle2Error: "خطا: ماکروی بررسی برابری دو مقدار در زبان راست assert_eq! است.",
+                mission3Step: ">> مرحله ۲: تست دکمه خودتخریبی!",
+                mission3Desc: "بعضی وقت‌ها برنامه ما *باید* خطا بدهد (مثل وقتی می‌خواهیم عدد را بر صفر تقسیم کنیم). چطور به کامپایلر بگوییم: «اگر این تابع منفجر شد (panic)، یعنی تست با موفقیت پاس شده است!»؟",
+                puzzle3Btn: "تنظیم تست انفجار 💣",
+                puzzle3Success: "> عالی! حالا اگر دکمه منفجر شود، تست پاس می‌شود!",
+                puzzle3Error: "خطا: برای توابعی که انتظار داریم پنیک کنند، از #[should_panic] استفاده می‌کنیم.",
+                mission4Step: ">> مرحله نهایی: اجرای cargo test",
+                mission4Desc: "روی دکمه‌های `cargo test` کلیک کن تا سیستم‌ها را امتحان کنی. اگر کدی باگ (حشره 🐛) داشت و تست قرمز شد، دکمه «اصلاح باگ» را بزن تا سبز شود!",
+                test1Name: "test tests::engine_startup ...",
+                test2Name: "test tests::nav_math ...",
+                test3Name: "test tests::self_destruct ...",
+                bugInfoText: "left: `4`<br>right: `5`<br>🐛 Bug found: Nav calculated 2+2=5!",
+                fixBtnText: "اصلاح باگ و تست مجدد",
+                bugFixedMsg: "✅ باگ برطرف شد! (۲+۲=۴) حالا دوباره تست کن.",
+                simStandby: "آماده به کار",
+                simRunning: "در حال اجرا...",
+                testRunning: "در حال تست...",
+                testOkSimple: "ok",
+                testOkPanic: "ok (panicked as expected)",
+                testFail: "FAILED",
+                statusPending: "pending",
+                winTitle: "همه تست‌ها پاس شدند!",
+                winMessage: "شما یاد گرفتید چطور مثل مهندسان حرفه‌ای، قبل از اجرای برنامه آن را تست کنید!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                testsLabel: "Tests Passed:",
+                simLabel: "Simulator Status:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
                     "Hi! Before we launch the ship, we must make sure all buttons work correctly! 🚀",
                     "In programming, this is called Testing. We write small codes to check our main codes.",
                     "If a test turns green, it's safe. If it turns red, there's a bug in the system! 🐛",
-                    "Let's enter the Flight Simulator and practice writing tests together! 🕹️",
+                    "Let's enter the Flight Simulator and practice writing tests together! 🕹️"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-teal-500 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("tests-count").innerText =
-                        `${testsPassed.toLocaleString("fa-IR")} / ۳`;
-                    if (
-                        document
-                            .getElementById("sim-status")
-                            .innerText.includes("Standby")
-                    )
-                        document.getElementById("sim-status").innerHTML =
-                            '<span class="lang-fa">آماده به کار</span><span class="lang-en" style="display:none">Standby</span>';
-                    if (
-                        document
-                            .getElementById("sim-status")
-                            .innerText.includes("Running")
-                    )
-                        document.getElementById("sim-status").innerHTML =
-                            '<span class="lang-fa text-emerald-400">در حال اجرا...</span><span class="lang-en" style="display:none">Running...</span>';
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-teal-500 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("tests-count").innerText =
-                        `${testsPassed} / 3`;
-                    if (
-                        document
-                            .getElementById("sim-status")
-                            .innerText.includes("آماده به کار")
-                    )
-                        document.getElementById("sim-status").innerHTML =
-                            '<span class="lang-fa" style="display:none">آماده به کار</span><span class="lang-en">Standby</span>';
-                    if (
-                        document
-                            .getElementById("sim-status")
-                            .innerText.includes("در حال اجرا")
-                    )
-                        document.getElementById("sim-status").innerHTML =
-                            '<span class="lang-fa" style="display:none">در حال اجرا...</span><span class="lang-en text-emerald-400">Running...</span>';
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Awesome! Look at the simulator monitor below to write our first test.",
+                mission1Title: "Chapter 11: Flight Simulator (Writing Tests) 🧪",
+                mission1Text: `
+                    <p class="text-teal-300">> Before the real flight, we must try all systems in the "Flight Simulator".</p>
+                    <p class="text-slate-300">> In programming, this is called writing **Tests**. We write small codes to check if our main code works correctly.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">To tell the compiler a function is only for testing, what word do we write inside the `#[ ]` above it?</p>
+                `,
+                puzzle1Btn: "Register Test Function ⚙️",
+                puzzle1Success: "> Test function registered successfully!",
+                puzzle1Error: "Error: In Rust, we use the #[test] attribute to create a test.",
+                mission2Step: ">> Step 1: Verification Tools (Assertions)",
+                mission2Desc: "<p>Inside a test, we must compare the result with what we expect. If we calculate 2+2, we must ensure the answer is exactly 4.</p><p class='text-white font-bold'>Which macro (magic word) is used to strictly compare and check if two values are 'equal'?</p>",
+                puzzle2Btn: "Confirm Comparison ⚖️",
+                puzzle2Success: "> Comparison tool successfully placed.",
+                puzzle2Error: "Error: The macro to check equality of two values in Rust is assert_eq!.",
+                mission3Step: ">> Step 2: Testing the Self-Destruct Button!",
+                mission3Desc: "Sometimes our program *should* error out (like dividing by zero). How do we tell the compiler: 'If this function explodes (panics), it means the test passed successfully!'?",
+                puzzle3Btn: "Set Explosion Test 💣",
+                puzzle3Success: "> Great! Now if the button explodes, the test passes!",
+                puzzle3Error: "Error: For functions we expect to panic, we use #[should_panic].",
+                mission4Step: ">> Final Step: Running cargo test",
+                mission4Desc: "Click the `cargo test` buttons to test the systems. If code has a bug (🐛) and the test turns red, click 'Fix Bug' to make it green!",
+                test1Name: "test tests::engine_startup ...",
+                test2Name: "test tests::nav_math ...",
+                test3Name: "test tests::self_destruct ...",
+                bugInfoText: "left: `4`<br>right: `5`<br>🐛 Bug found: Nav calculated 2+2=5!",
+                fixBtnText: "Fix Bug & Retest",
+                bugFixedMsg: "✅ Bug Fixed! (2+2=4) Now run the test again.",
+                simStandby: "Standby",
+                simRunning: "Running...",
+                testRunning: "running...",
+                testOkSimple: "ok",
+                testOkPanic: "ok (panicked as expected)",
+                testFail: "FAILED",
+                statusPending: "pending",
+                winTitle: "All Tests Passed!",
+                winMessage: "You learned how to test your program before running it, just like pro engineers!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                testsLabel: "Pruebas superadas:",
+                simLabel: "Estado del simulador:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! Antes de lanzar la nave, debemos asegurarnos de que todos los botones funcionen correctamente. 🚀",
+                    "En programación, esto se llama Pruebas. Escribimos pequeños códigos para verificar nuestros códigos principales.",
+                    "Si una prueba se vuelve verde, es segura. Si se vuelve roja, ¡hay un error en el sistema! 🐛",
+                    "¡Entremos al simulador de vuelo y practiquemos la escritura de pruebas juntos! 🕹️"
+                ],
+                afterDialog: "¡Genial! Mira el monitor del simulador a continuación para escribir nuestra primera prueba.",
+                mission1Title: "Capítulo 11: Simulador de vuelo (Escribiendo pruebas) 🧪",
+                mission1Text: `
+                    <p class="text-teal-300">> Antes del vuelo real, debemos probar todos los sistemas en el "Simulador de vuelo".</p>
+                    <p class="text-slate-300">> En programación, esto se llama escribir **Pruebas**. Escribimos pequeños códigos para verificar si nuestro código principal funciona correctamente.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Para decirle al compilador que una función es solo para pruebas, ¿qué palabra escribimos dentro de `#[ ]` encima de ella?</p>
+                `,
+                puzzle1Btn: "Registrar función de prueba ⚙️",
+                puzzle1Success: "> ¡Función de prueba registrada exitosamente!",
+                puzzle1Error: "Error: En Rust, usamos el atributo #[test] para crear una prueba.",
+                mission2Step: ">> Paso 1: Herramientas de verificación (Afirmaciones)",
+                mission2Desc: "<p>Dentro de una prueba, debemos comparar el resultado con lo que esperamos. Si calculamos 2+2, debemos asegurarnos de que la respuesta sea exactamente 4.</p><p class='text-white font-bold'>¿Qué macro (palabra mágica) se usa para comparar estrictamente y verificar si dos valores son 'iguales'?</p>",
+                puzzle2Btn: "Confirmar comparación ⚖️",
+                puzzle2Success: "> Herramienta de comparación colocada exitosamente.",
+                puzzle2Error: "Error: La macro para verificar igualdad de dos valores en Rust es assert_eq!.",
+                mission3Step: ">> Paso 2: ¡Probando el botón de autodestrucción!",
+                mission3Desc: "A veces nuestro programa *debería* generar un error (como dividir por cero). ¿Cómo le decimos al compilador: 'Si esta función explota (entra en pánico), significa que la prueba pasó exitosamente'?",
+                puzzle3Btn: "Configurar prueba de explosión 💣",
+                puzzle3Success: "> ¡Genial! Ahora si el botón explota, ¡la prueba pasa!",
+                puzzle3Error: "Error: Para funciones que esperamos que entren en pánico, usamos #[should_panic].",
+                mission4Step: ">> Paso final: Ejecutando cargo test",
+                mission4Desc: "Haz clic en los botones `cargo test` para probar los sistemas. Si el código tiene un error (🐛) y la prueba se vuelve roja, haz clic en 'Arreglar error' para que se vuelva verde.",
+                test1Name: "prueba tests::engine_startup ...",
+                test2Name: "prueba tests::nav_math ...",
+                test3Name: "prueba tests::self_destruct ...",
+                bugInfoText: "izquierda: `4`<br>derecha: `5`<br>🐛 Error encontrado: ¡Nav calculó 2+2=5!",
+                fixBtnText: "Arreglar error y reintentar",
+                bugFixedMsg: "✅ ¡Error arreglado! (2+2=4) Ahora ejecuta la prueba nuevamente.",
+                simStandby: "En espera",
+                simRunning: "Ejecutando...",
+                testRunning: "ejecutando...",
+                testOkSimple: "ok",
+                testOkPanic: "ok (entró en pánico como se esperaba)",
+                testFail: "FALLÓ",
+                statusPending: "pendiente",
+                winTitle: "¡Todas las pruebas pasaron!",
+                winMessage: "¡Aprendiste a probar tu programa antes de ejecutarlo, como los ingenieros profesionales!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                testsLabel: "Bestandene Tests:",
+                simLabel: "Simulatorstatus:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Bevor wir das Schiff starten, müssen wir sicherstellen, dass alle Knöpfe richtig funktionieren! 🚀",
+                    "In der Programmierung nennt man das Testen. Wir schreiben kleine Codes, um unsere Hauptcodes zu überprüfen.",
+                    "Wenn ein Test grün wird, ist er sicher. Wenn er rot wird, gibt es einen Fehler im System! 🐛",
+                    "Lasst uns in den Flugsimulator gehen und gemeinsam das Schreiben von Tests üben! 🕹️"
+                ],
+                afterDialog: "Großartig! Schau auf den Simulator-Monitor unten, um unseren ersten Test zu schreiben.",
+                mission1Title: "Kapitel 11: Flugsimulator (Tests schreiben) 🧪",
+                mission1Text: `
+                    <p class="text-teal-300">> Vor dem echten Flug müssen wir alle Systeme im "Flugsimulator" testen.</p>
+                    <p class="text-slate-300">> In der Programmierung nennt man das **Tests schreiben**. Wir schreiben kleine Codes, um zu überprüfen, ob unser Hauptcode richtig funktioniert.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Um dem Compiler mitzuteilen, dass eine Funktion nur zum Testen da ist, welches Wort schreiben wir innerhalb der `#[ ]` darüber?</p>
+                `,
+                puzzle1Btn: "Testfunktion registrieren ⚙️",
+                puzzle1Success: "> Testfunktion erfolgreich registriert!",
+                puzzle1Error: "Fehler: In Rust verwenden wir das Attribut #[test], um einen Test zu erstellen.",
+                mission2Step: ">> Schritt 1: Verifizierungswerkzeuge (Assertions)",
+                mission2Desc: "<p>Innerhalb eines Tests müssen wir das Ergebnis mit dem vergleichen, was wir erwarten. Wenn wir 2+2 berechnen, müssen wir sicherstellen, dass die Antwort genau 4 ist.</p><p class='text-white font-bold'>Welches Makro (magisches Wort) wird verwendet, um strikt zu vergleichen, ob zwei Werte 'gleich' sind?</p>",
+                puzzle2Btn: "Vergleich bestätigen ⚖️",
+                puzzle2Success: "> Vergleichswerkzeug erfolgreich platziert.",
+                puzzle2Error: "Fehler: Das Makro zum Überprüfen der Gleichheit zweier Werte in Rust ist assert_eq!.",
+                mission3Step: ">> Schritt 2: Testen des Selbstzerstörungsknopfs!",
+                mission3Desc: "Manchmal *sollte* unser Programm einen Fehler ausgeben (wie Division durch Null). Wie sagen wir dem Compiler: 'Wenn diese Funktion explodiert (panict), bedeutet das, dass der Test erfolgreich bestanden wurde!'?",
+                puzzle3Btn: "Explosionstest einrichten 💣",
+                puzzle3Success: "> Großartig! Wenn der Knopf jetzt explodiert, besteht der Test!",
+                puzzle3Error: "Fehler: Für Funktionen, bei denen wir erwarten, dass sie panicken, verwenden wir #[should_panic].",
+                mission4Step: ">> Letzter Schritt: cargo test ausführen",
+                mission4Desc: "Klicke auf die `cargo test`-Knöpfe, um die Systeme zu testen. Wenn der Code einen Fehler (🐛) hat und der Test rot wird, klicke auf 'Fehler beheben', um ihn grün zu machen!",
+                test1Name: "test tests::engine_startup ...",
+                test2Name: "test tests::nav_math ...",
+                test3Name: "test tests::self_destruct ...",
+                bugInfoText: "links: `4`<br>rechts: `5`<br>🐛 Fehler gefunden: Nav berechnete 2+2=5!",
+                fixBtnText: "Fehler beheben & erneut testen",
+                bugFixedMsg: "✅ Fehler behoben! (2+2=4) Führe den Test jetzt erneut aus.",
+                simStandby: "Bereit",
+                simRunning: "Läuft...",
+                testRunning: "läuft...",
+                testOkSimple: "ok",
+                testOkPanic: "ok (wie erwartet panicked)",
+                testFail: "FEHLGESCHLAGEN",
+                statusPending: "ausstehend",
+                winTitle: "Alle Tests bestanden!",
+                winMessage: "Du hast gelernt, wie du dein Programm vor der Ausführung testen kannst, genau wie Profi-Ingenieure!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                testsLabel: "Geslaagde tests:",
+                simLabel: "Simulatorstatus:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Voordat we het schip lanceren, moeten we ervoor zorgen dat alle knoppen correct werken! 🚀",
+                    "In programmeren heet dit Testen. We schrijven kleine codes om onze hoofdcodes te controleren.",
+                    "Als een test groen wordt, is het veilig. Als het rood wordt, zit er een bug in het systeem! 🐛",
+                    "Laten we de vluchtsimulator binnengaan en samen oefenen met het schrijven van tests! 🕹️"
+                ],
+                afterDialog: "Geweldig! Kijk naar de simulatormonitor hieronder om onze eerste test te schrijven.",
+                mission1Title: "Hoofdstuk 11: Vluchtsimulator (Tests schrijven) 🧪",
+                mission1Text: `
+                    <p class="text-teal-300">> Voor de echte vlucht moeten we alle systemen testen in de "Vluchtsimulator".</p>
+                    <p class="text-slate-300">> In programmeren heet dit **Tests schrijven**. We schrijven kleine codes om te controleren of onze hoofdcode correct werkt.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Om de compiler te vertellen dat een functie alleen voor testen is, welk woord schrijven we binnen de `#[ ]` erboven?</p>
+                `,
+                puzzle1Btn: "Testfunctie registreren ⚙️",
+                puzzle1Success: "> Testfunctie succesvol geregistreerd!",
+                puzzle1Error: "Fout: In Rust gebruiken we het attribuut #[test] om een test te maken.",
+                mission2Step: ">> Stap 1: Verificatiehulpmiddelen (Assertions)",
+                mission2Desc: "<p>Binnen een test moeten we het resultaat vergelijken met wat we verwachten. Als we 2+2 berekenen, moeten we ervoor zorgen dat het antwoord exact 4 is.</p><p class='text-white font-bold'>Welke macro (magisch woord) wordt gebruikt om strikt te vergelijken of twee waarden 'gelijk' zijn?</p>",
+                puzzle2Btn: "Vergelijking bevestigen ⚖️",
+                puzzle2Success: "> Vergelijkingstool succesvol geplaatst.",
+                puzzle2Error: "Fout: De macro om gelijkheid van twee waarden in Rust te controleren is assert_eq!.",
+                mission3Step: ">> Stap 2: Testen van de zelfvernietigingsknop!",
+                mission3Desc: "Soms *zou* ons programma een fout moeten geven (zoals delen door nul). Hoe vertellen we de compiler: 'Als deze functie explodeert (panict), betekent dat dat de test succesvol is geslaagd!'?",
+                puzzle3Btn: "Explosietest instellen 💣",
+                puzzle3Success: "> Geweldig! Als de knop nu explodeert, slaagt de test!",
+                puzzle3Error: "Fout: Voor functies waarvan we verwachten dat ze panicken, gebruiken we #[should_panic].",
+                mission4Step: ">> Laatste stap: cargo test uitvoeren",
+                mission4Desc: "Klik op de `cargo test`-knoppen om de systemen te testen. Als de code een bug (🐛) heeft en de test wordt rood, klik dan op 'Bug oplossen' om hem groen te maken!",
+                test1Name: "test tests::engine_startup ...",
+                test2Name: "test tests::nav_math ...",
+                test3Name: "test tests::self_destruct ...",
+                bugInfoText: "links: `4`<br>rechts: `5`<br>🐛 Bug gevonden: Nav berekende 2+2=5!",
+                fixBtnText: "Bug oplossen & opnieuw testen",
+                bugFixedMsg: "✅ Bug opgelost! (2+2=4) Voer de test nu opnieuw uit.",
+                simStandby: "Stand-by",
+                simRunning: "Bezig...",
+                testRunning: "bezig...",
+                testOkSimple: "ok",
+                testOkPanic: "ok (panicked zoals verwacht)",
+                testFail: "MISLUKT",
+                statusPending: "in afwachting",
+                winTitle: "Alle tests geslaagd!",
+                winMessage: "Je hebt geleerd hoe je je programma kunt testen voordat je het uitvoert, net als professionele ingenieurs!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let testsPassed = 0;
+        let bugFixed = false;
+        let test1Done = false, test2Done = false, test3Done = false;
+
+        // DOM elements
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-teal-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake-danger');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake-danger'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
-
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
-                } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "عالیه! به مانیتور شبیه‌ساز در پایین نگاه کن تا اولین تست رو بنویسیم."
-                            : "Awesome! Look at the simulator monitor below to write our first test.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
-                }
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
             }
-
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
-
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
-
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
-
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
-                runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
-            }
-
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
-            }
-
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "test") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> تابع تست با موفقیت ثبت شد!"
-                            : "> Test function registered successfully!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: در راست برای ساخت تست از اتریبیوت #[test] استفاده می‌کنیم.",
-                        "Error: In Rust, we use the #[test] attribute to create a test.",
-                    );
-                }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "assert_eq!") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> ابزار مقایسه با موفقیت کار گذاشته شد."
-                            : "> Comparison tool successfully placed.";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: ماکروی بررسی برابری دو مقدار در زبان راست assert_eq! است.",
-                        "Error: The macro to check equality of two values in Rust is assert_eq!.",
-                    );
-                }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "should_panic") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> عالی! حالا اگر دکمه منفجر شود، تست پاس می‌شود!"
-                            : "> Great! Now if the button explodes, the test passes!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: برای توابعی که انتظار داریم پنیک کنند، از #[should_panic] استفاده می‌کنیم.",
-                        "Error: For functions we expect to panic, we use #[should_panic].",
-                    );
-                }
-            }
-
-            // --- Simulator Mini-Game ---
-            function setSimulatorRunning(isRunning) {
-                const status = document.getElementById("sim-status");
-                if (isRunning) {
-                    status.innerHTML =
-                        currentLang === "fa"
-                            ? '<span class="text-emerald-400">در حال اجرا...</span>'
-                            : '<span class="text-emerald-400">Running...</span>';
-                } else {
-                    status.innerHTML =
-                        currentLang === "fa"
-                            ? '<span class="text-yellow-400">آماده به کار</span>'
-                            : '<span class="text-yellow-400">Standby</span>';
-                }
-            }
-
-            function passTest(tNum) {
-                document.getElementById(`status-t${tNum}`).innerHTML =
-                    '<span class="test-ok">ok</span>';
-                document.getElementById(`btn-t${tNum}`).disabled = true;
-                testsPassed++;
-                setLang(currentLang); // Update HUD counter
-                checkWin();
-            }
-
-            function runTest(tNum) {
-                setSimulatorRunning(true);
-                const statusEl = document.getElementById(`status-t${tNum}`);
-                const btnEl = document.getElementById(`btn-t${tNum}`);
-
-                btnEl.disabled = true;
-                statusEl.innerHTML =
-                    currentLang === "fa" ? "در حال تست..." : "running...";
-
-                setTimeout(() => {
-                    setSimulatorRunning(false);
-
-                    if (tNum === 1) {
-                        // Test 1: Simple Pass
-                        passTest(1);
-                    } else if (tNum === 2) {
-                        // Test 2: Buggy test that fails first
-                        if (!bugFixed) {
-                            statusEl.innerHTML =
-                                '<span class="test-fail">FAILED</span>';
-                            document
-                                .getElementById("bug-info-t2")
-                                .classList.remove("hidden");
-
-                            // Shake screen for error
-                            document
-                                .getElementById("main-dashboard")
-                                .classList.add("shake-danger");
-                            setTimeout(
-                                () =>
-                                    document
-                                        .getElementById("main-dashboard")
-                                        .classList.remove("shake-danger"),
-                                500,
-                            );
-                        } else {
-                            // After bug is fixed
-                            document
-                                .getElementById("bug-info-t2")
-                                .classList.add("hidden");
-                            passTest(2);
-                        }
-                    } else if (tNum === 3) {
-                        // Test 3: Panic test (Shakes but passes)
-                        document
-                            .getElementById("main-dashboard")
-                            .classList.add("shake-danger");
-                        setTimeout(() => {
-                            document
-                                .getElementById("main-dashboard")
-                                .classList.remove("shake-danger");
-                            statusEl.innerHTML =
-                                '<span class="test-ok">ok (panicked as expected)</span>';
-                            btnEl.disabled = true;
-                            testsPassed++;
-                            setLang(currentLang);
-                            checkWin();
-                        }, 600);
-                    }
-                }, 800);
-            }
-
-            function fixBug() {
-                bugFixed = true;
-                const bugInfo = document.getElementById("bug-info-t2");
-                bugInfo.innerHTML =
-                    currentLang === "fa"
-                        ? '<span class="text-emerald-400">✅ باگ برطرف شد! (۲+۲=۴) حالا دوباره تست کن.</span>'
-                        : '<span class="text-emerald-400">✅ Bug Fixed! (2+2=4) Now run the test again.</span>';
-
-                const btnEl = document.getElementById("btn-t2");
-                btnEl.disabled = false;
-                btnEl.classList.add("pop-in");
-            }
-
-            function checkWin() {
-                if (testsPassed >= 3) {
-                    setTimeout(() => {
-                        triggerConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
-                    }, 1000);
-                }
-            }
-
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#14b8a6",
-                "#10b981",
-                "#34d399",
-                "#5eead4",
-                "#ffffff",
-            ]; // Cyan, Emerald
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
-            }, 500);
-        </script>
-    </body>
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            document.getElementById('tests-label').innerHTML = pack.testsLabel;
+            document.getElementById('sim-label').innerHTML = pack.simLabel;
+            document.getElementById('tests-count').innerHTML = currentLang === 'fa' ? `${formatNumber(testsPassed, currentLang)} / ۳` : `${testsPassed} / 3`;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('test1-name').innerHTML = pack.test1Name;
+            document.getElementById('test2-name').innerHTML = pack.test2Name;
+            document.getElementById('test3-name').innerHTML = pack.test3Name;
+            document.getElementById('bug-info-text').innerHTML = pack.bugInfoText;
+            document.getElementById('fix-btn-text').innerHTML = pack.fixBtnText;
+
+            // Simulator status (if not running)
+            if (!document.getElementById('sim-status').innerHTML.includes('در حال اجرا') && 
+                !document.getElementById('sim-status').innerHTML.includes('Running') &&
+                !document.getElementById('sim-status').innerHTML.includes('Ejecutando') &&
+                !document.getElementById('sim-status').innerHTML.includes('Läuft') &&
+                !document.getElementById('sim-status').innerHTML.includes('Bezig')) {
+                document.getElementById('sim-status').innerHTML = pack.simStandby;
+            }
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-teal-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
+
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
+
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'test') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
+            }
+        }
+
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'assert_eq!') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
+            }
+        }
+
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'should_panic') {
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
+
+        // Test Runner Simulator
+        function setSimulatorRunning(isRunning) {
+            const pack = languagePack[currentLang];
+            const statusEl = document.getElementById('sim-status');
+            if (isRunning) {
+                statusEl.innerHTML = pack.simRunning;
+                statusEl.classList.add('text-emerald-400');
+            } else {
+                statusEl.innerHTML = pack.simStandby;
+                statusEl.classList.remove('text-emerald-400');
+            }
+        }
+
+        function passTest(tNum) {
+            const pack = languagePack[currentLang];
+            document.getElementById(`status-t${tNum}`).innerHTML = `<span class="test-ok">${pack.testOkSimple}</span>`;
+            document.getElementById(`btn-t${tNum}`).disabled = true;
+            testsPassed++;
+            document.getElementById('tests-count').innerHTML = currentLang === 'fa' ? `${formatNumber(testsPassed, currentLang)} / ۳` : `${testsPassed} / 3`;
+            if (tNum === 1) test1Done = true;
+            if (tNum === 2) test2Done = true;
+            if (tNum === 3) test3Done = true;
+            checkWin();
+        }
+
+        function runTest(tNum) {
+            const pack = languagePack[currentLang];
+            setSimulatorRunning(true);
+            const statusEl = document.getElementById(`status-t${tNum}`);
+            const btnEl = document.getElementById(`btn-t${tNum}`);
+
+            btnEl.disabled = true;
+            statusEl.innerHTML = pack.testRunning;
+
+            setTimeout(() => {
+                setSimulatorRunning(false);
+
+                if (tNum === 1) {
+                    passTest(1);
+                }
+                else if (tNum === 2) {
+                    if (!bugFixed) {
+                        statusEl.innerHTML = `<span class="test-fail">${pack.testFail}</span>`;
+                        document.getElementById('bug-info-t2').classList.remove('hidden');
+                        document.getElementById('main-dashboard').classList.add('shake-danger');
+                        setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake-danger'), 500);
+                        btnEl.disabled = false;
+                    } else {
+                        document.getElementById('bug-info-t2').classList.add('hidden');
+                        passTest(2);
+                    }
+                }
+                else if (tNum === 3) {
+                    document.getElementById('main-dashboard').classList.add('shake-danger');
+                    setTimeout(() => {
+                        document.getElementById('main-dashboard').classList.remove('shake-danger');
+                        statusEl.innerHTML = `<span class="test-ok">${pack.testOkPanic}</span>`;
+                        btnEl.disabled = true;
+                        testsPassed++;
+                        document.getElementById('tests-count').innerHTML = currentLang === 'fa' ? `${formatNumber(testsPassed, currentLang)} / ۳` : `${testsPassed} / 3`;
+                        test3Done = true;
+                        checkWin();
+                    }, 600);
+                }
+            }, 800);
+        }
+
+        function fixBug() {
+            const pack = languagePack[currentLang];
+            bugFixed = true;
+            const bugInfo = document.getElementById('bug-info-t2');
+            bugInfo.innerHTML = `<span class="text-emerald-400">${pack.bugFixedMsg}</span>`;
+            const btnEl = document.getElementById('btn-t2');
+            btnEl.disabled = false;
+            btnEl.classList.add('pop-in');
+        }
+
+        function checkWin() {
+            if (testsPassed >= 3) {
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        function goToNextChapter() {
+            window.location.href = 'chapter-12.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#14b8a6", "#10b981", "#34d399", "#5eead4", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
+
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>

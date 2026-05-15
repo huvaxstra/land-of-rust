@@ -2,49 +2,41 @@
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 4</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --bg-color: #0f172a; /* Slate 900 */
-            --crt-bg: #020617; /* Slate 950 */
+            --bg-color: #0f172a;
+            --crt-bg: #020617;
         }
-
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(rgba(56, 189, 248, 0.1) 2px, transparent 40px),
-                radial-gradient(rgba(250, 204, 21, 0.05) 1px, transparent 30px);
+            background-image: radial-gradient(rgba(56, 189, 248, 0.1) 2px, transparent 40px), radial-gradient(rgba(250, 204, 21, 0.05) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
         html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
         html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
         .code-font { font-family: 'JetBrains Mono', monospace !important; }
-
-        /* Spaceship Dashboard UI - Security Club Edition */
+        /* Force LTR for code blocks */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, #card-display, .borrow-card {
+            direction: ltr !important;
+            text-align: left !important;
+        }
         .dashboard {
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border: 4px solid #3b82f6; /* Blue 500 */
+            border: 4px solid #3b82f6;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-            border: 4px solid #1e3a8a; /* Blue 900 */
+            border: 4px solid #1e3a8a;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
@@ -60,10 +52,8 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
-            background: rgba(240, 249, 255, 0.95); /* Sky 50 */
+            background: rgba(240, 249, 255, 0.95);
             color: #0f172a;
             border-radius: 15px;
             border: 3px solid #3b82f6;
@@ -77,7 +67,6 @@
             content: ''; position: absolute; bottom: -15px; left: 40px;
             border-width: 15px 15px 0; border-style: solid; border-color: rgba(240, 249, 255, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #eff6ff; border-radius: 50%;
@@ -85,14 +74,11 @@
             font-size: 2.5rem; border: 4px solid #3b82f6;
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Interactive Elements */
         .code-slot {
             display: inline-block; min-width: 60px; height: 30px;
             border-bottom: 3px dashed #fbbf24; margin: 0 5px;
@@ -101,7 +87,6 @@
             border-radius: 5px; cursor: pointer; transition: all 0.3s;
         }
         .code-slot.filled { border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.2); color: #bae6fd; }
-
         .code-option {
             background: #1e3a8a; border: 2px solid #3b82f6;
             padding: 8px 15px; border-radius: 8px; cursor: pointer;
@@ -109,8 +94,6 @@
         }
         .code-option:hover { background: #2563eb; transform: scale(1.05); }
         .code-option.selected { background: #38bdf8; border-color: #e0f2fe; color: #0f172a; font-weight: bold; }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); background-color: #7f1d1d; }
@@ -132,26 +115,26 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.5); border-radius: 8px; padding: 12px; border: 1px solid rgba(56, 189, 248, 0.2);
         }
-
-        /* Card Styles for Mini-game */
         .borrow-card {
             display: inline-flex; align-items: center; justify-content: center;
             width: 50px; height: 70px; border-radius: 8px; margin: 4px;
             font-weight: bold; font-family: 'JetBrains Mono', monospace;
             box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s;
         }
         .card-blue { background: linear-gradient(135deg, #2563eb, #1e3a8a); color: white; border: 2px solid #60a5fa; }
         .card-gold { background: linear-gradient(135deg, #eab308, #a16207); color: #2e1065; border: 2px solid #fef08a; }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .borrow-card { width: 40px; height: 55px; font-size: 0.8rem; }
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
@@ -160,114 +143,62 @@
 
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-blue-600 text-white">فارسی</button>
-        </div>
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD -->
+        <!-- HUD -->
         <div class="flex justify-between items-center mb-6 border-b border-blue-900 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-sky-400"><i class="fa-solid fa-tractor"></i> <span class="lang-fa">مالک تراکتور:</span><span class="lang-en">Tractor Owner:</span> <span id="tractor-owner">فریس (Ferris)</span></div>
-                <div class="text-emerald-400" id="guard-status-hud"><i class="fa-solid fa-shield-halved"></i> <span class="lang-fa">وضعیت نگهبان:</span><span class="lang-en">Guard Status:</span> <span id="guard-status"><span class="lang-fa">آرام</span><span class="lang-en">Relaxed</span> 🛡️</span></div>
+                <div class="text-sky-400"><i class="fa-solid fa-tractor"></i> <span id="tractor-label"></span> <span id="tractor-owner">Ferris</span></div>
+                <div class="text-emerald-400" id="guard-status-hud"><i class="fa-solid fa-shield-halved"></i> <span id="guard-label"></span> <span id="guard-status">Relaxed 🛡️</span></div>
             </div>
-            <div class="text-blue-300 code-font text-sm opacity-70">SECURITY-OS v4.0 (Borrow Checker)</div>
+            <div class="text-blue-300 code-font text-xs md:text-sm opacity-70">SECURITY-OS v4.0 (Borrow Checker)</div>
         </div>
 
-        <!-- Story Section -->
+        <!-- Dialog Box -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-blue-500">
-                <h3 class="font-bold text-blue-600 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-blue-600 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold"></p>
-
+                <h3 id="ferris-name" class="font-bold text-blue-600 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Screen -->
+        <!-- Game Area -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-blue-300 code-font min-h-[400px] flex flex-col">
 
-                <!-- Mission 1: The Move Concept -->
+                <!-- Mission 1: Move concept -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-blue-900 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۴: کلوب امانت‌داری فریس 🛡️</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 4: Ferris's Borrowing Club 🛡️</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa leading-relaxed space-y-3">
-                        <p class="text-sky-300">> قانون شماره ۱: هر مقدار در راست فقط <strong>یک مالک (Owner)</strong> دارد.</p>
-                        <p class="text-slate-300">> اگر فریس تراکتورش را به دوستش «بیل» بدهد، دیگر خودش نمی‌تواند با آن بازی کند! به این کار انتقال مالکیت یا <strong>Move</strong> می‌گوییم.</p>
-                        <div class="terminal-block mt-4 text-emerald-300">
-                            <span class="text-slate-400">// فریس مالک تراکتور است</span><br>
-                            <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
-                            <span class="text-slate-400">// مالکیت به بیل (s2) منتقل می‌شود</span><br>
-                            <span class="text-pink-400">let</span> s2 = s1;<br>
-                            <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Value moved!</span>
-                        </div>
-                    </div>
-
-                    <div class="lang-en leading-relaxed space-y-3">
-                        <p class="text-sky-300">> Rule #1: Every value in Rust has exactly <strong>one owner</strong>.</p>
-                        <p class="text-slate-300">> If Ferris gives his tractor to his friend Bill, Ferris can't play with it anymore! This is called <strong>Move</strong>.</p>
-                        <div class="terminal-block mt-4 text-emerald-300">
-                            <span class="text-slate-400">// Ferris owns the tractor</span><br>
-                            <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
-                            <span class="text-slate-400">// Ownership moves to Bill (s2)</span><br>
-                            <span class="text-pink-400">let</span> s2 = s1;<br>
-                            <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Value moved!</span>
-                        </div>
-                    </div>
-
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
                     <div class="mt-8 text-center">
-                        <button class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-2 rounded font-bold code-font" onclick="triggerMove()">
-                            <i class="fa-solid fa-truck-fast"></i>
-                            <span class="lang-fa">اجرای انتقال مالکیت (Move)</span>
-                            <span class="lang-en">Execute Ownership Move</span>
+                        <button id="mission1-btn" class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-2 rounded font-bold code-font" onclick="triggerMove()">
+                            <i class="fa-solid fa-truck-fast"></i> <span id="mission1-btn-text"></span>
                         </button>
-                        <p id="move-feedback" class="mt-4 text-rose-400 font-bold hidden">
-                            <span class="lang-fa">⚠️ تراکتور منتقل شد! فریس دیگر مالک آن نیست.</span>
-                            <span class="lang-en">⚠️ Tractor moved! Ferris is no longer the owner.</span>
-                        </p>
+                        <p id="move-feedback" class="mt-4 text-rose-400 font-bold hidden"></p>
                         <button id="btn-next-m1" class="mt-4 bg-blue-700 hover:bg-blue-600 text-white px-6 py-2 rounded font-bold code-font hidden mx-auto" onclick="startMission(2)">
-                            <span class="lang-fa">مرحله بعد [Enter]</span><span class="lang-en">Next Step [Enter]</span>
+                            <span id="next-step-m1-text"></span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Mission 2: Normal Reference Puzzle -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: کارت امانت آبی (Reference)</span>
-                        <span class="lang-en">>> Step 1: Blue Borrowing Card (Reference)</span>
-                    </div>
-
-                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
-                        <p>برای اینکه فریس تراکتورش را از دست ندهد، به جای دادن خود تراکتور، یک «کارت امانت» صادر می‌کند تا دیگران فقط به آن <strong>نگاه کنند</strong>.</p>
-                        <p class="text-sky-300 font-bold">برای ساخت یک کارت امانت (رفرنس) از چه علامتی استفاده می‌کنیم؟</p>
-                    </div>
-                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
-                        <p>To not lose his tractor, instead of moving it, Ferris issues a "borrowing card" so others can just <strong>look</strong> at it.</p>
-                        <p class="text-sky-300 font-bold">Which symbol do we use to create a borrowing card (reference)?</p>
-                    </div>
-
-                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
-                        <span class="text-pink-400">let</span> s2 = <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span>s1; <span class="text-slate-500 text-sm">// 👈 Fill this</span>
+                        <span class="text-pink-400">let</span> s2 = <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span>s1;
                     </div>
-
-                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-blue-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 1, '*')">*</div>
@@ -276,32 +207,23 @@
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 1, 'ref')">ref</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle1-btn" class="bg-blue-700 hover:bg-blue-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
-                            <span class="lang-fa">صدور کارت آبی 📘</span><span class="lang-en">Issue Blue Card 📘</span>
+                            <span id="puzzle1-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Mission 3: Mutable Reference Puzzle -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۲: کارت طلایی (Mutable Reference)</span>
-                        <span class="lang-en">>> Step 2: Golden Card (Mutable Reference)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-slate-300 mb-4">اگر دوستِ فریس بخواهد تراکتور را رنگ کند (تغییر دهد)، به یک کارت ویژه نیاز دارد. او به <strong>کارت طلایی امانت قابل تغییر</strong> نیاز دارد.</p>
-                    <p class="lang-en text-sm text-slate-300 mb-4">If Ferris's friend wants to paint the tractor (modify it), he needs a special card. He needs the <strong>Golden Mutable Borrowing Card</strong>.</p>
-
+                    <div id="mission3-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
                     <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-pink-400">let mut</span> s = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
                         <span class="text-pink-400">let</span> r1 = <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> s;<br>
-                        r1.push_str(<span class="text-yellow-300">" red"</span>); <span class="text-slate-500 text-sm">// Paint it red!</span>
+                        r1.push_str(<span class="text-yellow-300">" red"</span>);
                     </div>
-
-                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-blue-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font" onclick="selectOption(this, 2, '&')">&amp;</div>
@@ -310,10 +232,9 @@
                             <div class="code-option code-font" onclick="selectOption(this, 2, '*mut')">*mut</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle2-btn" class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
-                            <span class="lang-fa">صدور کارت طلایی 🪪</span><span class="lang-en">Issue Golden Card 🪪</span>
+                            <span id="puzzle2-btn-text"></span>
                         </button>
                     </div>
                 </div>
@@ -321,47 +242,31 @@
                 <!-- Mission 4: Borrow Checker Simulator -->
                 <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
                     <div class="text-yellow-400 mb-2 border-b border-blue-800 pb-2 flex justify-between items-center">
-                        <div>
-                            <span class="lang-fa">>> مرحله نهایی: عبور از نگهبان (Borrow Checker)</span>
-                            <span class="lang-en">>> Final Step: Pass the Guard (Borrow Checker)</span>
-                        </div>
+                        <span id="mission4-step"></span>
                     </div>
-
-                    <div class="lang-fa text-sm mb-4 text-slate-300">نگهبان قوانین سختی دارد: بی‌نهایت کارت آبی (&) مجاز است. اما کارت طلایی (&mut) <strong>فقط یکی</strong> مجاز است، و نباید هیچ کارت دیگری همراهش باشد! دو ماموریت زیر را انجام بده:</div>
-                    <div class="lang-en text-sm mb-4 text-slate-300">The Guard is strict: Unlimited Blue cards (&) are allowed. But <strong>ONLY ONE</strong> Golden card (&mut) is allowed, with NO other cards at the same time! Complete these tasks:</div>
-
-                    <!-- Tasks -->
+                    <div id="mission4-desc" class="text-sm mb-4 text-slate-300"></div>
                     <div class="bg-blue-950/50 border border-blue-800 rounded p-3 mb-4 text-sm">
                         <div id="task1" class="flex items-center gap-2 text-slate-400">
                             <i class="fa-regular fa-circle"></i>
-                            <span class="lang-fa">ماموریت ۱: برای ۳ نفر همزمان کارت آبی صادر کن (بدون کارت طلایی).</span>
-                            <span class="lang-en">Task 1: Issue 3 Blue cards simultaneously (no golden cards).</span>
+                            <span id="task1-text"></span>
                         </div>
                         <div id="task2" class="flex items-center gap-2 text-slate-400 mt-2">
                             <i class="fa-regular fa-circle"></i>
-                            <span class="lang-fa">ماموریت ۲: همه را پاک کن و دقیقا ۱ کارت طلایی صادر کن.</span>
-                            <span class="lang-en">Task 2: Clear all, and issue exactly 1 Golden card.</span>
+                            <span id="task2-text"></span>
                         </div>
                     </div>
-
-                    <!-- Card Display -->
                     <div class="terminal-block flex-grow mb-4 min-h-[100px] flex flex-wrap content-start gap-2" id="card-display">
-                        <span class="text-slate-500 italic text-sm mt-2 w-full text-center" id="empty-msg">
-                            <span class="lang-fa">هیچ کارتی صادر نشده...</span>
-                            <span class="lang-en">No cards issued yet...</span>
-                        </span>
+                        <span class="text-slate-500 italic text-sm mt-2 w-full text-center" id="empty-msg">No cards issued yet...</span>
                     </div>
-
-                    <!-- Controls -->
                     <div class="flex flex-wrap gap-2 justify-center mt-auto">
                         <button class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-bold code-font shadow-lg border border-blue-400" onclick="issueCard('blue')">
-                            + &amp; <span class="text-xs ml-1"><span class="lang-fa">(آبی)</span><span class="lang-en">(Blue)</span></span>
+                            + &amp; <span id="blue-card-text"></span>
                         </button>
                         <button class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded font-bold code-font shadow-lg border border-yellow-300" onclick="issueCard('gold')">
-                            + &amp;mut <span class="text-xs ml-1"><span class="lang-fa">(طلایی)</span><span class="lang-en">(Gold)</span></span>
+                            + &amp;mut <span id="gold-card-text"></span>
                         </button>
                         <button class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded font-bold ml-auto" onclick="clearCards()">
-                            <i class="fa-solid fa-trash"></i> <span class="lang-fa">پاک کردن</span><span class="lang-en">Clear</span>
+                            <i class="fa-solid fa-trash"></i> <span id="clear-btn-text"></span>
                         </button>
                     </div>
                 </div>
@@ -369,128 +274,490 @@
             </div>
         </div>
 
-        <!-- Success overlay -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
-            <div class="text-7xl mb-4 animate-bounce">🛡️🦀🎉</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">نگهبان راضی است!</span>
-                <span class="lang-en">The Guard is Happy!</span>
-            </h2>
-            <p class="text-xl text-sky-400 mb-6 text-center px-4">
-                <span class="lang-fa">شما سخت‌ترین مفهوم زبان راست یعنی Ownership و Borrowing را یاد گرفتید!</span>
-                <span class="lang-en">You've mastered Rust's hardest concept: Ownership and Borrowing!</span>
-            </p>
-            <button class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(59,130,246,0.6)]" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۴ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 4 - Play Again</span>
-            </button>
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🛡️🦀🎉</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-sky-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(59,130,246,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State & Logic ---
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                tractorLabel: "مالک تراکتور:",
+                guardLabel: "وضعیت نگهبان:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "سلام! من یه تراکتور قرمز اسباب‌بازی دارم. امروز می‌خوام یه کلوب امانت‌داری باز کنم! 🚜",
+                    "در زبان راست (Rust)، هر چیزی فقط یک «مالک» (Owner) داره. اگر اسباب‌بازیم رو بدم به دوستم، دیگه مال من نیست! به این می‌گن Move.",
+                    "برای اینکه اسباب‌بازیم رو از دست ندم، به جای دادن خودش، یک «کارت امانت» (Reference) به بقیه می‌دم تا فقط نگاهش کنن.",
+                    "اما باید مراقب «نگهبان کلوب» باشیم! اون قوانین امانت گرفتن رو به شدت کنترل می‌کنه و اگه قانون رو بشکنی ارور می‌ده. بیا بریم تو کلوب! 🛡️"
+                ],
+                afterDialog: "بیا ببینیم چطور می‌تونیم بدون اینکه نگهبان رو عصبانی کنیم، اسباب‌بازی رو امانت بدیم!",
+                mission1Title: "فصل ۴: کلوب امانت‌داری فریس 🛡️",
+                mission1Text: `
+                    <p class="text-sky-300">> قانون شماره ۱: هر مقدار در راست فقط <strong>یک مالک (Owner)</strong> دارد.</p>
+                    <p class="text-slate-300">> اگر فریس تراکتورش را به دوستش «بیل» بدهد، دیگر خودش نمی‌تواند با آن بازی کند! به این کار انتقال مالکیت یا <strong>Move</strong> می‌گوییم.</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// فریس مالک تراکتور است</span><br>
+                        <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-slate-400">// مالکیت به بیل (s2) منتقل می‌شود</span><br>
+                        <span class="text-pink-400">let</span> s2 = s1;<br>
+                        <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Value moved!</span>
+                    </div>
+                `,
+                mission1Btn: "اجرای انتقال مالکیت (Move)",
+                moveFeedback: "⚠️ تراکتور منتقل شد! فریس دیگر مالک آن نیست.",
+                nextStepM1: "مرحله بعد [Enter]",
+                mission2Step: ">> مرحله ۱: کارت امانت آبی (Reference)",
+                mission2Desc: "<p>برای اینکه فریس تراکتورش را از دست ندهد، به جای دادن خود تراکتور، یک «کارت امانت» صادر می‌کند تا دیگران فقط به آن <strong>نگاه کنند</strong>.</p><p class='text-sky-300 font-bold'>برای ساخت یک کارت امانت (رفرنس) از چه علامتی استفاده می‌کنیم؟</p>",
+                puzzle1Btn: "صدور کارت آبی 📘",
+                puzzle1Success: "> کارت صادر شد! حالا بقیه می‌توانند نگاه کنند.",
+                puzzle1Error: "خطا: برای یک رفرنس معمولی باید از علامت & استفاده کنی.",
+                mission3Step: ">> مرحله ۲: کارت طلایی (Mutable Reference)",
+                mission3Desc: "اگر دوستِ فریس بخواهد تراکتور را رنگ کند (تغییر دهد)، به یک کارت ویژه نیاز دارد. او به <strong>کارت طلایی امانت قابل تغییر</strong> نیاز دارد.",
+                puzzle2Btn: "صدور کارت طلایی 🪪",
+                puzzle2Success: "> کارت طلایی صادر شد! تراکتور رنگ شد.",
+                puzzle2Error: "خطا: برای رفرنس قابل تغییر به ترکیب & و mut نیاز داری.",
+                mission4Step: ">> مرحله نهایی: عبور از نگهبان (Borrow Checker)",
+                mission4Desc: "نگهبان قوانین سختی دارد: بی‌نهایت کارت آبی (&) مجاز است. اما کارت طلایی (&mut) <strong>فقط یکی</strong> مجاز است، و نباید هیچ کارت دیگری همراهش باشد! دو ماموریت زیر را انجام بده:",
+                task1Text: "ماموریت ۱: برای ۳ نفر همزمان کارت آبی صادر کن (بدون کارت طلایی).",
+                task2Text: "ماموریت ۲: همه را پاک کن و دقیقا ۱ کارت طلایی صادر کن.",
+                blueCardText: "(آبی)",
+                goldCardText: "(طلایی)",
+                clearBtnText: "پاک کردن",
+                emptyMsg: "هیچ کارتی صادر نشده...",
+                errorGoldWithBlue: "کارت‌های آبی هنوز دست بقیه است! نمی‌توانی کارت طلایی بدهی.",
+                errorGoldDouble: "فقط یک کارت طلایی همزمان مجاز است!",
+                errorBlueWithGold: "وقتی کارت طلایی صادر شده، نمی‌توانی کارت آبی صادر کنی!",
+                successTitle: "نگهبان راضی است!",
+                successMessage: "شما سخت‌ترین مفهوم زبان راست یعنی Ownership و Borrowing را یاد گرفتید!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                tractorLabel: "Tractor Owner:",
+                guardLabel: "Guard Status:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hi! I have a red toy tractor. Today, I'm opening a Borrowing Club! 🚜",
+                    "In Rust, everything has exactly one 'Owner'. If I give my toy to my friend, it's not mine anymore! This is called Move.",
+                    "To not lose my toy, instead of giving it away, I hand out a 'Borrowing Card' (Reference) so they can just look at it.",
+                    "But we must watch out for the 'Club Guard'! He strictly enforces borrowing rules and throws errors if broken. Let's go in! 🛡️"
+                ],
+                afterDialog: "Let's see how we can borrow the toy without making the Guard angry!",
+                mission1Title: "Chapter 4: Ferris's Borrowing Club 🛡️",
+                mission1Text: `
+                    <p class="text-sky-300">> Rule #1: Every value in Rust has exactly <strong>one owner</strong>.</p>
+                    <p class="text-slate-300">> If Ferris gives his tractor to his friend Bill, Ferris can't play with it anymore! This is called <strong>Move</strong>.</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Ferris owns the tractor</span><br>
+                        <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-slate-400">// Ownership moves to Bill (s2)</span><br>
+                        <span class="text-pink-400">let</span> s2 = s1;<br>
+                        <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Value moved!</span>
+                    </div>
+                `,
+                mission1Btn: "Execute Ownership Move",
+                moveFeedback: "⚠️ Tractor moved! Ferris is no longer the owner.",
+                nextStepM1: "Next Step [Enter]",
+                mission2Step: ">> Step 1: Blue Borrowing Card (Reference)",
+                mission2Desc: "<p>To not lose his tractor, instead of moving it, Ferris issues a 'borrowing card' so others can just <strong>look</strong> at it.</p><p class='text-sky-300 font-bold'>Which symbol do we use to create a borrowing card (reference)?</p>",
+                puzzle1Btn: "Issue Blue Card 📘",
+                puzzle1Success: "> Card issued! Now others can look at it.",
+                puzzle1Error: "Error: Use the & symbol for a normal reference.",
+                mission3Step: ">> Step 2: Golden Card (Mutable Reference)",
+                mission3Desc: "If Ferris's friend wants to paint the tractor (modify it), he needs a special card. He needs the <strong>Golden Mutable Borrowing Card</strong>.",
+                puzzle2Btn: "Issue Golden Card 🪪",
+                puzzle2Success: "> Golden card issued! Tractor painted.",
+                puzzle2Error: "Error: You need the combination of & and mut for a mutable reference.",
+                mission4Step: ">> Final Step: Pass the Guard (Borrow Checker)",
+                mission4Desc: "The Guard is strict: Unlimited Blue cards (&) are allowed. But <strong>ONLY ONE</strong> Golden card (&mut) is allowed, with NO other cards at the same time! Complete these tasks:",
+                task1Text: "Task 1: Issue 3 Blue cards simultaneously (no golden cards).",
+                task2Text: "Task 2: Clear all, and issue exactly 1 Golden card.",
+                blueCardText: "(Blue)",
+                goldCardText: "(Gold)",
+                clearBtnText: "Clear",
+                emptyMsg: "No cards issued yet...",
+                errorGoldWithBlue: "Blue cards are still out! Cannot issue a golden card.",
+                errorGoldDouble: "Only ONE golden card is allowed at a time!",
+                errorBlueWithGold: "Cannot issue a blue card while a golden card exists!",
+                successTitle: "The Guard is Happy!",
+                successMessage: "You've mastered Rust's hardest concept: Ownership and Borrowing!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                tractorLabel: "Propietario del tractor:",
+                guardLabel: "Estado del guardia:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! Tengo un tractor de juguete rojo. ¡Hoy voy a abrir un Club de Préstamo! 🚜",
+                    "En Rust, cada valor tiene exactamente un 'Propietario'. Si le doy mi juguete a mi amigo, ¡ya no es mío! Esto se llama Movimiento.",
+                    "Para no perder mi juguete, en lugar de darlo, entrego una 'Tarjeta de Préstamo' (Referencia) para que solo puedan mirarlo.",
+                    "¡Pero debemos cuidarnos del 'Guardián del Club'! Él aplica estrictamente las reglas de préstamo y da errores si se rompen. ¡Vamos adentro! 🛡️"
+                ],
+                afterDialog: "¡Veamos cómo podemos tomar prestado el juguete sin enojar al Guardián!",
+                mission1Title: "Capítulo 4: Club de Préstamo de Ferris 🛡️",
+                mission1Text: `
+                    <p class="text-sky-300">> Regla #1: Cada valor en Rust tiene exactamente <strong>un propietario</strong>.</p>
+                    <p class="text-slate-300">> Si Ferris le da su tractor a su amigo Bill, ¡ya no puede jugar con él! Esto se llama <strong>Movimiento</strong>.</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Ferris es el dueño del tractor</span><br>
+                        <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-slate-400">// La propiedad se mueve a Bill (s2)</span><br>
+                        <span class="text-pink-400">let</span> s2 = s1;<br>
+                        <span class="text-slate-400">// println!("{}", s1); // ❌ Error! Valor movido!</span>
+                    </div>
+                `,
+                mission1Btn: "Ejecutar movimiento de propiedad",
+                moveFeedback: "⚠️ ¡Tractor movido! Ferris ya no es el dueño.",
+                nextStepM1: "Siguiente paso [Enter]",
+                mission2Step: ">> Paso 1: Tarjeta azul de préstamo (Referencia)",
+                mission2Desc: "<p>Para no perder su tractor, en lugar de moverlo, Ferris emite una 'tarjeta de préstamo' para que otros solo puedan <strong>mirarlo</strong>.</p><p class='text-sky-300 font-bold'>¿Qué símbolo usamos para crear una tarjeta de préstamo (referencia)?</p>",
+                puzzle1Btn: "Emitir tarjeta azul 📘",
+                puzzle1Success: "> ¡Tarjeta emitida! Ahora otros pueden mirarlo.",
+                puzzle1Error: "Error: Usa el símbolo & para una referencia normal.",
+                mission3Step: ">> Paso 2: Tarjeta dorada (Referencia mutable)",
+                mission3Desc: "Si el amigo de Ferris quiere pintar el tractor (modificarlo), necesita una tarjeta especial. Necesita la <strong>Tarjeta dorada de préstamo mutable</strong>.",
+                puzzle2Btn: "Emitir tarjeta dorada 🪪",
+                puzzle2Success: "> ¡Tarjeta dorada emitida! Tractor pintado.",
+                puzzle2Error: "Error: Necesitas la combinación de & y mut para una referencia mutable.",
+                mission4Step: ">> Paso final: Pasar al Guardián (Borrow Checker)",
+                mission4Desc: "El Guardián es estricto: Se permiten infinitas tarjetas azules (&). Pero <strong>SOLO UNA</strong> tarjeta dorada (&mut) está permitida, ¡sin otras tarjetas al mismo tiempo! Completa estas tareas:",
+                task1Text: "Tarea 1: Emite 3 tarjetas azules simultáneamente (sin tarjetas doradas).",
+                task2Text: "Tarea 2: Borra todo y emite exactamente 1 tarjeta dorada.",
+                blueCardText: "(Azul)",
+                goldCardText: "(Dorada)",
+                clearBtnText: "Borrar",
+                emptyMsg: "No se han emitido tarjetas...",
+                errorGoldWithBlue: "¡Aún hay tarjetas azules! No se puede emitir una tarjeta dorada.",
+                errorGoldDouble: "¡Solo se permite UNA tarjeta dorada a la vez!",
+                errorBlueWithGold: "¡No se puede emitir una tarjeta azul mientras exista una tarjeta dorada!",
+                successTitle: "¡El Guardián está feliz!",
+                successMessage: "¡Has dominado el concepto más difícil de Rust: Propiedad y Préstamo!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                tractorLabel: "Traktor-Besitzer:",
+                guardLabel: "Wächterstatus:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ich habe einen roten Spielzeugtraktor. Heute eröffne ich einen Ausleihclub! 🚜",
+                    "In Rust hat jeder Wert genau einen 'Besitzer'. Wenn ich mein Spielzeug meinem Freund gebe, gehört es mir nicht mehr! Das nennt man Move.",
+                    "Um mein Spielzeug nicht zu verlieren, gebe ich statt des Spielzeugs eine 'Ausleihkarte' (Referenz) aus, damit andere nur hinschauen können.",
+                    "Aber wir müssen auf den 'Club-Wächter' aufpassen! Er setzt die Ausleihregeln streng durch und gibt Fehler aus, wenn sie gebrochen werden. Los geht's! 🛡️"
+                ],
+                afterDialog: "Sehen wir, wie wir das Spielzeug ausleihen können, ohne den Wächter zu verärgern!",
+                mission1Title: "Kapitel 4: Ferris' Ausleihclub 🛡️",
+                mission1Text: `
+                    <p class="text-sky-300">> Regel #1: Jeder Wert in Rust hat genau <strong>einen Besitzer</strong>.</p>
+                    <p class="text-slate-300">> Wenn Ferris seinen Traktor an seinen Freund Bill gibt, kann er nicht mehr damit spielen! Das nennt man <strong>Move</strong>.</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Ferris besitzt den Traktor</span><br>
+                        <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-slate-400">// Besitz wechselt zu Bill (s2)</span><br>
+                        <span class="text-pink-400">let</span> s2 = s1;<br>
+                        <span class="text-slate-400">// println!("{}", s1); // ❌ Fehler! Wert bewegt!</span>
+                    </div>
+                `,
+                mission1Btn: "Eigentumsübertragung ausführen",
+                moveFeedback: "⚠️ Traktor bewegt! Ferris ist nicht mehr der Besitzer.",
+                nextStepM1: "Nächster Schritt [Enter]",
+                mission2Step: ">> Schritt 1: Blaue Ausleihkarte (Referenz)",
+                mission2Desc: "<p>Um seinen Traktor nicht zu verlieren, gibt Ferris anstelle des Traktors eine 'Ausleihkarte' aus, damit andere nur <strong>hinschauen</strong> können.</p><p class='text-sky-300 font-bold'>Welches Symbol verwenden wir, um eine Ausleihkarte (Referenz) zu erstellen?</p>",
+                puzzle1Btn: "Blaue Karte ausgeben 📘",
+                puzzle1Success: "> Karte ausgestellt! Jetzt können andere hinschauen.",
+                puzzle1Error: "Fehler: Verwende das &-Symbol für eine normale Referenz.",
+                mission3Step: ">> Schritt 2: Goldene Karte (veränderbare Referenz)",
+                mission3Desc: "Wenn Ferris' Freund den Traktor anmalen möchte (verändern), braucht er eine spezielle Karte. Er braucht die <strong>Goldene veränderbare Ausleihkarte</strong>.",
+                puzzle2Btn: "Goldene Karte ausgeben 🪪",
+                puzzle2Success: "> Goldene Karte ausgestellt! Traktor bemalt.",
+                puzzle2Error: "Fehler: Du benötigst die Kombination aus & und mut für eine veränderbare Referenz.",
+                mission4Step: ">> Letzter Schritt: Den Wächter passieren (Borrow Checker)",
+                mission4Desc: "Der Wächter ist streng: Unbegrenzt viele blaue Karten (&) sind erlaubt. Aber <strong>NUR EINE</strong> goldene Karte (&mut) ist erlaubt, und keine anderen Karten gleichzeitig! Erledige diese Aufgaben:",
+                task1Text: "Aufgabe 1: Gib 3 blaue Karten gleichzeitig aus (keine goldenen Karten).",
+                task2Text: "Aufgabe 2: Lösche alle und gib genau 1 goldene Karte aus.",
+                blueCardText: "(Blau)",
+                goldCardText: "(Gold)",
+                clearBtnText: "Löschen",
+                emptyMsg: "Noch keine Karten ausgegeben...",
+                errorGoldWithBlue: "Blaue Karten sind noch draußen! Kann keine goldene Karte ausgeben.",
+                errorGoldDouble: "Nur EINE goldene Karte ist gleichzeitig erlaubt!",
+                errorBlueWithGold: "Kann keine blaue Karte ausgeben, während eine goldene Karte existiert!",
+                successTitle: "Der Wächter ist zufrieden!",
+                successMessage: "Du hast das schwierigste Konzept von Rust gemeistert: Eigentum und Ausleihen!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                tractorLabel: "Tractoreigenaar:",
+                guardLabel: "Bewakerstatus:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ik heb een rode speelgoedtractor. Vandaag open ik een Uitleenclub! 🚜",
+                    "In Rust heeft elke waarde precies één 'Eigenaar'. Als ik mijn speelgoed aan mijn vriend geef, is het niet meer van mij! Dit heet Move.",
+                    "Om mijn speelgoed niet te verliezen, geef ik in plaats van het speelgoed een 'Uitleenkaart' (Referentie) uit, zodat anderen er alleen naar kunnen <strong>kijken</strong>.",
+                    "Maar we moeten oppassen voor de 'Clubwachter'! Hij handhaaft strikt de uitleenregels en geeft fouten als ze worden overtreden. Laten we naar binnen gaan! 🛡️"
+                ],
+                afterDialog: "Laten we kijken hoe we het speelgoed kunnen lenen zonder de Wachter boos te maken!",
+                mission1Title: "Hoofdstuk 4: Ferris' Uitleenclub 🛡️",
+                mission1Text: `
+                    <p class="text-sky-300">> Regel #1: Elke waarde in Rust heeft precies <strong>één eigenaar</strong>.</p>
+                    <p class="text-slate-300">> Als Ferris zijn tractor aan zijn vriend Bill geeft, kan hij er niet meer mee spelen! Dit heet <strong>Move</strong>.</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Ferris is de eigenaar van de tractor</span><br>
+                        <span class="text-pink-400">let</span> s1 = String::from(<span class="text-yellow-300">"tractor"</span>);<br>
+                        <span class="text-slate-400">// Eigendom gaat naar Bill (s2)</span><br>
+                        <span class="text-pink-400">let</span> s2 = s1;<br>
+                        <span class="text-slate-400">// println!("{}", s1); // ❌ Fout! Waarde verplaatst!</span>
+                    </div>
+                `,
+                mission1Btn: "Eigendomsoverdracht uitvoeren",
+                moveFeedback: "⚠️ Tractor verplaatst! Ferris is niet langer de eigenaar.",
+                nextStepM1: "Volgende stap [Enter]",
+                mission2Step: ">> Stap 1: Blauwe uitleenkaart (Referentie)",
+                mission2Desc: "<p>Om zijn tractor niet te verliezen, geeft Ferris in plaats van de tractor een 'uitleenkaart' uit, zodat anderen er alleen naar kunnen <strong>kijken</strong>.</p><p class='text-sky-300 font-bold'>Welk symbool gebruiken we om een uitleenkaart (referentie) te maken?</p>",
+                puzzle1Btn: "Blauwe kaart uitgeven 📘",
+                puzzle1Success: "> Kaart uitgegeven! Anderen kunnen er nu naar kijken.",
+                puzzle1Error: "Fout: Gebruik het &-symbool voor een normale referentie.",
+                mission3Step: ">> Stap 2: Gouden kaart (Veranderbare referentie)",
+                mission3Desc: "Als Ferris' vriend de tractor wil schilderen (wijzigen), heeft hij een speciale kaart nodig. Hij heeft de <strong>Gouden veranderbare uitleenkaart</strong> nodig.",
+                puzzle2Btn: "Gouden kaart uitgeven 🪪",
+                puzzle2Success: "> Gouden kaart uitgegeven! Tractor geverfd.",
+                puzzle2Error: "Fout: Je hebt de combinatie van & en mut nodig voor een veranderbare referentie.",
+                mission4Step: ">> Laatste stap: De wachter passeren (Borrow Checker)",
+                mission4Desc: "De Wachter is streng: Onbeperkte blauwe kaarten (&) zijn toegestaan. Maar <strong>SLECHTS ÉÉN</strong> gouden kaart (&mut) is toegestaan, met GEEN andere kaarten tegelijk! Voltooi deze taken:",
+                task1Text: "Taak 1: Geef 3 blauwe kaarten tegelijk uit (geen gouden kaarten).",
+                task2Text: "Taak 2: Wis alles en geef precies 1 gouden kaart uit.",
+                blueCardText: "(Blauw)",
+                goldCardText: "(Goud)",
+                clearBtnText: "Wissen",
+                emptyMsg: "Nog geen kaarten uitgegeven...",
+                errorGoldWithBlue: "Blauwe kaarten zijn nog uit! Kan geen gouden kaart uitgeven.",
+                errorGoldDouble: "Slechts ÉÉN gouden kaart is tegelijk toegestaan!",
+                errorBlueWithGold: "Kan geen blauwe kaart uitgeven terwijl er een gouden kaart bestaat!",
+                successTitle: "De Wachter is blij!",
+                successMessage: "Je hebt het moeilijkste concept van Rust onder de knie: Eigendom en Uitlenen!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
+        };
+
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
         let currentLang = 'fa';
         let currentStep = 0;
         let currentDialogIndex = 0;
-        let typeInterval;
-
-        // Borrow Checker State
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false;
+        let moved = false;
         let cards = { blue: 0, gold: 0 };
-        let task1Done = false;
-        let task2Done = false;
+        let task1Done = false, task2Done = false;
 
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "سلام! من یه تراکتور قرمز اسباب‌بازی دارم. امروز می‌خوام یه کلوب امانت‌داری باز کنم! 🚜",
-                "در زبان راست (Rust)، هر چیزی فقط یک «مالک» (Owner) داره. اگر اسباب‌بازیم رو بدم به دوستم، دیگه مال من نیست! به این می‌گن Move.",
-                "برای اینکه اسباب‌بازیم رو از دست ندم، به جای دادن خودش، یک «کارت امانت» (Reference) به بقیه می‌دم تا فقط نگاهش کنن.",
-                "اما باید مراقب «نگهبان کلوب» باشیم! اون قوانین امانت گرفتن رو به شدت کنترل می‌کنه و اگه قانون رو بشکنی ارور می‌ده. بیا بریم تو کلوب! 🛡️"
-            ],
-            en: [
-                "Hi! I have a red toy tractor. Today, I'm opening a Borrowing Club! 🚜",
-                "In Rust, everything has exactly one 'Owner'. If I give my toy to my friend, it's not mine anymore! This is called Move.",
-                "To not lose my toy, instead of giving it away, I hand out a 'Borrowing Card' (Reference) so they can just look at it.",
-                "But we must watch out for the 'Club Guard'! He strictly enforces borrowing rules and throws errors if broken. Let's go in! 🛡️"
-            ]
-        };
+        // DOM elements
+        const tractorLabelSpan = document.getElementById('tractor-label');
+        const guardLabelSpan = document.getElementById('guard-label');
+        const tractorOwnerSpan = document.getElementById('tractor-owner');
+        const guardStatusSpan = document.getElementById('guard-status');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
 
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-blue-600 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                // Update specific HUD texts depending on state
-                if(document.getElementById('tractor-owner').innerText.includes('Bill')) {
-                    document.getElementById('tractor-owner').innerText = "بیل (Bill)";
-                } else {
-                    document.getElementById('tractor-owner').innerText = "فریس (Ferris)";
-                }
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-blue-600 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                if(document.getElementById('tractor-owner').innerText.includes('بیل')) {
-                    document.getElementById('tractor-owner').innerText = "Bill";
-                } else {
-                    document.getElementById('tractor-owner').innerText = "Ferris";
-                }
-            }
-
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
-            } else {
-                cb();
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
             }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
-            const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
-            nextBtn.classList.add('hidden');
-
-            typeWriter(text, 0, () => {
-                nextBtn.classList.remove('hidden');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.querySelector('.dashboard').classList.add('shake');
+                setTimeout(() => document.querySelector('.dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
             });
         }
 
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "بیا ببینیم چطور می‌تونیم بدون اینکه نگهبان رو عصبانی کنیم، اسباب‌بازی رو امانت بدیم!" :
-                    "Let's see how we can borrow the toy without making the Guard angry!";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            tractorLabelSpan.innerText = pack.tractorLabel;
+            guardLabelSpan.innerText = pack.guardLabel;
+            if (moved) {
+                tractorOwnerSpan.innerText = currentLang === 'fa' ? "بیل (Bill)" : (currentLang === 'en' ? "Bill" : (currentLang === 'es' ? "Bill" : (currentLang === 'de' ? "Bill" : "Bill")));
+            } else {
+                tractorOwnerSpan.innerText = currentLang === 'fa' ? "فریس (Ferris)" : (currentLang === 'en' ? "Ferris" : (currentLang === 'es' ? "Ferris" : (currentLang === 'de' ? "Ferris" : "Ferris")));
+            }
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('mission1-btn-text').innerHTML = pack.mission1Btn;
+            const moveFeedback = document.getElementById('move-feedback');
+            if (moveFeedback) moveFeedback.innerHTML = pack.moveFeedback;
+            document.getElementById('next-step-m1-text').innerHTML = pack.nextStepM1;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('task1-text').innerHTML = pack.task1Text;
+            document.getElementById('task2-text').innerHTML = pack.task2Text;
+            document.getElementById('blue-card-text').innerHTML = pack.blueCardText;
+            document.getElementById('gold-card-text').innerHTML = pack.goldCardText;
+            document.getElementById('clear-btn-text').innerHTML = pack.clearBtnText;
+            const emptyMsgSpan = document.getElementById('empty-msg');
+            if (emptyMsgSpan) emptyMsgSpan.innerHTML = pack.emptyMsg;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.successTitle;
+            document.getElementById('success-message').innerHTML = pack.successMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-blue-600 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
         }
 
         function startMission(missionNum) {
@@ -498,22 +765,26 @@
             document.getElementById('mission-' + missionNum).classList.remove('hidden');
         }
 
-        // --- Mission 1 Logic ---
+        // Mission 1: Move
         function triggerMove() {
-            document.getElementById('tractor-owner').innerText = currentLang === 'fa' ? "بیل (Bill)" : "Bill";
-            document.getElementById('tractor-owner').parentElement.classList.replace('text-sky-400', 'text-rose-400');
-            document.getElementById('move-feedback').classList.remove('hidden');
+            if (moved) return;
+            moved = true;
+            const pack = languagePack[currentLang];
+            tractorOwnerSpan.innerText = currentLang === 'fa' ? "بیل (Bill)" : (currentLang === 'en' ? "Bill" : (currentLang === 'es' ? "Bill" : (currentLang === 'de' ? "Bill" : "Bill")));
+            tractorOwnerSpan.parentElement.classList.replace('text-sky-400', 'text-rose-400');
+            const feedbackDiv = document.getElementById('move-feedback');
+            feedbackDiv.classList.remove('hidden');
+            feedbackDiv.innerText = pack.moveFeedback;
             document.getElementById('btn-next-m1').classList.remove('hidden');
         }
 
-        // --- Puzzle System ---
+        // Puzzle handlers
         function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed)) return;
             element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
-
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
@@ -522,9 +793,9 @@
         }
 
         function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed)) return;
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
@@ -534,56 +805,58 @@
         }
 
         function checkPuzzle1() {
+            if (puzzle1Completed) return;
             const slotText = document.getElementById('slot1').innerText;
             const feedback = document.getElementById('puzzle1-feedback');
             const crt = document.getElementById('crt-monitor');
-
             if (slotText === '&') {
                 feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
-                feedback.innerText = currentLang === 'fa' ? "> کارت صادر شد! حالا بقیه می‌توانند نگاه کنند." : "> Card issued! Now others can look at it.";
-
-                // Reset HUD
-                document.getElementById('tractor-owner').innerText = currentLang === 'fa' ? "فریس (Ferris)" : "Ferris";
-                document.getElementById('tractor-owner').parentElement.classList.replace('text-rose-400', 'text-sky-400');
-
+                feedback.innerText = languagePack[currentLang].puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(3), 1500);
             } else {
                 crt.classList.add('glitch');
                 setTimeout(() => crt.classList.remove('glitch'), 300);
-                feedback.innerText = currentLang === 'fa' ? "خطا: برای یک رفرنس معمولی باید از علامت & استفاده کنی." : "Error: Use the & symbol for a normal reference.";
+                feedback.innerText = languagePack[currentLang].puzzle1Error;
             }
         }
 
         function checkPuzzle2() {
+            if (puzzle2Completed) return;
             const slotText = document.getElementById('slot2').innerText;
             const feedback = document.getElementById('puzzle2-feedback');
             const crt = document.getElementById('crt-monitor');
-
             if (slotText === '&mut') {
                 feedback.className = "text-yellow-400 h-6 mb-4 font-bold text-sm";
-                feedback.innerText = currentLang === 'fa' ? "> کارت طلایی صادر شد! تراکتور رنگ شد." : "> Golden card issued! Tractor painted.";
+                feedback.innerText = languagePack[currentLang].puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
                 crt.classList.add('glitch');
                 setTimeout(() => crt.classList.remove('glitch'), 300);
-                feedback.innerText = currentLang === 'fa' ? "خطا: برای رفرنس قابل تغییر به ترکیب & و mut نیاز داری." : "Error: You need the combination of & and mut for a mutable reference.";
+                feedback.innerText = languagePack[currentLang].puzzle2Error;
             }
         }
 
-        // --- Borrow Checker Terminal Simulator ---
+        // Borrow Checker Simulator
         function updateGuardHUD(isAngry) {
-            const guardUI = document.getElementById('guard-status');
             const guardContainer = document.getElementById('guard-status-hud');
-            if(isAngry) {
-                guardUI.innerHTML = currentLang === 'fa' ? "عصبانی! 🚨" : "Angry! 🚨";
+            if (isAngry) {
+                guardStatusSpan.innerHTML = currentLang === 'fa' ? "عصبانی! 🚨" : (currentLang === 'en' ? "Angry! 🚨" : (currentLang === 'es' ? "Enojado! 🚨" : (currentLang === 'de' ? "Wütend! 🚨" : "Boos! 🚨")));
                 guardContainer.classList.replace('text-emerald-400', 'text-rose-500');
             } else {
-                guardUI.innerHTML = currentLang === 'fa' ? "آرام 🛡️" : "Relaxed 🛡️";
+                guardStatusSpan.innerHTML = currentLang === 'fa' ? "آرام 🛡️" : (currentLang === 'en' ? "Relaxed 🛡️" : (currentLang === 'es' ? "Relajado 🛡️" : (currentLang === 'de' ? "Entspannt 🛡️" : "Ontspannen 🛡️")));
                 guardContainer.classList.replace('text-rose-500', 'text-emerald-400');
             }
         }
 
-        function triggerError(msgFa, msgEn) {
+        function triggerError(msgFa, msgEn, msgEs, msgDe, msgNl) {
             const crt = document.getElementById('crt-monitor');
             crt.classList.add('glitch');
             updateGuardHUD(true);
@@ -591,31 +864,32 @@
                 crt.classList.remove('glitch');
                 setTimeout(() => updateGuardHUD(false), 1500);
             }, 300);
-
-            // Show alert box (using standard alert for simplicity in demo, or we could add an in-game modal)
-            alert(currentLang === 'fa' ? `🚨 خطای Borrow Checker:\n${msgFa}` : `🚨 Borrow Checker Error:\n${msgEn}`);
+            let errorMsg = '';
+            if (currentLang === 'fa') errorMsg = `🚨 خطای Borrow Checker:\n${msgFa}`;
+            else if (currentLang === 'en') errorMsg = `🚨 Borrow Checker Error:\n${msgEn}`;
+            else if (currentLang === 'es') errorMsg = `🚨 Error del Borrow Checker:\n${msgEs}`;
+            else if (currentLang === 'de') errorMsg = `🚨 Borrow Checker Fehler:\n${msgDe}`;
+            else errorMsg = `🚨 Borrow Checker Fout:\n${msgNl}`;
+            alert(errorMsg);
         }
 
         function renderCards() {
             const container = document.getElementById('card-display');
             container.innerHTML = '';
-
-            if(cards.blue === 0 && cards.gold === 0) {
-                container.innerHTML = `<span class="text-slate-500 italic text-sm mt-2 w-full text-center" id="empty-msg">
-                    <span class="lang-fa" style="display:${currentLang==='fa'?'block':'none'}">هیچ کارتی صادر نشده...</span>
-                    <span class="lang-en" style="display:${currentLang==='en'?'block':'none'}">No cards issued yet...</span>
-                </span>`;
+            if (cards.blue === 0 && cards.gold === 0) {
+                const emptySpan = document.createElement('span');
+                emptySpan.className = "text-slate-500 italic text-sm mt-2 w-full text-center";
+                emptySpan.innerText = languagePack[currentLang].emptyMsg;
+                container.appendChild(emptySpan);
                 return;
             }
-
-            for(let i=0; i<cards.blue; i++) {
+            for (let i = 0; i < cards.blue; i++) {
                 const el = document.createElement('div');
                 el.className = 'borrow-card card-blue';
                 el.innerText = '&';
                 container.appendChild(el);
             }
-
-            for(let i=0; i<cards.gold; i++) {
+            for (let i = 0; i < cards.gold; i++) {
                 const el = document.createElement('div');
                 el.className = 'borrow-card card-gold';
                 el.innerText = '&mut';
@@ -624,24 +898,24 @@
         }
 
         function issueCard(type) {
-            if(type === 'blue') {
-                if(cards.gold > 0) {
-                    triggerError("وقتی کارت طلایی صادر شده، نمی‌توانی کارت آبی صادر کنی!", "Cannot issue a blue card while a golden card exists!");
+            const pack = languagePack[currentLang];
+            if (type === 'blue') {
+                if (cards.gold > 0) {
+                    triggerError(pack.errorBlueWithGold, pack.errorBlueWithGold, pack.errorBlueWithGold, pack.errorBlueWithGold, pack.errorBlueWithGold);
                     return;
                 }
                 cards.blue++;
-            } else if(type === 'gold') {
-                if(cards.blue > 0) {
-                    triggerError("کارت‌های آبی هنوز دست بقیه است! نمی‌توانی کارت طلایی بدهی.", "Blue cards are still out! Cannot issue a golden card.");
+            } else if (type === 'gold') {
+                if (cards.blue > 0) {
+                    triggerError(pack.errorGoldWithBlue, pack.errorGoldWithBlue, pack.errorGoldWithBlue, pack.errorGoldWithBlue, pack.errorGoldWithBlue);
                     return;
                 }
-                if(cards.gold > 0) {
-                    triggerError("فقط یک کارت طلایی همزمان مجاز است!", "Only ONE golden card is allowed at a time!");
+                if (cards.gold > 0) {
+                    triggerError(pack.errorGoldDouble, pack.errorGoldDouble, pack.errorGoldDouble, pack.errorGoldDouble, pack.errorGoldDouble);
                     return;
                 }
                 cards.gold++;
             }
-
             renderCards();
             checkWinCondition();
         }
@@ -653,20 +927,17 @@
         }
 
         function checkWinCondition() {
-            if(!task1Done && cards.blue >= 3 && cards.gold === 0) {
+            if (!task1Done && cards.blue >= 3 && cards.gold === 0) {
                 task1Done = true;
                 const t1 = document.getElementById('task1');
                 t1.classList.replace('text-slate-400', 'text-emerald-400');
                 t1.querySelector('i').classList.replace('fa-circle', 'fa-circle-check');
             }
-
-            if(task1Done && !task2Done && cards.gold === 1 && cards.blue === 0) {
+            if (task1Done && !task2Done && cards.gold === 1 && cards.blue === 0) {
                 task2Done = true;
                 const t2 = document.getElementById('task2');
                 t2.classList.replace('text-slate-400', 'text-emerald-400');
                 t2.querySelector('i').classList.replace('fa-circle', 'fa-circle-check');
-
-                // WIN!
                 setTimeout(() => {
                     triggerConfetti();
                     document.getElementById('success-screen').classList.remove('hidden');
@@ -674,17 +945,18 @@
             }
         }
 
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        function goToNextChapter() {
+            window.location.href = 'chapter-5.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
         const possibleColors = ["#3b82f6", "#eab308", "#60a5fa", "#fef08a"];
-
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -694,7 +966,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -704,46 +975,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
-            if(!animationId) Draw();
+            if (!animationId) Draw();
         }
 
-        // Initialize Game
+        // Initialization
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

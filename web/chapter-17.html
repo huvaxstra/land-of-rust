@@ -1,53 +1,44 @@
 <!DOCTYPE html>
-
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 17</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --bg-color: #0f172a; /* Slate 900 */
-            --crt-bg: #082f49; /* Sky 900 */
-            --accent-primary: #06b6d4; /* Cyan 500 */
-            --accent-secondary: #8b5cf6; /* Violet 500 */
+            --bg-color: #0f172a;
+            --crt-bg: #082f49;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #8b5cf6;
         }
-
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(rgba(6, 182, 212, 0.1) 2px, transparent 40px),
-                radial-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 30px);
+            background-image: radial-gradient(rgba(6, 182, 212, 0.1) 2px, transparent 40px), radial-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
         html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
         html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
         .code-font { font-family: 'JetBrains Mono', monospace !important; }
-
-        /* Spaceship Dashboard UI - Mecha Factory Edition */
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .hero-btn, .squad-slot, .health-bar-container, #sim-terminal {
+            direction: ltr !important;
+            text-align: left !important;
+        }
         .dashboard {
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border: 4px solid var(--accent-primary);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-            border: 4px solid #0369a1; /* Sky 700 */
+            border: 4px solid #0369a1;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
@@ -63,11 +54,9 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
-            background: rgba(236, 254, 255, 0.95); /* Cyan 50 */
-            color: #083344; /* Cyan 950 */
+            background: rgba(236, 254, 255, 0.95);
+            color: #083344;
             border-radius: 15px;
             border: 3px solid var(--accent-primary);
             position: relative;
@@ -80,7 +69,6 @@
             content: ''; position: absolute; bottom: -15px; left: 40px;
             border-width: 15px 15px 0; border-style: solid; border-color: rgba(236, 254, 255, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #cffafe; border-radius: 50%;
@@ -88,14 +76,11 @@
             font-size: 2.5rem; border: 4px solid var(--accent-primary);
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Interactive Elements */
         .code-slot {
             display: inline-block; min-width: 60px; height: 30px;
             border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
@@ -104,7 +89,6 @@
             border-radius: 5px; cursor: pointer; transition: all 0.3s;
         }
         .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(6, 182, 212, 0.2); color: #a5f3fc; }
-
         .code-option {
             background: #1e293b; border: 2px solid #334155;
             padding: 8px 15px; border-radius: 8px; cursor: pointer;
@@ -112,8 +96,6 @@
         }
         .code-option:hover { background: #334155; transform: scale(1.05); }
         .code-option.selected { background: var(--accent-primary); border-color: #67e8f9; color: #083344; font-weight: bold; }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); background-color: #7f1d1d; }
@@ -122,6 +104,13 @@
             60% { transform: skew(-5deg); background-color: #991b1b; }
             80% { transform: skew(5deg); }
             100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
         }
         .fade-in { animation: fadeIn 0.5s ease-in forwards; }
         @keyframes fadeIn {
@@ -144,37 +133,37 @@
             50% { transform: translateX(20px) scale(1.2); }
             100% { transform: translateX(0) scale(1); }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(6, 182, 212, 0.3);
         }
-
-        /* RPG Simulator Styles */
         .hero-btn {
             background: #1e293b; border: 2px solid #38bdf8; border-radius: 8px;
             padding: 8px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center;
         }
         .hero-btn:hover { background: #0c4a6e; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4); }
         .hero-btn:disabled { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; transform: none; box-shadow: none; }
-
         .squad-slot {
             width: 50px; height: 50px; border: 2px dashed #0284c7; border-radius: 8px;
             display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
             background: rgba(0,0,0,0.3);
         }
         .squad-slot.filled { border-style: solid; border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); }
-
         .health-bar-container {
             width: 100%; height: 20px; background: #334155; border-radius: 10px; overflow: hidden; border: 2px solid #0f172a;
         }
         .health-bar-fill {
             height: 100%; background: #ef4444; width: 100%; transition: width 0.3s ease-out;
         }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .squad-slot { width: 40px; height: 40px; font-size: 1.2rem; }
+            .hero-btn { padding: 4px; }
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
@@ -183,73 +172,50 @@
 
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-cyan-600 text-white">فارسی</button>
-        </div>
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD -->
+        <!-- HUD -->
         <div class="flex justify-between items-center mb-6 border-b border-cyan-900 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-cyan-400"><i class="fa-solid fa-users"></i> <span class="lang-fa">قهرمانان تیم:</span><span class="lang-en">Squad Heroes:</span> <span class="text-white" id="hud-heroes">۰ / ۳</span></div>
-                <div class="text-rose-400"><i class="fa-solid fa-heart"></i> <span class="lang-fa">جان دشمن:</span><span class="lang-en">Enemy HP:</span> <span class="text-white" id="hud-hp">۸۰ / ۸۰</span></div>
+                <div class="text-cyan-400"><i class="fa-solid fa-users"></i> <span id="squad-label"></span> <span id="hud-heroes">0 / 3</span></div>
+                <div class="text-rose-400"><i class="fa-solid fa-heart"></i> <span id="enemy-hp-label"></span> <span id="hud-hp">80 / 80</span></div>
             </div>
-            <div class="text-cyan-300 code-font text-sm opacity-70">MECHA-OS v17.0</div>
+            <div class="text-cyan-300 code-font text-xs md:text-sm opacity-70">MECHA-OS v17.0</div>
         </div>
 
-        <!-- Story Section -->
+        <!-- Dialog Box -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">🤖🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-cyan-500">
-                <h3 class="font-bold text-cyan-800 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-cyan-800 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold text-cyan-950"></p>
-
+                <h3 id="ferris-name" class="font-bold text-cyan-800 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-cyan-950"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Screen -->
+        <!-- Game Area -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-cyan-100 code-font min-h-[400px] flex flex-col">
 
-                <!-- Mission 1: Composition vs Inheritance -->
+                <!-- Mission 1: Composition (struct) -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-cyan-900 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۱۷: ربات‌های ترنسفورمر (Composition) 🤖</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 17: Transformer Robots (Composition) 🤖</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa leading-relaxed space-y-3">
-                        <p class="text-cyan-300">> در زبان‌های قدیمی، برای ساخت یک ربات جنگجو می‌گفتند: «او یک فرزند از ربات پایه است و ویژگی‌هایش را به ارث می‌برد (Inheritance)».</p>
-                        <p class="text-slate-300">> اما این روش باعث شلوغی و مشکلات زیادی می‌شود. در Rust ما از روش **ترکیب (Composition)** استفاده می‌کنیم؛ یعنی قطعات لگو را کنار هم می‌چینیم!</p>
-                        <p class="text-violet-300 mt-4 font-bold">برای تعریف رباتی که از یک موتور و شمشیر تشکیل شده، از کدام کلمه کلیدی استفاده می‌کنیم؟</p>
-                    </div>
-
-                    <div class="lang-en leading-relaxed space-y-3">
-                        <p class="text-cyan-300">> In older languages, to make a combat robot they said: "It's a child of the base robot and inherits its features (Inheritance)".</p>
-                        <p class="text-slate-300">> But this causes messy code. In Rust, we use **Composition**; we snap Lego blocks together!</p>
-                        <p class="text-violet-300 mt-4 font-bold">Which keyword do we use to define a robot made of an engine and a sword?</p>
-                    </div>
-
-                    <div class="terminal-block mt-4 text-emerald-300 text-lg">
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
                         <span class="text-slate-400 text-sm">// Instead of: class CombatRobot extends Robot</span><br>
                         <span id="slot1" class="code-slot text-cyan-400" onclick="clearSlot(1)">---</span> CombatRobot {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;engine: Engine,<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;weapon: Sword,<br>
                         }
                     </div>
-
-                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"></div>
-
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-cyan-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'class')">class</div>
@@ -258,38 +224,23 @@
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'impl')">impl</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle1-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
-                            <span class="lang-fa">سرهم کردن قطعات 🧩</span><span class="lang-en">Assemble Parts 🧩</span>
+                            <span id="puzzle1-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 2: Traits for Behavior -->
+                <!-- Mission 2: trait -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-violet-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: گواهی‌نامه‌ی مهارت (Traits)</span>
-                        <span class="lang-en">>> Step 1: Skill Certificates (Traits)</span>
-                    </div>
-
-                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
-                        <p>وقتی می‌خواهیم بگوییم چند ربات یا ماشین مختلف بلدند آژیر بکشند، به جای اینکه از یک کلاس ارث‌بری کنند، به آن‌ها یک گواهی‌نامه‌ی مشترک می‌دهیم.</p>
-                        <p class="text-white font-bold">نام کلمه کلیدی که برای تعریف این گواهی‌نامه (رفتار مشترک) استفاده می‌شود چیست؟</p>
-                    </div>
-                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
-                        <p>When we want to say different robots or cars can sound an alarm, instead of inheriting from a class, we give them a shared certificate.</p>
-                        <p class="text-white font-bold">What is the keyword used to define this certificate (shared behavior)?</p>
-                    </div>
-
-                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                    <div id="mission2-step" class="text-violet-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-pink-400" id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> MakeSound {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400">fn</span> <span class="text-blue-300">make_sound</span>(&self);<br>
                         }
                     </div>
-
-                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-cyan-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font" onclick="selectOption(this, 2, 'interface')">interface</div>
@@ -298,24 +249,17 @@
                             <div class="code-option code-font" onclick="selectOption(this, 2, 'base')">base</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle2-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
-                            <span class="lang-fa">صدور گواهی مهارت 🏅</span><span class="lang-en">Issue Skill Cert 🏅</span>
+                            <span id="puzzle2-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 3: Trait Objects -->
+                <!-- Mission 3: dyn Trait -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-violet-400 mb-2 font-bold">
-                        <span class="lang-fa">>> مرحله ۲: ارتش متنوع (Trait Objects)</span>
-                        <span class="lang-en">>> Step 2: Diverse Army (Trait Objects)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-slate-300 mb-4">حالا می‌خواهیم یک جنگجو، جادوگر و کماندار را داخل یک لیست (`Vec`) بگذاریم. چون نوعشان فرق دارد، کامپایلر اجازه نمی‌دهد. اما اگر آن‌ها را داخل جعبه‌ای بگذاریم که می‌گوید «من هر چیزی که رفتار Attack داشته باشد را قبول می‌کنم»، مشکل حل می‌شود! این جعبه‌ی جادویی با چه کلمه‌ای مشخص می‌شود؟</p>
-                    <p class="lang-en text-sm text-slate-300 mb-4">Now we want to put a Warrior, Mage, and Archer into one list (`Vec`). Since their types differ, the compiler won't allow it. But if we put them in a box that says "I accept anything with the Attack behavior," it works! What keyword identifies this magic box?</p>
-
+                    <div id="mission3-step" class="text-violet-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
                     <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-slate-400 text-sm">// A list of heroes of different types!</span><br>
                         <span class="text-pink-400">let</span> heroes: Vec&lt;Box&lt;<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span> Attack&gt;&gt; = <span class="text-blue-300">vec!</span>[<br>
@@ -323,9 +267,7 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;Box::new(Mage { mana: <span class="text-orange-300">40</span> }),<br>
                         ];
                     </div>
-
-                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-cyan-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'any')">any</div>
@@ -334,10 +276,9 @@
                             <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'obj')">obj</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle3-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
-                            <span class="lang-fa">ایجاد لیست قهرمانان 📜</span><span class="lang-en">Create Hero Roster 📜</span>
+                            <span id="puzzle3-btn-text"></span>
                         </button>
                     </div>
                 </div>
@@ -345,28 +286,12 @@
                 <!-- Mission 4: RPG Battle Simulator -->
                 <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
                     <div class="text-violet-400 mb-2 border-b border-cyan-800 pb-2 flex justify-between items-center">
-                        <div>
-                            <span class="lang-fa">>> مرحله نهایی: نبرد RPG با Trait Object</span>
-                            <span class="lang-en">>> Final Step: RPG Battle with Trait Object</span>
-                        </div>
-                        <div class="text-xs bg-cyan-900 px-2 py-1 rounded text-white">
-                            <span class="lang-fa">پروژه ۱۷.۳</span><span class="lang-en">Project 17.3</span>
-                        </div>
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-cyan-900 px-2 py-1 rounded text-white">Project 17.3</div>
                     </div>
-
-                    <div class="lang-fa text-sm mb-2 text-slate-300">
-                        سه قهرمان را به لیست (`Vec<Box<dyn Attack>>`) اضافه کن. سپس دکمه <strong>اجرای حلقه حمله</strong> را بزن تا اعضای لیست به نوبت به هیولا حمله کنند!
-                    </div>
-                    <div class="lang-en text-sm mb-2 text-slate-300">
-                        Add three heroes to the list (`Vec<Box<dyn Attack>>`). Then click the <strong>Run Attack Loop</strong> button so the list members attack the monster in turn!
-                    </div>
-
+                    <div id="mission4-desc" class="text-sm mb-2 text-slate-300"></div>
                     <div class="flex flex-col md:flex-row gap-4 flex-grow">
-
-                        <!-- RPG Arena -->
                         <div class="w-full md:w-1/2 flex flex-col justify-between">
-
-                            <!-- Enemy -->
                             <div class="bg-rose-950/40 border border-rose-800 rounded-xl p-3 flex flex-col items-center">
                                 <span class="text-4xl mb-2" id="enemy-sprite">🐉</span>
                                 <div class="health-bar-container">
@@ -374,178 +299,539 @@
                                 </div>
                                 <span class="text-xs text-rose-200 mt-1 font-bold code-font">HP: <span id="enemy-hp-text">80</span></span>
                             </div>
-
-                            <!-- Squad Setup -->
                             <div class="flex justify-center gap-2 my-3" id="squad-display">
                                 <div class="squad-slot"></div>
                                 <div class="squad-slot"></div>
                                 <div class="squad-slot"></div>
                             </div>
-
-                            <!-- Hero Selection -->
                             <div class="flex gap-2 justify-center">
                                 <button class="hero-btn" id="btn-warrior" onclick="recruitHero('Warrior', '⚔️')">
                                     <span class="text-xl">⚔️</span>
-                                    <span class="text-xs mt-1 text-slate-300"><span class="lang-fa">جنگجو</span><span class="lang-en">Warrior</span></span>
+                                    <span id="warrior-text" class="text-xs mt-1 text-slate-300"></span>
                                 </button>
                                 <button class="hero-btn" id="btn-mage" onclick="recruitHero('Mage', '🔮')">
                                     <span class="text-xl">🔮</span>
-                                    <span class="text-xs mt-1 text-slate-300"><span class="lang-fa">جادوگر</span><span class="lang-en">Mage</span></span>
+                                    <span id="mage-text" class="text-xs mt-1 text-slate-300"></span>
                                 </button>
                                 <button class="hero-btn" id="btn-archer" onclick="recruitHero('Archer', '🏹')">
                                     <span class="text-xl">🏹</span>
-                                    <span class="text-xs mt-1 text-slate-300"><span class="lang-fa">کماندار</span><span class="lang-en">Archer</span></span>
+                                    <span id="archer-text" class="text-xs mt-1 text-slate-300"></span>
                                 </button>
                             </div>
-
                             <button id="btn-attack-loop" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded font-bold w-full mt-3 opacity-50 cursor-not-allowed" onclick="executeAttacks()" disabled>
-                                <i class="fa-solid fa-play"></i> <span class="lang-fa">اجرای حلقه حمله</span><span class="lang-en">Run Attack Loop</span>
+                                <i class="fa-solid fa-play"></i> <span id="attack-loop-text"></span>
                             </button>
                         </div>
-
-                        <!-- Terminal -->
                         <div id="sim-terminal" class="terminal-block text-xs overflow-y-auto w-full md:w-1/2 flex flex-col" style="max-height: 220px;">
-                            <div class="text-slate-500 italic">
-                                <span class="lang-fa">> منتظر تشکیل تیم (Vec)...</span>
-                                <span class="lang-en">> Waiting for squad creation (Vec)...</span>
-                            </div>
+                            <div id="sim-initial-msg" class="text-slate-500 italic"></div>
                         </div>
-
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- Success overlay -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
-            <div class="text-7xl mb-4 animate-bounce">⚔️🐉🎉</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">هیولا شکست خورد!</span>
-                <span class="lang-en">Monster Defeated!</span>
-            </h2>
-            <p class="text-xl text-cyan-400 mb-6 text-center px-4">
-                <span class="lang-fa">شما مفهوم قدرتمند Trait Object و Composition را یاد گرفتید. این روش بسیار منعطف‌تر از ارث‌بری است!</span>
-                <span class="lang-en">You mastered the powerful concept of Trait Objects and Composition. This is much more flexible than Inheritance!</span>
-            </p>
-            <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(6,182,212,0.6)]" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۱۷ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 17 - Play Again</span>
-            </button>
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">⚔️🐉🎉</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-cyan-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(6,182,212,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State & Logic ---
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                squadLabel: "قهرمانان تیم:",
+                enemyHpLabel: "جان دشمن:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "سلام! امروز می‌خوایم یه لشکر از ربات‌های جنگجو و قهرمان‌ها بسازیم! 🤖⚔️",
+                    "تو زبان‌های قدیمی (مثل جاوا)، برای ساخت یه ربات جدید می‌گفتن: «این ربات فرزند یه ربات دیگه‌ست و ویژگی‌هاش رو به ارث می‌بره».",
+                    "ولی این روش خیلی زود به هم ریخته میشه! تو زبان Rust ما از روش «ترکیب قطعات لگو» (Composition) و «گواهی‌نامه مهارت» (Traits) استفاده می‌کنیم.",
+                    "با این روش می‌تونیم انواع مختلف قهرمان‌ها رو توی یک جعبه جادویی (Trait Object) بریزیم و به نبرد بفرستیم. بیا امتحانش کنیم! 🚀"
+                ],
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا یاد بگیریم چطور قطعات رو سرهم کنیم.",
+                mission1Title: "فصل ۱۷: ربات‌های ترنسفورمر (Composition) 🤖",
+                mission1Text: `
+                    <p class="text-cyan-300">> در زبان‌های قدیمی، برای ساخت یک ربات جنگجو می‌گفتند: «او یک فرزند از ربات پایه است و ویژگی‌هایش را به ارث می‌برد (Inheritance)».</p>
+                    <p class="text-slate-300">> اما این روش باعث شلوغی و مشکلات زیادی می‌شود. در Rust ما از روش **ترکیب (Composition)** استفاده می‌کنیم؛ یعنی قطعات لگو را کنار هم می‌چینیم!</p>
+                    <p class="text-violet-300 mt-4 font-bold">برای تعریف رباتی که از یک موتور و شمشیر تشکیل شده، از کدام کلمه کلیدی استفاده می‌کنیم؟</p>
+                `,
+                puzzle1Btn: "سرهم کردن قطعات 🧩",
+                puzzle1Success: "> عالی! ما با structها قطعات (Lego) را کنار هم می‌چینیم.",
+                puzzle1Error: "خطا: در راست کلاس وجود ندارد. ما از struct برای تعریف ساختارهای داده استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: گواهی‌نامه‌ی مهارت (Traits)",
+                mission2Desc: "<p>وقتی می‌خواهیم بگوییم چند ربات یا ماشین مختلف بلدند آژیر بکشند، به جای اینکه از یک کلاس ارث‌بری کنند، به آن‌ها یک گواهی‌نامه‌ی مشترک می‌دهیم.</p><p class='text-white font-bold'>نام کلمه کلیدی که برای تعریف این گواهی‌نامه (رفتار مشترک) استفاده می‌شود چیست؟</p>",
+                puzzle2Btn: "صدور گواهی مهارت 🏅",
+                puzzle2Success: "> گواهی مهارت (Trait) ایجاد شد!",
+                puzzle2Error: "خطا: برای تعریف رفتارهای مشترک، از کلمه کلیدی trait استفاده می‌کنیم.",
+                mission3Step: ">> مرحله ۲: ارتش متنوع (Trait Objects)",
+                mission3Desc: "حالا می‌خواهیم یک جنگجو، جادوگر و کماندار را داخل یک لیست (`Vec`) بگذاریم. چون نوعشان فرق دارد، کامپایلر اجازه نمی‌دهد. اما اگر آن‌ها را داخل جعبه‌ای بگذاریم که می‌گوید «من هر چیزی که رفتار Attack داشته باشد را قبول می‌کنم»، مشکل حل می‌شود! این جعبه‌ی جادویی با چه کلمه‌ای مشخص می‌شود؟",
+                puzzle3Btn: "ایجاد لیست قهرمانان 📜",
+                puzzle3Success: "> جعبه جادویی (Trait Object) فعال شد!",
+                puzzle3Error: "خطا: برای ساختن Trait Object که نوعش داینامیک است، از کلمه dyn قبل از اسم Trait استفاده می‌کنیم.",
+                mission4Step: ">> مرحله نهایی: نبرد RPG با Trait Object",
+                mission4Desc: "سه قهرمان را به لیست (`Vec<Box<dyn Attack>>`) اضافه کن. سپس دکمه <strong>اجرای حلقه حمله</strong> را بزن تا اعضای لیست به نوبت به هیولا حمله کنند!",
+                warriorBtn: "جنگجو",
+                mageBtn: "جادوگر",
+                archerBtn: "کماندار",
+                attackLoopBtn: "اجرای حلقه حمله",
+                simInitial: "> منتظر تشکیل تیم (Vec)...",
+                recruitLog: (hero) => `> Box::new(${hero}) به Vec اضافه شد.`,
+                loopStart: "> for hero in heroes { hero.attack(&mut enemy); }",
+                warriorAttack: "⚔️ جنگجو با قدرت 25 ضربه زد!",
+                mageAttack: "🔮 جادوگر با 40 آسیب طلسم کرد!",
+                archerAttack: "🏹 کماندار 15 تیر پرتاب کرد!",
+                defeatMsg: "💀 هیولا شکست خورد! HP=0",
+                winTitle: "هیولا شکست خورد!",
+                winMessage: "شما مفهوم قدرتمند Trait Object و Composition را یاد گرفتید. این روش بسیار منعطف‌تر از ارث‌بری است!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                squadLabel: "Squad Heroes:",
+                enemyHpLabel: "Enemy HP:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hi! Today we're building an army of combat robots and heroes! 🤖⚔️",
+                    "In older languages (like Java), to make a new robot they said: 'This robot is a child of another robot and inherits its features'.",
+                    "But this gets messy fast! In Rust, we use the 'Lego blocks' approach (Composition) and 'Skill Certificates' (Traits).",
+                    "This way, we can put different types of heroes in one magic box (Trait Object) and send them to battle. Let's try it! 🚀"
+                ],
+                afterDialog: "Let's go! Look at the monitor below to learn how to assemble parts.",
+                mission1Title: "Chapter 17: Transformer Robots (Composition) 🤖",
+                mission1Text: `
+                    <p class="text-cyan-300">> In older languages, to make a combat robot they said: "It's a child of the base robot and inherits its features (Inheritance)".</p>
+                    <p class="text-slate-300">> But this causes messy code. In Rust, we use **Composition**; we snap Lego blocks together!</p>
+                    <p class="text-violet-300 mt-4 font-bold">Which keyword do we use to define a robot made of an engine and a sword?</p>
+                `,
+                puzzle1Btn: "Assemble Parts 🧩",
+                puzzle1Success: "> Great! We use structs to snap parts (Lego) together.",
+                puzzle1Error: "Error: Rust doesn't have classes. We use 'struct' to define data structures.",
+                mission2Step: ">> Step 1: Skill Certificates (Traits)",
+                mission2Desc: "<p>When we want to say different robots or cars can sound an alarm, instead of inheriting from a class, we give them a shared certificate.</p><p class='text-white font-bold'>What is the keyword used to define this certificate (shared behavior)?</p>",
+                puzzle2Btn: "Issue Skill Cert 🏅",
+                puzzle2Success: "> Skill certificate (Trait) created!",
+                puzzle2Error: "Error: To define shared behaviors, we use the 'trait' keyword.",
+                mission3Step: ">> Step 2: Diverse Army (Trait Objects)",
+                mission3Desc: "Now we want to put a Warrior, Mage, and Archer into one list (`Vec`). Since their types differ, the compiler won't allow it. But if we put them in a box that says 'I accept anything with the Attack behavior,' it works! What keyword identifies this magic box?",
+                puzzle3Btn: "Create Hero Roster 📜",
+                puzzle3Success: "> Magic Box (Trait Object) activated!",
+                puzzle3Error: "Error: To create a dynamic Trait Object, we use the word 'dyn' before the Trait name.",
+                mission4Step: ">> Final Step: RPG Battle with Trait Object",
+                mission4Desc: "Add three heroes to the list (`Vec<Box<dyn Attack>>`). Then click the <strong>Run Attack Loop</strong> button so the list members attack the monster in turn!",
+                warriorBtn: "Warrior",
+                mageBtn: "Mage",
+                archerBtn: "Archer",
+                attackLoopBtn: "Run Attack Loop",
+                simInitial: "> Waiting for squad creation (Vec)...",
+                recruitLog: (hero) => `> Box::new(${hero}) added to Vec.`,
+                loopStart: "> for hero in heroes { hero.attack(&mut enemy); }",
+                warriorAttack: "⚔️ Warrior hit for 25 damage!",
+                mageAttack: "🔮 Mage cast a 40 damage spell!",
+                archerAttack: "🏹 Archer shot for 15 damage!",
+                defeatMsg: "💀 Monster defeated! HP=0",
+                winTitle: "Monster Defeated!",
+                winMessage: "You mastered the powerful concept of Trait Objects and Composition. This is much more flexible than Inheritance!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                squadLabel: "Héroes del escuadrón:",
+                enemyHpLabel: "HP del enemigo:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! ¡Hoy construiremos un ejército de robots de combate y héroes! 🤖⚔️",
+                    "En lenguajes antiguos (como Java), para hacer un nuevo robot decían: 'Este robot es hijo de otro robot y hereda sus características'.",
+                    "¡Pero esto se desordena rápidamente! En Rust, usamos el enfoque de 'bloques Lego' (Composición) y 'Certificados de habilidad' (Traits).",
+                    "¡De esta manera, podemos poner diferentes tipos de héroes en una caja mágica (Trait Object) y enviarlos a la batalla! 🚀"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para aprender cómo ensamblar partes.",
+                mission1Title: "Capítulo 17: Robots transformadores (Composición) 🤖",
+                mission1Text: `
+                    <p class="text-cyan-300">> En lenguajes antiguos, para hacer un robot de combate decían: 'Es hijo del robot base y hereda sus características (Herencia)'.</p>
+                    <p class="text-slate-300">> ¡Pero esto causa código desordenado! En Rust, usamos **Composición**; ¡ensamblamos bloques Lego!</p>
+                    <p class="text-violet-300 mt-4 font-bold">¿Qué palabra clave usamos para definir un robot hecho de un motor y una espada?</p>
+                `,
+                puzzle1Btn: "Ensamblar partes 🧩",
+                puzzle1Success: "> ¡Genial! Usamos structs para ensamblar piezas (Lego).",
+                puzzle1Error: "Error: Rust no tiene clases. Usamos 'struct' para definir estructuras de datos.",
+                mission2Step: ">> Paso 1: Certificados de habilidad (Traits)",
+                mission2Desc: "<p>Cuando queremos decir que diferentes robots o autos pueden sonar una alarma, en lugar de heredar de una clase, les damos un certificado compartido.</p><p class='text-white font-bold'>¿Cuál es la palabra clave usada para definir este certificado (comportamiento compartido)?</p>",
+                puzzle2Btn: "Emitir certificado de habilidad 🏅",
+                puzzle2Success: "> ¡Certificado de habilidad (Trait) creado!",
+                puzzle2Error: "Error: Para definir comportamientos compartidos, usamos la palabra clave 'trait'.",
+                mission3Step: ">> Paso 2: Ejército diverso (Trait Objects)",
+                mission3Desc: "Ahora queremos poner un Guerrero, Mago y Arquero en una lista (`Vec`). Como sus tipos difieren, el compilador no lo permite. Pero si los ponemos en una caja que dice 'Acepto cualquier cosa con el comportamiento Attack', ¡funciona! ¿Qué palabra clave identifica esta caja mágica?",
+                puzzle3Btn: "Crear lista de héroes 📜",
+                puzzle3Success: "> ¡Caja mágica (Trait Object) activada!",
+                puzzle3Error: "Error: Para crear un Trait Object dinámico, usamos la palabra 'dyn' antes del nombre del Trait.",
+                mission4Step: ">> Paso final: Batalla RPG con Trait Object",
+                mission4Desc: "Agrega tres héroes a la lista (`Vec<Box<dyn Attack>>`). Luego presiona el botón <strong>Ejecutar bucle de ataque</strong> para que los miembros de la lista ataquen al monstruo por turno!",
+                warriorBtn: "Guerrero",
+                mageBtn: "Mago",
+                archerBtn: "Arquero",
+                attackLoopBtn: "Ejecutar bucle de ataque",
+                simInitial: "> Esperando formación del equipo (Vec)...",
+                recruitLog: (hero) => `> Box::new(${hero}) añadido a Vec.`,
+                loopStart: "> for hero in heroes { hero.attack(&mut enemy); }",
+                warriorAttack: "⚔️ ¡Guerrero golpeó por 25 de daño!",
+                mageAttack: "🔮 ¡Mago lanzó un hechizo de 40 de daño!",
+                archerAttack: "🏹 ¡Arquero disparó por 15 de daño!",
+                defeatMsg: "💀 ¡Monstruo derrotado! HP=0",
+                winTitle: "¡Monstruo derrotado!",
+                winMessage: "¡Dominaste el poderoso concepto de Trait Objects y Composición! ¡Esto es mucho más flexible que la Herencia!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                squadLabel: "Teamhelden:",
+                enemyHpLabel: "Gegner-KP:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Heute bauen wir eine Armee von Kampfrobotern und Helden! 🤖⚔️",
+                    "In älteren Sprachen (wie Java) sagten sie: 'Dieser Roboter ist ein Kind eines anderen Roboters und erbt seine Eigenschaften'.",
+                    "Aber das wird schnell unübersichtlich! In Rust verwenden wir den 'Lego-Block'-Ansatz (Komposition) und 'Fähigkeitszertifikate' (Traits).",
+                    "Auf diese Weise können wir verschiedene Heldentypen in eine magische Box (Trait-Objekt) stecken und in die Schlacht schicken. Probieren wir es aus! 🚀"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um zu lernen, wie man Teile zusammensetzt.",
+                mission1Title: "Kapitel 17: Transformationsroboter (Komposition) 🤖",
+                mission1Text: `
+                    <p class="text-cyan-300">> In älteren Sprachen sagten sie: 'Dieser Roboter ist ein Kind des Basisroboters und erbt seine Eigenschaften (Vererbung)'.</p>
+                    <p class="text-slate-300">> Aber das führt zu unübersichtlichem Code! In Rust verwenden wir **Komposition**; wir setzen Lego-Steine zusammen!</p>
+                    <p class="text-violet-300 mt-4 font-bold">Welches Schlüsselwort verwenden wir, um einen Roboter aus Motor und Schwert zu definieren?</p>
+                `,
+                puzzle1Btn: "Teile zusammensetzen 🧩",
+                puzzle1Success: "> Großartig! Wir verwenden Strukturen, um Teile (Lego) zusammenzusetzen.",
+                puzzle1Error: "Fehler: Rust hat keine Klassen. Wir verwenden 'struct', um Datenstrukturen zu definieren.",
+                mission2Step: ">> Schritt 1: Fähigkeitszertifikate (Traits)",
+                mission2Desc: "<p>Wenn wir sagen wollen, dass verschiedene Roboter oder Autos Alarm schlagen können, geben wir ihnen anstelle der Vererbung von einer Klasse ein gemeinsames Zertifikat.</p><p class='text-white font-bold'>Wie lautet das Schlüsselwort, das verwendet wird, um dieses Zertifikat (gemeinsames Verhalten) zu definieren?</p>",
+                puzzle2Btn: "Fähigkeitszertifikat ausstellen 🏅",
+                puzzle2Success: "> Fähigkeitszertifikat (Trait) erstellt!",
+                puzzle2Error: "Fehler: Um gemeinsames Verhalten zu definieren, verwenden wir das Schlüsselwort 'trait'.",
+                mission3Step: ">> Schritt 2: Vielfältige Armee (Trait-Objekte)",
+                mission3Desc: "Nun wollen wir einen Krieger, Magier und Bogenschützen in eine Liste (`Vec`) stecken. Da ihre Typen unterschiedlich sind, erlaubt der Compiler dies nicht. Aber wenn wir sie in eine Box stecken, die sagt: 'Ich akzeptiere alles mit dem Attack-Verhalten', funktioniert es! Welches Schlüsselwort identifiziert diese magische Box?",
+                puzzle3Btn: "Heldenliste erstellen 📜",
+                puzzle3Success: "> Magische Box (Trait-Objekt) aktiviert!",
+                puzzle3Error: "Fehler: Um ein dynamisches Trait-Objekt zu erstellen, verwenden wir das Wort 'dyn' vor dem Trait-Namen.",
+                mission4Step: ">> Letzter Schritt: RPG-Kampf mit Trait-Objekt",
+                mission4Desc: "Füge drei Helden zur Liste (`Vec<Box<dyn Attack>>`) hinzu. Klicke dann auf den <strong>Angriffsschleife ausführen</strong>-Knopf, damit die Listenmitglieder das Monster abwechselnd angreifen!",
+                warriorBtn: "Krieger",
+                mageBtn: "Magier",
+                archerBtn: "Bogenschütze",
+                attackLoopBtn: "Angriffsschleife ausführen",
+                simInitial: "> Warten auf Teamerstellung (Vec)...",
+                recruitLog: (hero) => `> Box::new(${hero}) zu Vec hinzugefügt.`,
+                loopStart: "> for hero in heroes { hero.attack(&mut enemy); }",
+                warriorAttack: "⚔️ Krieger traf für 25 Schaden!",
+                mageAttack: "🔮 Magier wirkte einen 40-Schaden-Zauber!",
+                archerAttack: "🏹 Bogenschütze schoss für 15 Schaden!",
+                defeatMsg: "💀 Monster besiegt! KP=0",
+                winTitle: "Monster besiegt!",
+                winMessage: "Du hast das mächtige Konzept von Trait-Objekten und Komposition gemeistert! Das ist viel flexibler als Vererbung!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                squadLabel: "Squadhelden:",
+                enemyHpLabel: "Vijand HP:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Vandaag bouwen we een leger van gevechtsrobots en helden! 🤖⚔️",
+                    "In oudere talen (zoals Java) zeiden ze: 'Deze robot is een kind van een andere robot en erft zijn eigenschappen'.",
+                    "Maar dit wordt snel rommelig! In Rust gebruiken we de 'Lego-blokken'-benadering (Compositie) en 'Vaardigheidscertificaten' (Traits).",
+                    "Op deze manier kunnen we verschillende soorten helden in een magische doos (Trait-object) stoppen en ten strijde trekken. Laten we het proberen! 🚀"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om te leren hoe je onderdelen assembleert.",
+                mission1Title: "Hoofdstuk 17: Transformatorrobots (Compositie) 🤖",
+                mission1Text: `
+                    <p class="text-cyan-300">> In oudere talen zeiden ze: 'Deze robot is een kind van de basisrobot en erft zijn eigenschappen (Overerving)'.</p>
+                    <p class="text-slate-300">> Maar dit zorgt voor rommelige code! In Rust gebruiken we **Compositie**; we klikken Lego-blokken in elkaar!</p>
+                    <p class="text-violet-300 mt-4 font-bold">Welk trefwoord gebruiken we om een robot te definiëren die bestaat uit een motor en een zwaard?</p>
+                `,
+                puzzle1Btn: "Onderdelen assembleren 🧩",
+                puzzle1Success: "> Geweldig! We gebruiken structs om Lego-onderdelen samen te voegen.",
+                puzzle1Error: "Fout: Rust heeft geen klassen. We gebruiken 'struct' om datastructuren te definiëren.",
+                mission2Step: ">> Stap 1: Vaardigheidscertificaten (Traits)",
+                mission2Desc: "<p>Als we willen zeggen dat verschillende robots of auto's alarm kunnen slaan, geven we ze in plaats van overerving van een klasse een gedeeld certificaat.</p><p class='text-white font-bold'>Wat is het trefwoord dat wordt gebruikt om dit certificaat (gedeeld gedrag) te definiëren?</p>",
+                puzzle2Btn: "Vaardigheidscertificaat uitgeven 🏅",
+                puzzle2Success: "> Vaardigheidscertificaat (Trait) aangemaakt!",
+                puzzle2Error: "Fout: Om gedeeld gedrag te definiëren, gebruiken we het trefwoord 'trait'.",
+                mission3Step: ">> Stap 2: Diverse leger (Trait-objecten)",
+                mission3Desc: "Nu willen we een krijger, magiër en boogschutter in één lijst (`Vec`) stoppen. Omdat hun typen verschillen, staat de compiler dit niet toe. Maar als we ze in een doos stoppen die zegt: 'Ik accepteer alles met het Attack-gedrag', werkt het! Welk trefwoord identificeert deze magische doos?",
+                puzzle3Btn: "Heldenlijst maken 📜",
+                puzzle3Success: "> Magische doos (Trait-object) geactiveerd!",
+                puzzle3Error: "Fout: Om een dynamisch Trait-object te maken, gebruiken we het woord 'dyn' vóór de Trait-naam.",
+                mission4Step: ">> Laatste stap: RPG-gevecht met Trait-object",
+                mission4Desc: "Voeg drie helden toe aan de lijst (`Vec<Box<dyn Attack>>`). Klik vervolgens op de knop <strong>Val lus uitvoeren</strong> zodat de lijstleden het monster om de beurt aanvallen!",
+                warriorBtn: "Krijger",
+                mageBtn: "Magiër",
+                archerBtn: "Boogschutter",
+                attackLoopBtn: "Aanvalslus uitvoeren",
+                simInitial: "> Wachten op teamvorming (Vec)...",
+                recruitLog: (hero) => `> Box::new(${hero}) toegevoegd aan Vec.`,
+                loopStart: "> for hero in heroes { hero.attack(&mut enemy); }",
+                warriorAttack: "⚔️ Krijger sloeg voor 25 schade!",
+                mageAttack: "🔮 Magiër sprak een spreuk van 40 schade uit!",
+                archerAttack: "🏹 Boogschutter schoot voor 15 schade!",
+                defeatMsg: "💀 Monster verslagen! HP=0",
+                winTitle: "Monster verslagen!",
+                winMessage: "Je hebt het krachtige concept van Trait-objecten en Compositie onder de knie! Dit is veel flexibeler dan overerving!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
+        };
+
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
         let currentLang = 'fa';
         let currentStep = 0;
         let currentDialogIndex = 0;
-        let typeInterval;
-
-        // RPG Battle State
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
         let squad = [];
         let enemyHp = 80;
 
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "سلام! امروز می‌خوایم یه لشکر از ربات‌های جنگجو و قهرمان‌ها بسازیم! 🤖⚔️",
-                "تو زبان‌های قدیمی (مثل جاوا)، برای ساخت یه ربات جدید می‌گفتن: «این ربات فرزند یه ربات دیگه‌ست و ویژگی‌هاش رو به ارث می‌بره».",
-                "ولی این روش خیلی زود به هم ریخته میشه! تو زبان Rust ما از روش «ترکیب قطعات لگو» (Composition) و «گواهی‌نامه مهارت» (Traits) استفاده می‌کنیم.",
-                "با این روش می‌تونیم انواع مختلف قهرمان‌ها رو توی یک جعبه جادویی (Trait Object) بریزیم و به نبرد بفرستیم. بیا امتحانش کنیم! 🚀"
-            ],
-            en: [
-                "Hi! Today we're building an army of combat robots and heroes! 🤖⚔️",
-                "In older languages (like Java), to make a new robot they said: 'This robot is a child of another robot and inherits its features'.",
-                "But this gets messy fast! In Rust, we use the 'Lego blocks' approach (Composition) and 'Skill Certificates' (Traits).",
-                "This way, we can put different types of heroes in one magic box (Trait Object) and send them to battle. Let's try it! 🚀"
-            ]
-        };
+        // DOM elements
+        const squadLabelSpan = document.getElementById('squad-label');
+        const enemyHpLabelSpan = document.getElementById('enemy-hp-label');
+        const hudHeroesSpan = document.getElementById('hud-heroes');
+        const hudHpSpan = document.getElementById('hud-hp');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
 
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-cyan-600 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hud-heroes').innerText = `${squad.length.toLocaleString('fa-IR')} / ۳`;
-                document.getElementById('hud-hp').innerText = `${enemyHp.toLocaleString('fa-IR')} / ۸۰`;
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-cyan-600 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hud-heroes').innerText = `${squad.length} / 3`;
-                document.getElementById('hud-hp').innerText = `${enemyHp} / 80`;
-            }
-
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-cyan-600 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
-            } else {
-                cb();
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
             }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
-            const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
-            nextBtn.classList.add('hidden');
-
-            typeWriter(text, 0, () => {
-                nextBtn.classList.remove('hidden');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
             });
         }
 
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "بزن بریم! به مانیتور پایین نگاه کن تا یاد بگیریم چطور قطعات رو سرهم کنیم." :
-                    "Let's go! Look at the monitor below to learn how to assemble parts.";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            squadLabelSpan.innerText = pack.squadLabel;
+            enemyHpLabelSpan.innerText = pack.enemyHpLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            hudHeroesSpan.innerText = currentLang === 'fa' ? `${formatNumber(squad.length, currentLang)} / ۳` : `${squad.length} / 3`;
+            hudHpSpan.innerText = currentLang === 'fa' ? `${formatNumber(enemyHp, currentLang)} / ۸۰` : `${enemyHp} / 80`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('warrior-text').innerHTML = pack.warriorBtn;
+            document.getElementById('mage-text').innerHTML = pack.mageBtn;
+            document.getElementById('archer-text').innerHTML = pack.archerBtn;
+            document.getElementById('attack-loop-text').innerHTML = pack.attackLoopBtn;
+            document.getElementById('sim-initial-msg').innerHTML = pack.simInitial;
+
+            // Enemy HP text and bar update
+            document.getElementById('enemy-hp-text').innerText = enemyHp;
+            const fill = document.getElementById('enemy-hp-bar');
+            fill.style.width = `${(enemyHp / 80) * 100}%`;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-cyan-600 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
         }
 
         function startMission(missionNum) {
             document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
             document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            if (missionNum === 4) {
+                // Reset RPG state
+                squad = [];
+                enemyHp = 80;
+                document.getElementById('enemy-sprite').innerHTML = '🐉';
+                document.getElementById('enemy-hp-text').innerText = '80';
+                const fill = document.getElementById('enemy-hp-bar');
+                fill.style.width = '100%';
+                hudHeroesSpan.innerText = currentLang === 'fa' ? `۰ / ۳` : `0 / 3`;
+                hudHpSpan.innerText = currentLang === 'fa' ? `۸۰ / ۸۰` : `80 / 80`;
+                const slots = document.querySelectorAll('.squad-slot');
+                slots.forEach(slot => {
+                    slot.innerHTML = '';
+                    slot.classList.remove('filled');
+                });
+                const attackBtn = document.getElementById('btn-attack-loop');
+                attackBtn.disabled = true;
+                attackBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                const heroBtns = ['warrior', 'mage', 'archer'];
+                heroBtns.forEach(btn => {
+                    const el = document.getElementById(`btn-${btn}`);
+                    if (el) el.disabled = false;
+                });
+                const term = document.getElementById('sim-terminal');
+                term.innerHTML = `<div id="sim-initial-msg" class="text-slate-500 italic">${languagePack[currentLang].simInitial}</div>`;
+            }
         }
 
-        // --- Puzzle System ---
+        // Puzzle handlers
         function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
-
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
@@ -554,9 +840,9 @@
         }
 
         function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
@@ -565,98 +851,98 @@
             document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
         }
 
-        function triggerError(puzzleNum, msgFa, msgEn) {
+        function triggerError(puzzleNum, msg) {
             const crt = document.getElementById('crt-monitor');
             const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
             crt.classList.add('glitch');
             setTimeout(() => crt.classList.remove('glitch'), 300);
-            feedback.innerText = currentLang === 'fa' ? msgFa : msgEn;
+            feedback.innerText = msg;
         }
 
         function checkPuzzle1() {
+            if (puzzle1Completed) return;
             const slotText = document.getElementById('slot1').innerText;
-            const feedback = document.getElementById('puzzle1-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'struct') {
-                feedback.className = "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> عالی! ما با structها قطعات (Lego) را کنار هم می‌چینیم." : "> Great! We use structs to snap parts (Lego) together.";
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(2), 1500);
             } else {
-                triggerError(1, "خطا: در راست کلاس وجود ندارد. ما از struct برای تعریف ساختارهای داده استفاده می‌کنیم.", "Error: Rust doesn't have classes. We use 'struct' to define data structures.");
+                triggerError(1, pack.puzzle1Error);
             }
         }
 
         function checkPuzzle2() {
+            if (puzzle2Completed) return;
             const slotText = document.getElementById('slot2').innerText;
-            const feedback = document.getElementById('puzzle2-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'trait') {
-                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> گواهی مهارت (Trait) ایجاد شد!" : "> Skill certificate (Trait) created!";
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(3), 1500);
             } else {
-                triggerError(2, "خطا: برای تعریف رفتارهای مشترک، از کلمه کلیدی trait استفاده می‌کنیم.", "Error: To define shared behaviors, we use the 'trait' keyword.");
+                triggerError(2, pack.puzzle2Error);
             }
         }
 
         function checkPuzzle3() {
+            if (puzzle3Completed) return;
             const slotText = document.getElementById('slot3').innerText;
-            const feedback = document.getElementById('puzzle3-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'dyn') {
-                feedback.className = "text-cyan-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> جعبه جادویی (Trait Object) فعال شد!" : "> Magic Box (Trait Object) activated!";
+                document.getElementById('puzzle3-feedback').className = "text-cyan-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
-                triggerError(3, "خطا: برای ساختن Trait Object که نوعش داینامیک است، از کلمه dyn قبل از اسم Trait استفاده می‌کنیم.", "Error: To create a dynamic Trait Object, we use the word 'dyn' before the Trait name.");
+                triggerError(3, pack.puzzle3Error);
             }
         }
 
-        // --- RPG Battle Simulator ---
-        function appendToTerminal(msgFa, msgEn, isAction = false) {
+        // RPG Battle Simulator
+        function appendToTerminal(htmlContent, isAction = false) {
             const term = document.getElementById('sim-terminal');
-            if(term.innerHTML.includes("منتظر تشکیل تیم") || term.innerHTML.includes("Waiting for squad")) {
+            if (term.innerHTML.includes(languagePack[currentLang].simInitial)) {
                 term.innerHTML = '';
             }
             const div = document.createElement('div');
             div.className = "mb-1 border-b border-cyan-900/30 pb-1";
-
-            if(isAction) div.classList.add('text-emerald-300');
+            if (isAction) div.classList.add('text-emerald-300');
             else div.classList.add('text-cyan-300');
-
-            div.innerHTML = currentLang === 'fa' ? msgFa : msgEn;
+            div.innerHTML = htmlContent;
             term.appendChild(div);
             term.scrollTop = term.scrollHeight;
         }
 
-        // Utility sleep for async JS
         const sleep = ms => new Promise(r => setTimeout(r, ms));
 
         function recruitHero(heroType, emoji) {
+            const pack = languagePack[currentLang];
             if (squad.length >= 3) return;
-
             squad.push(heroType);
-
-            // Disable button
-            document.getElementById(`btn-${heroType.toLowerCase()}`).disabled = true;
-
-            // Fill slot
+            const btn = document.getElementById(`btn-${heroType.toLowerCase()}`);
+            if (btn) btn.disabled = true;
             const slots = document.querySelectorAll('.squad-slot');
             slots[squad.length - 1].innerHTML = emoji;
             slots[squad.length - 1].classList.add('filled', 'pop-in');
-
-            // Log
-            const msgFa = `> Box::new(${heroType}) به Vec اضافه شد.`;
-            const msgEn = `> Box::new(${heroType}) added to Vec.`;
-            appendToTerminal(msgFa, msgEn, false);
-
-            setLang(currentLang); // Update HUD
-
+            appendToTerminal(pack.recruitLog(heroType), false);
+            hudHeroesSpan.innerText = currentLang === 'fa' ? `${formatNumber(squad.length, currentLang)} / ۳` : `${squad.length} / 3`;
             if (squad.length === 3) {
-                const playBtn = document.getElementById('btn-attack-loop');
-                playBtn.disabled = false;
-                playBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                playBtn.classList.add('pop-in');
+                const attackBtn = document.getElementById('btn-attack-loop');
+                attackBtn.disabled = false;
+                attackBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                attackBtn.classList.add('pop-in');
             }
         }
 
@@ -664,63 +950,42 @@
             document.getElementById('enemy-hp-text').innerText = newHp;
             const fill = document.getElementById('enemy-hp-bar');
             fill.style.width = `${(newHp / 80) * 100}%`;
-            if(newHp <= 0) fill.style.width = '0%';
-            setLang(currentLang); // update HUD text
+            hudHpSpan.innerText = currentLang === 'fa' ? `${formatNumber(newHp, currentLang)} / ۸۰` : `${newHp} / 80`;
         }
 
         async function executeAttacks() {
-            const btn = document.getElementById('btn-attack-loop');
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-
-            appendToTerminal(
-                `> <span class="text-violet-400">for hero in heroes { hero.attack(&mut enemy); }</span>`,
-                `> <span class="text-violet-400">for hero in heroes { hero.attack(&mut enemy); }</span>`,
-                false
-            );
+            const pack = languagePack[currentLang];
+            const attackBtn = document.getElementById('btn-attack-loop');
+            attackBtn.disabled = true;
+            attackBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            appendToTerminal(`<span class="text-violet-400">${pack.loopStart}</span>`, false);
             await sleep(800);
-
             const sprite = document.getElementById('enemy-sprite');
-
             for (let hero of squad) {
                 let dmg = 0;
-                let msgFa, msgEn;
-
+                let msg = '';
+                let attackMsg = '';
                 if (hero === 'Warrior') {
                     dmg = 25;
-                    msgFa = "⚔️ جنگجو با قدرت 25 ضربه زد!";
-                    msgEn = "⚔️ Warrior hit for 25 damage!";
+                    attackMsg = pack.warriorAttack;
                 } else if (hero === 'Mage') {
                     dmg = 40;
-                    msgFa = "🔮 جادوگر با 40 آسیب طلسم کرد!";
-                    msgEn = "🔮 Mage cast a 40 damage spell!";
+                    attackMsg = pack.mageAttack;
                 } else if (hero === 'Archer') {
                     dmg = 15;
-                    msgFa = "🏹 کماندار 15 تیر پرتاب کرد!";
-                    msgEn = "🏹 Archer shot for 15 damage!";
+                    attackMsg = pack.archerAttack;
                 }
-
-                // Animate
                 sprite.classList.add('attack-anim');
-
                 enemyHp -= dmg;
                 if (enemyHp < 0) enemyHp = 0;
-
-                appendToTerminal(msgFa, msgEn, true);
+                appendToTerminal(attackMsg, true);
                 updateHpUI(enemyHp);
-
                 await sleep(500);
                 sprite.classList.remove('attack-anim');
                 await sleep(500);
-
                 if (enemyHp === 0) {
-                    sprite.innerText = '💀';
-                    appendToTerminal(
-                        `<span class="text-yellow-400 font-bold">💀 هیولا شکست خورد! HP=0</span>`,
-                        `<span class="text-yellow-400 font-bold">💀 Monster defeated! HP=0</span>`,
-                        false
-                    );
-
+                    sprite.innerHTML = '💀';
+                    appendToTerminal(`<span class="text-yellow-400 font-bold">${pack.defeatMsg}</span>`, false);
                     setTimeout(() => {
                         triggerConfetti();
                         document.getElementById('success-screen').classList.remove('hidden');
@@ -730,17 +995,18 @@
             }
         }
 
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        function goToNextChapter() {
+            window.location.href = 'chapter-18.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
-        const possibleColors = ["#06b6d4", "#22d3ee", "#8b5cf6", "#c4b5fd", "#ffffff"]; // Cyan, Violet
-
+        const possibleColors = ["#06b6d4", "#22d3ee", "#8b5cf6", "#c4b5fd", "#ffffff"];
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -750,7 +1016,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -760,46 +1025,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
-            if(!animationId) Draw();
+            if (!animationId) Draw();
         }
 
-        // Initialize Game
+        // Initialization
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

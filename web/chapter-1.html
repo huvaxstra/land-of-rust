@@ -2,52 +2,34 @@
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 1</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        :root {
-            --bg-color: #020617;
-            --crt-bg: #064e3b;
-        }
-
+        :root { --bg-color: #020617; --crt-bg: #064e3b; }
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(white, rgba(255,255,255,.15) 2px, transparent 40px),
-                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 30px);
+            background-image: radial-gradient(white, rgba(255,255,255,.15) 2px, transparent 40px), radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
-        /* Language specific fonts */
-        html[dir="rtl"] body {
-            font-family: 'Vazirmatn', sans-serif;
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* force code blocks to always be LTR */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .code-block {
+            direction: ltr !important;
+            text-align: left !important;
         }
-        html[dir="ltr"] body {
-            font-family: 'Nunito', sans-serif;
-        }
-        .code-font {
-            font-family: 'JetBrains Mono', monospace !important;
-        }
-
-        /* Spaceship Dashboard UI */
         .dashboard {
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border: 4px solid #475569;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
@@ -67,8 +49,6 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
             background: rgba(255, 255, 255, 0.95);
             color: #1e293b;
@@ -76,8 +56,6 @@
             border: 3px solid #fb923c;
             position: relative;
         }
-
-        /* Arrow changes based on direction */
         html[dir="rtl"] .dialog-box::after {
             content: ''; position: absolute; bottom: -15px; right: 40px;
             border-width: 15px 15px 0; border-style: solid;
@@ -88,7 +66,6 @@
             border-width: 15px 15px 0; border-style: solid;
             border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #f8fafc; border-radius: 50%;
@@ -96,14 +73,11 @@
             font-size: 2.5rem; border: 4px solid #fb923c;
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Puzzle Elements */
         .code-slot {
             display: inline-block; min-width: 80px; height: 30px;
             border-bottom: 3px dashed #fbbf24; margin: 0 5px;
@@ -123,8 +97,6 @@
         .code-option.selected {
             background: #fb923c; border-color: #fdba74; color: #1e293b; font-weight: bold;
         }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); }
@@ -146,155 +118,94 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; border: 1px solid rgba(255,255,255,0.1);
         }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 60px; height: 26px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-    <!-- Confetti Canvas -->
     <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-    <!-- Game Container -->
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-indigo-500 text-white">فارسی</button>
-        </div>
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD (Heads Up Display) -->
         <div class="flex justify-between items-center mb-6 border-b border-slate-600 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-rose-500"><i class="fa-solid fa-heart"></i> <span class="lang-fa">سلامت:</span><span class="lang-en">HP:</span> <span id="hp">۲۰٪</span></div>
-                <div class="text-yellow-400"><i class="fa-solid fa-bolt"></i> <span class="lang-fa">انرژی:</span><span class="lang-en">Power:</span> <span id="energy">۰٪</span></div>
+                <div class="text-rose-500"><i class="fa-solid fa-heart"></i> <span id="hp-label"></span> <span id="hp-value">20%</span></div>
+                <div class="text-yellow-400"><i class="fa-solid fa-bolt"></i> <span id="energy-label"></span> <span id="energy-value">0%</span></div>
             </div>
-            <div class="text-slate-400 code-font text-sm">RUST-OS v1.0.1</div>
+            <div class="text-slate-400 code-font text-xs md:text-sm">RUST-OS v1.0.1</div>
         </div>
 
-        <!-- Story & Character Section -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full">
-                <h3 class="font-bold text-orange-600 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-orange-600 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold text-slate-700"></p>
-
+                <h3 id="ferris-name" class="font-bold text-orange-600 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-slate-700"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Terminal / Main Screen -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-emerald-400 code-font min-h-[350px] flex flex-col">
-
-                <!-- Mission 1: Theory (Why Rust) -->
+                <!-- Mission 1 -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-emerald-800 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۱: جعبه‌ابزار گمشده</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 1: The Lost Toolbox</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa text-emerald-300 leading-relaxed space-y-3">
-                        <p>> لاگ سیستم: سفینه آسیب دیده است. کامپیوترها فقط با زبان <strong>Rust</strong> کار می‌کنند.</p>
-                        <p>> چرا زبان Rust؟</p>
-                        <ul class="list-disc list-inside ml-4 space-y-1 text-emerald-100">
-                            <li>بسیار سریع است ⚡</li>
-                            <li>بسیار امن است (جلوی خرابی سفینه را می‌گیرد) 🛡️</li>
-                            <li>مثل یک مهندس فضایی فکر کردن را یاد می‌دهد!</li>
-                        </ul>
-                        <p class="text-yellow-300 mt-4 animate-pulse">> مأموریت اول: برای شروع تعمیرات، باید جعبه ابزار جادویی (rustup) را نصب کنیم.</p>
-                    </div>
-
-                    <div class="lang-en text-emerald-300 leading-relaxed space-y-3">
-                        <p>> System Log: Ship damaged. Computers only accept <strong>Rust</strong> language.</p>
-                        <p>> Why Rust?</p>
-                        <ul class="list-disc list-inside mr-4 space-y-1 text-emerald-100">
-                            <li>It's blazing fast ⚡</li>
-                            <li>It's super safe (prevents ship crashes) 🛡️</li>
-                            <li>It teaches you to think like a space engineer!</li>
-                        </ul>
-                        <p class="text-yellow-300 mt-4 animate-pulse">> Mission 1: To begin repairs, we must install the magic toolbox (rustup).</p>
-                    </div>
-
+                    <div id="mission1-text" class="text-emerald-300 leading-relaxed space-y-3 text-sm md:text-base"></div>
                     <div class="mt-auto pt-6 text-center">
-                        <button class="bg-emerald-700 hover:bg-emerald-600 text-white px-6 py-2 rounded font-bold code-font" onclick="startMission(2)">
-                            <span class="lang-fa">شروع نصب جعبه‌ابزار [Enter]</span>
-                            <span class="lang-en">Start Toolbox Install [Enter]</span>
-                        </button>
+                        <button id="mission1-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 md:px-6 py-2 rounded font-bold code-font text-sm md:text-base" onclick="startMission(2)"></button>
                     </div>
                 </div>
 
-                <!-- Mission 2: Install Rustup -->
+                <!-- Mission 2 -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: نصب rustup</span>
-                        <span class="lang-en">>> Step 1: Install rustup</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-emerald-300 mb-4">جعبه ابزار (rustup) شامل کامپایلر (rustc) است. کامپایلر مثل یک مترجم، حرف‌های ما را به صفر و یک تبدیل می‌کند. روی دکمه زیر کلیک کن تا سیستم آن را دانلود کند:</p>
-                    <p class="lang-en text-sm text-emerald-300 mb-4">The toolbox (rustup) contains the compiler (rustc). It translates our words into zeros and ones. Click below to download:</p>
-
-                    <div class="terminal-block mb-4 text-sm">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission2-desc" class="text-sm md:text-base text-emerald-300 mb-4"></p>
+                    <div class="terminal-block mb-4 text-xs md:text-sm">
                         <span class="text-blue-400">$</span> curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
                     </div>
-
                     <div class="text-center mb-4">
-                        <button id="dl-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-bold" onclick="simulateDownload()">
-                            <i class="fa-solid fa-download"></i>
-                            <span class="lang-fa">دانلود و نصب</span>
-                            <span class="lang-en">Download & Install</span>
+                        <button id="dl-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-bold text-sm md:text-base" onclick="simulateDownload()">
+                            <i class="fa-solid fa-download"></i> <span id="dl-btn-text"></span>
                         </button>
                     </div>
-
                     <div id="dl-progress" class="hidden text-sm text-emerald-200">
-                        <div class="lang-fa">در حال دانلود... [██████████] ۱۰۰٪</div>
-                        <div class="lang-en">Downloading... [██████████] 100%</div>
-                        <div class="text-yellow-300 mt-2 font-bold">
-                            <span class="lang-fa">نصب با موفقیت انجام شد! حالا کامپایلر آماده است.</span>
-                            <span class="lang-en">Installed successfully! Compiler is ready.</span>
-                        </div>
+                        <div id="dl-message"></div>
+                        <div id="install-success" class="text-yellow-300 mt-2 font-bold"></div>
                         <div class="mt-4 text-center">
-                            <button class="bg-emerald-700 hover:bg-emerald-600 px-6 py-2 rounded text-white" onclick="startMission(3)">
-                                <span class="lang-fa">مرحله بعدی</span><span class="lang-en">Next Step</span>
+                            <button id="nextStepMission2" class="bg-emerald-700 hover:bg-emerald-600 px-4 md:px-6 py-2 rounded text-white text-sm md:text-base" onclick="startMission(3); this.disabled=true;">
+                                <span id="next-step-text"></span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Mission 3: Hello World Puzzle -->
+                <!-- Mission 3 -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۲: برقراری ارتباط (Hello World)</span>
-                        <span class="lang-en">>> Step 2: Establish Connection (Hello World)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-emerald-300 mb-4">حالا باید به کامپیوتر ثابت کنیم که هستیم! باید پیام "Earth, I am here!" را روی صفحه چاپ کنیم. کلمه کلیدی درست را برای چاپ متن انتخاب کن:</p>
-                    <p class="lang-en text-sm text-emerald-300 mb-4">Now we must prove we are here! We need to print "Earth, I am here!". Select the correct keyword to print text:</p>
-
-                    <div class="terminal-block text-lg mb-4">
+                    <div id="mission3-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-emerald-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4">
                         <span class="text-pink-400">fn</span> <span class="text-blue-300">main</span>() {<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;<span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span>(<span class="text-yellow-300">"Earth, I am here!"</span>);<br>
                         }
                     </div>
-
-                    <div id="puzzle-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-emerald-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font" onclick="selectOption(this, 'print')">print</div>
@@ -303,223 +214,556 @@
                             <div class="code-option code-font" onclick="selectOption(this, 'write')">write</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
-                        <button id="run-puzzle-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle()" disabled>
-                            <i class="fa-solid fa-play"></i>
-                            <span class="lang-fa">اجرای کد</span><span class="lang-en">Run Code</span>
+                        <button id="run-puzzle-btn" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 md:px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition text-sm md:text-base" onclick="checkPuzzle()" disabled>
+                            <i class="fa-solid fa-play"></i> <span id="run-code-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 4: Cargo -->
+                <!-- Mission 4 -->
                 <div id="mission-4" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۳: دستیار هوشمند (Cargo)</span>
-                        <span class="lang-en">>> Step 3: The Smart Assistant (Cargo)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-emerald-300 mb-3">برای پروژه‌های واقعی، ما از دستیار هوشمند یعنی <strong>Cargo</strong> استفاده می‌کنیم. کارگو پروژه‌ها را می‌سازد و اجرا می‌کند.</p>
-                    <p class="lang-en text-sm text-emerald-300 mb-3">For real projects, we use the smart assistant <strong>Cargo</strong>. Cargo builds and runs projects for us.</p>
-
-                    <div class="terminal-block text-sm mb-4">
-                        <div class="text-slate-400">// <span class="lang-fa">ساخت پروژه</span><span class="lang-en">Create project</span></div>
+                    <div id="mission4-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission4-desc" class="text-sm md:text-base text-emerald-300 mb-3"></p>
+                    <div class="terminal-block text-xs md:text-sm mb-4">
+                        <div id="cargo-comment" class="text-slate-400"></div>
                         <div><span class="text-blue-400">$</span> cargo new engine_start</div>
                         <div><span class="text-blue-400">$</span> cd engine_start</div>
                     </div>
-
-                    <p class="lang-fa text-sm text-yellow-300 mb-2 text-center animate-pulse">ماموریت نهایی: برای روشن شدن موتور، دکمه اجرای کارگو را فشار بده!</p>
-                    <p class="lang-en text-sm text-yellow-300 mb-2 text-center animate-pulse">Final Mission: To start the engine, press the Cargo Run button!</p>
-
+                    <p id="mission4-final" class="text-xs md:text-sm text-yellow-300 mb-2 text-center animate-pulse"></p>
                     <div class="text-center mt-4">
-                        <button class="bg-orange-600 hover:bg-orange-500 text-white text-xl px-8 py-3 rounded-full font-bold shadow-[0_0_15px_rgba(234,88,12,0.5)] transition-all" onclick="runCargo()">
-                            <i class="fa-solid fa-power-off ml-2 mr-2"></i>
-                            <span class="code-font">cargo run</span>
+                        <button id="cargo-run-btn" class="bg-orange-600 hover:bg-orange-500 text-white text-base md:text-xl px-6 md:px-8 py-2 md:py-3 rounded-full font-bold shadow-[0_0_15px_rgba(234,88,12,0.5)] transition-all" onclick="runCargo()">
+                            <i class="fa-solid fa-power-off ml-2 mr-2"></i> <span class="code-font">cargo run</span>
                         </button>
                     </div>
-
                     <div id="cargo-output" class="hidden terminal-block mt-4 text-xs text-slate-300">
                         <div>Compiling engine_start v0.1.0</div>
                         <div>Finished dev [unoptimized + debuginfo] target(s) in 0.42s</div>
                         <div>Running `target/debug/engine_start`</div>
-                        <div class="text-emerald-400 font-bold text-sm mt-1">Engine Started Successfully! 🚀</div>
+                        <div id="engine-success" class="text-emerald-400 font-bold text-xs md:text-sm mt-1"></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Success overlay (Hidden) -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
             <div class="text-6xl mb-4 animate-bounce">🏆🦀🚀</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">ماموریت انجام شد!</span>
-                <span class="lang-en">Mission Accomplished!</span>
-            </h2>
-            <p class="text-xl text-emerald-400 mb-6 text-center px-4">
-                <span class="lang-fa">موتور سفینه روشن شد و شما زبان راست را یاد گرفتید.</span>
-                <span class="lang-en">The ship engine started and you learned Rust basics.</span>
-            </p>
-            <button class="bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-lg" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۱ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 1 - Play Again</span>
-            </button>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-emerald-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="restart-btn" class="bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State ---
-        let currentLang = 'fa';
-        let currentStep = 0; // 0 = Dialogs, 1..4 = Missions
-        let currentDialogIndex = 0;
-        let typeInterval;
-        let selectedWord = null;
-
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "وای نه! سیستم‌های سفینه بخاطر برخورد با اون شهاب‌سنگ خاموش شدن! لرزش سفینه رو حس می‌کنی؟ ☄️",
-                "من فریس هستم 🦀. برای روشن کردن موتور کمکی، باید به کامپیوتر اصلی سفینه دستور بدم.",
-                "اما من دست ندارم، فقط چنگک دارم! کامپیوتر سفینه هم فقط زبان برنامه‌نویسی راست (Rust) رو می‌فهمه.",
-                "می‌تونی کمکم کنی؟ ما باید قدم به قدم سیستم‌ها رو با کدهای جادویی تعمیر کنیم. بزن بریم! 🚀"
-            ],
-            en: [
-                "Oh no! The ship's systems are offline because of that meteor strike! Can you feel the ship shaking? ☄️",
-                "I'm Ferris 🦀. To start the auxiliary engine, I need to command the main computer.",
-                "But I don't have hands, only claws! And the ship's computer only understands the Rust programming language.",
-                "Can you help me? We need to fix the systems step-by-step using magic codes. Let's go! 🚀"
-            ]
+        // --------------------------------------------------------------
+        // زبان‌ها (همه متون) - اضافه شده: اسپانیایی، آلمانی، هلندی
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                hpLabel: "سلامت:",
+                energyLabel: "انرژی:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "وای نه! سیستم‌های سفینه بخاطر برخورد با اون شهاب‌سنگ خاموش شدن! لرزش سفینه رو حس می‌کنی؟ ☄️",
+                    "من فریس هستم 🦀. برای روشن کردن موتور کمکی، باید به کامپیوتر اصلی سفینه دستور بدم.",
+                    "اما من دست ندارم، فقط چنگک دارم! کامپیوتر سفینه هم فقط زبان برنامه‌نویسی راست (Rust) رو می‌فهمه.",
+                    "می‌تونی کمکم کنی؟ ما باید قدم به قدم سیستم‌ها رو با کدهای جادویی تعمیر کنیم. بزن بریم! 🚀"
+                ],
+                afterDialog: "عالیه! به صفحه نمایش کامپیوتر (پایین) نگاه کن و دستورات رو اجرا کن.",
+                mission1Title: "فصل ۱: جعبه‌ابزار گمشده",
+                mission1Text: `
+                    <p>> لاگ سیستم: سفینه آسیب دیده است. کامپیوترها فقط با زبان <strong>Rust</strong> کار می‌کنند.</p>
+                    <p>> چرا زبان Rust؟</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-emerald-100">
+                        <li>بسیار سریع است ⚡</li>
+                        <li>بسیار امن است (جلوی خرابی سفینه را می‌گیرد) 🛡️</li>
+                        <li>مثل یک مهندس فضایی فکر کردن را یاد می‌دهد!</li>
+                    </ul>
+                    <p class="text-yellow-300 mt-4 animate-pulse">> مأموریت اول: برای شروع تعمیرات، باید جعبه ابزار جادویی (rustup) را نصب کنیم.</p>
+                `,
+                mission1Btn: "شروع نصب جعبه‌ابزار [Enter]",
+                mission2Step: ">> مرحله ۱: نصب rustup",
+                mission2Desc: "جعبه ابزار (rustup) شامل کامپایلر (rustc) است. کامپایلر مثل یک مترجم، حرف‌های ما را به صفر و یک تبدیل می‌کند. روی دکمه زیر کلیک کن تا سیستم آن را دانلود کند:",
+                dlBtnText: "دانلود و نصب",
+                downloadMsg: "در حال دانلود... [██████████] ۱۰۰٪",
+                installSuccess: "نصب با موفقیت انجام شد! حالا کامپایلر آماده است.",
+                nextStepText: "مرحله بعدی",
+                mission3Step: ">> مرحله ۲: برقراری ارتباط (Hello World)",
+                mission3Desc: "حالا باید به کامپیوتر ثابت کنیم که هستیم! باید پیام \"Earth, I am here!\" را روی صفحه چاپ کنیم. کلمه کلیدی درست را برای چاپ متن انتخاب کن:",
+                runCodeText: "اجرای کد",
+                puzzleSuccess: "> ارتباط موفق! پیام ارسال شد.",
+                puzzleErrorPrint: "خطا: ماکروها در راست به علامت تعجب (!) نیاز دارند.",
+                puzzleErrorGeneric: "خطا: دستور '{word}' در زبان راست وجود ندارد!",
+                mission4Step: ">> مرحله ۳: دستیار هوشمند (Cargo)",
+                mission4Desc: "برای پروژه‌های واقعی، ما از دستیار هوشمند یعنی <strong>Cargo</strong> استفاده می‌کنیم. کارگو پروژه‌ها را می‌سازد و اجرا می‌کند.",
+                cargoComment: "// ساخت پروژه",
+                mission4Final: "ماموریت نهایی: برای روشن شدن موتور، دکمه اجرای کارگو را فشار بده!",
+                engineStarted: "موتور با موفقیت روشن شد! 🚀",
+                successTitle: "ماموریت انجام شد!",
+                successMessage: "موتور سفینه روشن شد و شما زبان راست را یاد گرفتید.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                hpLabel: "HP:",
+                energyLabel: "Power:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Oh no! The ship's systems are offline because of that meteor strike! Can you feel the ship shaking? ☄️",
+                    "I'm Ferris 🦀. To start the auxiliary engine, I need to command the main computer.",
+                    "But I don't have hands, only claws! And the ship's computer only understands the Rust programming language.",
+                    "Can you help me? We need to fix the systems step-by-step using magic codes. Let's go! 🚀"
+                ],
+                afterDialog: "Great! Look at the computer screen below and follow the instructions.",
+                mission1Title: "Chapter 1: The Lost Toolbox",
+                mission1Text: `
+                    <p>> System Log: Ship damaged. Computers only accept <strong>Rust</strong> language.</p>
+                    <p>> Why Rust?</p>
+                    <ul class="list-disc list-inside mr-4 space-y-1 text-emerald-100">
+                        <li>It's blazing fast ⚡</li>
+                        <li>It's super safe (prevents ship crashes) 🛡️</li>
+                        <li>It teaches you to think like a space engineer!</li>
+                    </ul>
+                    <p class="text-yellow-300 mt-4 animate-pulse">> Mission 1: To begin repairs, we must install the magic toolbox (rustup).</p>
+                `,
+                mission1Btn: "Start Toolbox Install [Enter]",
+                mission2Step: ">> Step 1: Install rustup",
+                mission2Desc: "The toolbox (rustup) contains the compiler (rustc). It translates our words into zeros and ones. Click below to download:",
+                dlBtnText: "Download & Install",
+                downloadMsg: "Downloading... [██████████] 100%",
+                installSuccess: "Installed successfully! Compiler is ready.",
+                nextStepText: "Next Step",
+                mission3Step: ">> Step 2: Establish Connection (Hello World)",
+                mission3Desc: "Now we must prove we are here! We need to print \"Earth, I am here!\". Select the correct keyword to print text:",
+                runCodeText: "Run Code",
+                puzzleSuccess: "> Connection Success! Message sent.",
+                puzzleErrorPrint: "Error: Macros in Rust need an exclamation mark (!).",
+                puzzleErrorGeneric: "Error: Command '{word}' not found in Rust!",
+                mission4Step: ">> Step 3: The Smart Assistant (Cargo)",
+                mission4Desc: "For real projects, we use the smart assistant <strong>Cargo</strong>. Cargo builds and runs projects for us.",
+                cargoComment: "// Create project",
+                mission4Final: "Final Mission: To start the engine, press the Cargo Run button!",
+                engineStarted: "Engine Started Successfully! 🚀",
+                successTitle: "Mission Accomplished!",
+                successMessage: "The ship engine started and you learned Rust basics.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                hpLabel: "Vida:",
+                energyLabel: "Energía:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Oh no! Los sistemas de la nave están fuera de línea debido a ese impacto de meteorito. ¿Sientes el temblor? ☄️",
+                    "Soy Ferris 🦀. Para encender el motor auxiliar, necesito dar órdenes a la computadora principal.",
+                    "Pero no tengo manos, ¡solo pinzas! Y la computadora de la nave solo entiende el lenguaje de programación Rust.",
+                    "¿Puedes ayudarme? Debemos reparar los sistemas paso a paso usando códigos mágicos. ¡Vamos! 🚀"
+                ],
+                afterDialog: "¡Genial! Mira la pantalla de la computadora (abajo) y sigue las instrucciones.",
+                mission1Title: "Capítulo 1: La Caja de Herramientas Perdida",
+                mission1Text: `
+                    <p>> Registro del sistema: Nave dañada. Las computadoras solo aceptan el lenguaje <strong>Rust</strong>.</p>
+                    <p>> ¿Por qué Rust?</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-emerald-100">
+                        <li>Es muy rápido ⚡</li>
+                        <li>Es muy seguro (previene fallos de la nave) 🛡️</li>
+                        <li>¡Te enseña a pensar como un ingeniero espacial!</li>
+                    </ul>
+                    <p class="text-yellow-300 mt-4 animate-pulse">> Misión 1: Para comenzar las reparaciones, debemos instalar la caja de herramientas mágica (rustup).</p>
+                `,
+                mission1Btn: "Iniciar instalación [Enter]",
+                mission2Step: ">> Paso 1: Instalar rustup",
+                mission2Desc: "La caja de herramientas (rustup) contiene el compilador (rustc). Traduce nuestras palabras a unos y ceros. Haz clic abajo para descargar:",
+                dlBtnText: "Descargar e instalar",
+                downloadMsg: "Descargando... [██████████] 100%",
+                installSuccess: "¡Instalación exitosa! El compilador está listo.",
+                nextStepText: "Siguiente paso",
+                mission3Step: ">> Paso 2: Establecer conexión (Hello World)",
+                mission3Desc: "¡Ahora debemos demostrar que estamos aquí! Necesitamos imprimir \"Earth, I am here!\". Selecciona la palabra clave correcta para imprimir texto:",
+                runCodeText: "Ejecutar código",
+                puzzleSuccess: "> ¡Conexión exitosa! Mensaje enviado.",
+                puzzleErrorPrint: "Error: Las macros en Rust necesitan un signo de exclamación (!).",
+                puzzleErrorGeneric: "Error: ¡El comando '{word}' no existe en Rust!",
+                mission4Step: ">> Paso 3: El asistente inteligente (Cargo)",
+                mission4Desc: "Para proyectos reales, usamos el asistente inteligente <strong>Cargo</strong>. Cargo construye y ejecuta proyectos por nosotros.",
+                cargoComment: "// Crear proyecto",
+                mission4Final: "Misión final: ¡Presiona el botón Cargo Run para encender el motor!",
+                engineStarted: "¡Motor encendido exitosamente! 🚀",
+                successTitle: "¡Misión cumplida!",
+                successMessage: "El motor de la nave se encendió y aprendiste los conceptos básicos de Rust.",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                hpLabel: "LP:",
+                energyLabel: "Energie:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Oh nein! Die Systeme des Schiffs sind nach dem Meteoriteneinschlag ausgefallen. Spürst du das Zittern? ☄️",
+                    "Ich bin Ferris 🦀. Um den Hilfsmotor zu starten, muss ich den Hauptcomputer befehligen.",
+                    "Aber ich habe keine Hände, nur Scheren! Und der Bordcomputer versteht nur die Programmiersprache Rust.",
+                    "Kannst du mir helfen? Wir müssen die Systeme Schritt für Schritt mit magischen Codes reparieren. Los geht's! 🚀"
+                ],
+                afterDialog: "Großartig! Schau auf den Computerbildschirm (unten) und folge den Anweisungen.",
+                mission1Title: "Kapitel 1: Die verlorene Werkzeugkiste",
+                mission1Text: `
+                    <p>> Systemprotokoll: Schiff beschädigt. Computer akzeptieren nur die Sprache <strong>Rust</strong>.</p>
+                    <p>> Warum Rust?</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-emerald-100">
+                        <li>Es ist blitzschnell ⚡</li>
+                        <li>Es ist super sicher (verhindert Schiffabstürze) 🛡️</li>
+                        <li>Es lehrt dich, wie ein Raumfahrtingenieur zu denken!</li>
+                    </ul>
+                    <p class="text-yellow-300 mt-4 animate-pulse">> Mission 1: Um mit den Reparaturen zu beginnen, müssen wir die magische Werkzeugkiste (rustup) installieren.</p>
+                `,
+                mission1Btn: "Werkzeugkiste installieren [Enter]",
+                mission2Step: ">> Schritt 1: rustup installieren",
+                mission2Desc: "Die Werkzeugkiste (rustup) enthält den Compiler (rustc). Er übersetzt unsere Worte in Nullen und Einsen. Klicke unten zum Herunterladen:",
+                dlBtnText: "Herunterladen & installieren",
+                downloadMsg: "Lade herunter... [██████████] 100%",
+                installSuccess: "Erfolgreich installiert! Der Compiler ist bereit.",
+                nextStepText: "Nächster Schritt",
+                mission3Step: ">> Schritt 2: Verbindung herstellen (Hello World)",
+                mission3Desc: "Jetzt müssen wir beweisen, dass wir hier sind! Wir müssen \"Earth, I am here!\" ausgeben. Wähle das richtige Schlüsselwort zum Drucken von Text:",
+                runCodeText: "Code ausführen",
+                puzzleSuccess: "> Verbindung erfolgreich! Nachricht gesendet.",
+                puzzleErrorPrint: "Fehler: Makros in Rust benötigen ein Ausrufezeichen (!).",
+                puzzleErrorGeneric: "Fehler: Befehl '{word}' in Rust nicht gefunden!",
+                mission4Step: ">> Schritt 3: Der intelligente Assistent (Cargo)",
+                mission4Desc: "Für echte Projekte verwenden wir den intelligenten Assistenten <strong>Cargo</strong>. Cargo erstellt und führt Projekte für uns aus.",
+                cargoComment: "// Projekt erstellen",
+                mission4Final: "Letzte Mission: Drücke den Cargo Run-Knopf, um den Motor zu starten!",
+                engineStarted: "Motor erfolgreich gestartet! 🚀",
+                successTitle: "Mission erfüllt!",
+                successMessage: "Der Schiffsmotor wurde gestartet und du hast die Grundlagen von Rust gelernt.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                hpLabel: "HP:",
+                energyLabel: "Energie:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Oh nee! De systemen van het schip zijn uitgevallen door die meteoorinslag. Voel je het schudden? ☄️",
+                    "Ik ben Ferris 🦀. Om de hulpmotor te starten, moet ik de hoofdcomputer opdrachten geven.",
+                    "Maar ik heb geen handen, alleen scharen! En de boordcomputer begrijpt alleen de programmeertaal Rust.",
+                    "Kun je me helpen? We moeten de systemen stap voor stap repareren met magische codes. Laten we gaan! 🚀"
+                ],
+                afterDialog: "Geweldig! Kijk naar het computerscherm (hieronder) en volg de instructies.",
+                mission1Title: "Hoofdstuk 1: De Verloren Gereedschapskist",
+                mission1Text: `
+                    <p>> Systeemlogboek: Schip beschadigd. Computers accepteren alleen de taal <strong>Rust</strong>.</p>
+                    <p>> Waarom Rust?</p>
+                    <ul class="list-disc list-inside ml-4 space-y-1 text-emerald-100">
+                        <li>Het is razendsnel ⚡</li>
+                        <li>Het is super veilig (voorkomt schipcrashes) 🛡️</li>
+                        <li>Het leert je denken als een ruimte-ingenieur!</li>
+                    </ul>
+                    <p class="text-yellow-300 mt-4 animate-pulse">> Missie 1: Om met reparaties te beginnen, moeten we de magische gereedschapskist (rustup) installeren.</p>
+                `,
+                mission1Btn: "Start gereedschapskist installatie [Enter]",
+                mission2Step: ">> Stap 1: rustup installeren",
+                mission2Desc: "De gereedschapskist (rustup) bevat de compiler (rustc). Het vertaalt onze woorden naar enen en nullen. Klik hieronder om te downloaden:",
+                dlBtnText: "Download & installeer",
+                downloadMsg: "Downloaden... [██████████] 100%",
+                installSuccess: "Succesvol geïnstalleerd! Compiler is klaar.",
+                nextStepText: "Volgende stap",
+                mission3Step: ">> Stap 2: Verbinding maken (Hello World)",
+                mission3Desc: "Nu moeten we bewijzen dat we hier zijn! We moeten \"Earth, I am here!\" afdrukken. Selecteer het juiste trefwoord om tekst af te drukken:",
+                runCodeText: "Code uitvoeren",
+                puzzleSuccess: "> Verbinding geslaagd! Bericht verzonden.",
+                puzzleErrorPrint: "Fout: Macro's in Rust hebben een uitroepteken (!) nodig.",
+                puzzleErrorGeneric: "Fout: Opdracht '{word}' niet gevonden in Rust!",
+                mission4Step: ">> Stap 3: De slimme assistent (Cargo)",
+                mission4Desc: "Voor echte projecten gebruiken we de slimme assistent <strong>Cargo</strong>. Cargo bouwt en voert projecten voor ons uit.",
+                cargoComment: "// Project aanmaken",
+                mission4Final: "Laatste missie: Druk op de Cargo Run-knop om de motor te starten!",
+                engineStarted: "Motor succesvol gestart! 🚀",
+                successTitle: "Missie volbracht!",
+                successMessage: "De scheepsmotor is gestart en je hebt de basisbeginselen van Rust geleerd.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
         };
 
-        // --- Setup UI based on Language ---
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-indigo-500 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-indigo-500 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-            }
-
-            // Refresh dialog if in dialog step
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // ساخت خودکار دکمه‌های زبان
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        // --- Dialog System ---
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 35);
+        // توابع کمکی
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang === 'en' || lang === 'es' || lang === 'de' || lang === 'nl') {
+                return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
             } else {
-                cb();
+                return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
             }
+        }
+
+        function formatPercent(value, lang) {
+            return formatNumber(value, lang) + '%';
+        }
+
+        // متغیرهای وضعیت
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let selectedWord = null;
+        let puzzleCompleted = false;
+        let cargoRunExecuted = false;
+
+        // ارجاع به المان‌ها
+        const hpLabelSpan = document.getElementById('hp-label');
+        const energyLabelSpan = document.getElementById('energy-label');
+        const hpValueSpan = document.getElementById('hp-value');
+        const energyValueSpan = document.getElementById('energy-value');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        function stopTyping() {
+            if (typeInterval) {
+                clearTimeout(typeInterval);
+                typeInterval = null;
+            }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
+            }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
             const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
             nextBtn.classList.add('hidden');
-
-            // Screen Shake Effect on first dialog
+            
             if(currentDialogIndex === 0) {
                 document.querySelector('.dashboard').classList.add('shake');
                 setTimeout(() => document.querySelector('.dashboard').classList.remove('shake'), 500);
             }
-
-            typeWriter(text, 0, () => {
+            
+            startTyping(text, () => {
                 nextBtn.classList.remove('hidden');
             });
         }
-
+        
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                document.getElementById('next-dialog-btn').classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
-                // End of dialogs, show game area
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "عالیه! به صفحه نمایش کامپیوتر (پایین) نگاه کن و دستورات رو اجرا کن." :
-                    "Great! Look at the computer screen below and follow the instructions.";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
         }
-
-        // --- Mission Manager ---
-        function startMission(missionNum) {
-            // Hide all missions
-            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
-            // Show target mission
-            document.getElementById('mission-' + missionNum).classList.remove('hidden');
-
-            // Update HUD
-            if(missionNum === 2) updateHUD('۴۰٪', '۱۰٪');
-            if(missionNum === 3) updateHUD('۶۰٪', '۴۰٪');
-            if(missionNum === 4) updateHUD('۸۰٪', '۷۰٪');
-        }
-
-        function updateHUD(hp, energy) {
-            document.getElementById('hp').innerText = hp;
-            const energyEl = document.getElementById('energy');
-            energyEl.innerText = energy;
-
-            if(parseInt(energy) > 50) {
-                energyEl.parentElement.classList.replace('text-yellow-400', 'text-emerald-400');
+        
+        function updateAllTexts() {
+            const lang = currentLang;
+            const pack = languagePack[lang];
+            
+            hpLabelSpan.innerText = pack.hpLabel;
+            energyLabelSpan.innerText = pack.energyLabel;
+            const currentHp = parseInt(hpValueSpan.innerText.replace(/[^0-9]/g, '')) || 20;
+            const currentEnergy = parseInt(energyValueSpan.innerText.replace(/[^0-9]/g, '')) || 0;
+            hpValueSpan.innerText = formatPercent(currentHp, lang);
+            energyValueSpan.innerText = formatPercent(currentEnergy, lang);
+            
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+            
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('mission1-btn').innerHTML = pack.mission1Btn;
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('dl-btn-text').innerHTML = pack.dlBtnText;
+            document.getElementById('dl-message').innerHTML = pack.downloadMsg;
+            document.getElementById('install-success').innerHTML = pack.installSuccess;
+            document.getElementById('next-step-text').innerHTML = pack.nextStepText;
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('run-code-text').innerHTML = pack.runCodeText;
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('cargo-comment').innerHTML = pack.cargoComment;
+            document.getElementById('mission4-final').innerHTML = pack.mission4Final;
+            document.getElementById('engine-success').innerHTML = pack.engineStarted;
+            document.getElementById('success-title').innerHTML = pack.successTitle;
+            document.getElementById('success-message').innerHTML = pack.successMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+            
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => {
+                            document.getElementById('next-dialog-btn').classList.remove('hidden');
+                        });
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        document.getElementById('next-dialog-btn').classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
             }
         }
-
-        // --- Mission 2: Download ---
+        
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-indigo-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+        
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            
+            if(missionNum === 1) updateHUD(20, 0);
+            if(missionNum === 2) updateHUD(40, 10);
+            if(missionNum === 3) {
+                updateHUD(60, 40);
+                resetPuzzle();
+            }
+            if(missionNum === 4) updateHUD(80, 70);
+        }
+        
+        function updateHUD(hpPercent, energyPercent) {
+            hpValueSpan.innerText = formatPercent(hpPercent, currentLang);
+            energyValueSpan.innerText = formatPercent(energyPercent, currentLang);
+            const energyParent = energyValueSpan.parentElement;
+            if(energyPercent > 50) {
+                energyParent.classList.replace('text-yellow-400', 'text-emerald-400');
+            } else {
+                energyParent.classList.replace('text-emerald-400', 'text-yellow-400');
+            }
+        }
+        
         function simulateDownload() {
             const btn = document.getElementById('dl-btn');
             btn.disabled = true;
             btn.classList.add('opacity-50');
-
             setTimeout(() => {
                 document.getElementById('dl-progress').classList.remove('hidden');
             }, 800);
         }
-
-        // --- Mission 3: Puzzle ---
+        
+        function resetPuzzle() {
+            const slot = document.getElementById('slot1');
+            const runBtn = document.getElementById('run-puzzle-btn');
+            const feedback = document.getElementById('puzzle-feedback');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            selectedWord = null;
+            feedback.innerText = "";
+            puzzleCompleted = false;
+            const crt = document.getElementById('crt-monitor');
+            crt.style.backgroundColor = "#064e3b";
+        }
+        
         function selectOption(element, word) {
+            if(puzzleCompleted) return;
             document.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
             selectedWord = word;
-
             const slot = document.getElementById('slot1');
             const runBtn = document.getElementById('run-puzzle-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
             runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             document.getElementById('puzzle-feedback').innerText = "";
         }
-
+        
         function clearSlot(num) {
+            if(puzzleCompleted) return;
             const slot = document.getElementById('slot1');
             const runBtn = document.getElementById('run-puzzle-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
@@ -527,59 +771,63 @@
             document.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             selectedWord = null;
         }
-
+        
         function checkPuzzle() {
+            if(puzzleCompleted) return;
             const slotText = document.getElementById('slot1').innerText;
             const feedback = document.getElementById('puzzle-feedback');
             const crt = document.getElementById('crt-monitor');
-
+            
             if (slotText === 'println!') {
                 feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
-                feedback.innerText = currentLang === 'fa' ? "> ارتباط موفق! پیام ارسال شد." : "> Connection Success! Message sent.";
-                crt.style.backgroundColor = "#022c22"; // darken green
-
+                feedback.innerText = languagePack[currentLang].puzzleSuccess;
+                crt.style.backgroundColor = "#022c22";
+                puzzleCompleted = true;
+                const runBtn = document.getElementById('run-puzzle-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
                 crt.classList.add('glitch');
                 setTimeout(() => crt.classList.remove('glitch'), 400);
-
                 if (slotText === 'print') {
-                    feedback.innerText = currentLang === 'fa' ?
-                        "خطا: ماکروها در راست به علامت تعجب (!) نیاز دارند." :
-                        "Error: Macros in Rust need an exclamation mark (!).";
+                    feedback.innerText = languagePack[currentLang].puzzleErrorPrint;
                 } else {
-                    feedback.innerText = currentLang === 'fa' ?
-                        `خطا: دستور '${slotText}' در زبان راست وجود ندارد!` :
-                        `Error: Command '${slotText}' not found in Rust!`;
+                    let msg = languagePack[currentLang].puzzleErrorGeneric.replace('{word}', slotText);
+                    feedback.innerText = msg;
                 }
             }
         }
-
-        // --- Mission 4: Cargo Run & Victory ---
+        
         function runCargo() {
+            if(cargoRunExecuted) return;
+            cargoRunExecuted = true;
+            const btn = document.getElementById('cargo-run-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
             const output = document.getElementById('cargo-output');
             output.classList.remove('hidden');
-
             setTimeout(() => {
-                updateHUD('۱۰۰٪', '۱۰۰٪');
+                updateHUD(100, 100);
                 triggerConfetti();
                 setTimeout(() => {
                     document.getElementById('success-screen').classList.remove('hidden');
                 }, 1000);
             }, 1000);
         }
-
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        
+        function goToNextChapter() {
+            window.location.href = 'chapter-2.html';
+        }
+        
+        // --- Confetti (بدون تغییر) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
         const possibleColors = ["#fb923c", "#fcd34d", "#818cf8", "#34d399", "#f472b6"];
-
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -589,7 +837,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -599,46 +846,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
             if(!animationId) Draw();
         }
-
-        // Initialize Game
+        
+        // مقداردهی اولیه
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

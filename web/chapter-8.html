@@ -2,49 +2,41 @@
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 8</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --bg-color: #1e1b4b; /* Indigo 950 */
-            --crt-bg: #2e1065; /* Violet 950 */
+            --bg-color: #1e1b4b;
+            --crt-bg: #2e1065;
         }
-
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(rgba(168, 85, 247, 0.15) 2px, transparent 40px),
-                radial-gradient(rgba(250, 204, 21, 0.05) 1px, transparent 30px);
+            background-image: radial-gradient(rgba(168, 85, 247, 0.15) 2px, transparent 40px), radial-gradient(rgba(250, 204, 21, 0.05) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
         html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
         html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
         .code-font { font-family: 'JetBrains Mono', monospace !important; }
-
-        /* Spaceship Dashboard UI - RPG Inventory Edition */
+        /* Force LTR for code blocks and RPG elements */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .rpg-btn, .inventory-slot, #rpg-feedback {
+            direction: ltr !important;
+            text-align: left !important;
+        }
         .dashboard {
-            background: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%); /* Sky 900 to Indigo 950 */
-            border: 4px solid #a855f7; /* Purple 500 */
+            background: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%);
+            border: 4px solid #a855f7;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-            border: 4px solid #6b21a8; /* Purple 800 */
+            border: 4px solid #6b21a8;
             border-radius: 12px;
             position: relative;
             overflow: hidden;
@@ -60,10 +52,8 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
-            background: rgba(250, 245, 255, 0.95); /* Sky 50 */
+            background: rgba(250, 245, 255, 0.95);
             color: #1e1b4b;
             border-radius: 15px;
             border: 3px solid #a855f7;
@@ -77,7 +67,6 @@
             content: ''; position: absolute; bottom: -15px; left: 40px;
             border-width: 15px 15px 0; border-style: solid; border-color: rgba(250, 245, 255, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #f3e8ff; border-radius: 50%;
@@ -85,14 +74,11 @@
             font-size: 2.5rem; border: 4px solid #a855f7;
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Interactive Elements */
         .code-slot {
             display: inline-block; min-width: 60px; height: 30px;
             border-bottom: 3px dashed #fcd34d; margin: 0 5px;
@@ -101,7 +87,6 @@
             border-radius: 5px; cursor: pointer; transition: all 0.3s;
         }
         .code-slot.filled { border: 2px solid #d8b4fe; background: rgba(216, 180, 254, 0.2); color: #e9d5ff; }
-
         .code-option {
             background: #4c1d95; border: 2px solid #7e22ce;
             padding: 8px 15px; border-radius: 8px; cursor: pointer;
@@ -109,8 +94,6 @@
         }
         .code-option:hover { background: #581c87; transform: scale(1.05); }
         .code-option.selected { background: #9333ea; border-color: #d8b4fe; color: white; font-weight: bold; }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); background-color: #7f1d1d; }
@@ -119,6 +102,13 @@
             60% { transform: skew(-5deg); background-color: #991b1b; }
             80% { transform: skew(5deg); }
             100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
         }
         .fade-in { animation: fadeIn 0.5s ease-in forwards; }
         @keyframes fadeIn {
@@ -130,17 +120,9 @@
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.5); border-radius: 8px; padding: 12px; border: 1px solid rgba(168, 85, 247, 0.3);
         }
-
-        /* RPG Mini-game Styles */
         .rpg-btn {
             background: #4c1d95; border: 2px solid #7e22ce; border-radius: 8px;
             padding: 8px 12px; cursor: pointer; transition: all 0.2s; color: white;
@@ -148,13 +130,22 @@
         }
         .rpg-btn:hover { background: #6b21a8; border-color: #d8b4fe; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.4); }
         .rpg-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; filter: grayscale(100%); }
-
         .inventory-slot {
             background: rgba(0,0,0,0.4); border: 2px dashed #7e22ce; border-radius: 8px;
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; transition: all 0.3s;
         }
         .inventory-slot.filled { border-style: solid; border-color: #fcd34d; background: rgba(252, 211, 77, 0.2); }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .rpg-btn { padding: 6px 8px; font-size: 0.8rem; }
+            .inventory-slot { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
@@ -163,73 +154,50 @@
 
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-purple-500 text-white">فارسی</button>
-        </div>
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD -->
+        <!-- HUD -->
         <div class="flex justify-between items-center mb-6 border-b border-purple-900 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-fuchsia-400"><i class="fa-solid fa-backpack"></i> <span class="lang-fa">آیتم‌ها:</span><span class="lang-en">Items:</span> <span id="hud-items">۰ / ۳</span></div>
-                <div class="text-amber-400"><i class="fa-solid fa-coins"></i> <span class="lang-fa">سکه طلا:</span><span class="lang-en">Gold Coins:</span> <span id="hud-gold">۰</span></div>
+                <div class="text-fuchsia-400"><i class="fa-solid fa-backpack"></i> <span id="items-label"></span> <span id="hud-items">0 / 3</span></div>
+                <div class="text-amber-400"><i class="fa-solid fa-coins"></i> <span id="gold-label"></span> <span id="hud-gold">0</span></div>
             </div>
-            <div class="text-purple-300 code-font text-sm opacity-70">COLLECTION-OS v8.0</div>
+            <div class="text-purple-300 code-font text-xs md:text-sm opacity-70">COLLECTION-OS v8.0</div>
         </div>
 
-        <!-- Story Section -->
+        <!-- Dialog Box -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-purple-500">
-                <h3 class="font-bold text-purple-700 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-purple-700 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold"></p>
-
+                <h3 id="ferris-name" class="font-bold text-purple-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Screen -->
+        <!-- Game Area -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-purple-200 code-font min-h-[400px] flex flex-col">
 
-                <!-- Mission 1: The Vector -->
+                <!-- Mission 1: Vector -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-purple-900 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۸: جعبه‌های جادویی (Collections) 🎒</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 8: Magic Boxes (Collections) 🎒</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa leading-relaxed space-y-3">
-                        <p class="text-fuchsia-300">> در ماجراجویی فضایی، ما وسایل زیادی پیدا می‌کنیم. آرایه‌های معمولی اندازه ثابتی دارند و نمی‌توانند بزرگ شوند.</p>
-                        <p class="text-slate-300">> برای ساخت یک لیست هوشمند که بتواند بزرگ و کوچک شود، از ابزاری به نام <strong>Vector</strong> استفاده می‌کنیم.</p>
-                        <p class="text-amber-300 mt-4 font-bold">برای ساخت سریع یک وکتور با مقادیر اولیه، از چه ماکرویی (کلمه جادوییِ دارای علامت تعجب) استفاده می‌کنیم؟</p>
-                    </div>
-
-                    <div class="lang-en leading-relaxed space-y-3">
-                        <p class="text-fuchsia-300">> On a space adventure, we find many items. Normal arrays have a fixed size and can't grow.</p>
-                        <p class="text-slate-300">> To make a smart list that can grow and shrink, we use a tool called a <strong>Vector</strong>.</p>
-                        <p class="text-amber-300 mt-4 font-bold">To quickly create a vector with initial values, which macro (magic word with an exclamation mark) do we use?</p>
-                    </div>
-
-                    <div class="terminal-block mt-4 text-emerald-300 text-lg">
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
                         <span class="text-slate-400 text-sm">// Inventory Bag</span><br>
                         <span class="text-pink-400">let mut</span> inventory = <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span>![<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;String::from(<span class="text-yellow-300">"Sword"</span>),<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;String::from(<span class="text-yellow-300">"Potion"</span>),<br>
                         ];
                     </div>
-
-                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"></div>
-
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-purple-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'list')">list</div>
@@ -238,37 +206,22 @@
                             <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'set')">set</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle1-btn" class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
-                            <span class="lang-fa">باز کردن کوله‌پشتی 🎒</span><span class="lang-en">Open Backpack 🎒</span>
+                            <span id="puzzle1-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 2: Pushing to Vector -->
+                <!-- Mission 2: push -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: اضافه کردن آیتم (Vector)</span>
-                        <span class="lang-en">>> Step 1: Adding an Item (Vector)</span>
-                    </div>
-
-                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
-                        <p>حالا که وکتور ما ساخته شد، می‌خواهیم یک سیب جادویی 🍎 به انتهای آن اضافه کنیم تا لیست ما بزرگ‌تر شود.</p>
-                        <p class="text-white font-bold">کدام متد یک آیتم جدید را به انتهای وکتور (کوله‌پشتی) هل می‌دهد؟</p>
-                    </div>
-                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
-                        <p>Now that our vector is created, we want to add a Magic Apple 🍎 to the end of it so our list grows.</p>
-                        <p class="text-white font-bold">Which method pushes a new item to the end of the vector (backpack)?</p>
-                    </div>
-
-                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                    <div id="mission2-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-slate-400 text-sm">// Adding an apple to the end</span><br>
                         inventory.<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(String::from(<span class="text-yellow-300">"Magic Apple"</span>));
                     </div>
-
-                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-purple-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'add')">add</div>
@@ -277,32 +230,23 @@
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 2, 'append')">append</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle2-btn" class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
-                            <span class="lang-fa">انداختن در کوله 📥</span><span class="lang-en">Drop into Bag 📥</span>
+                            <span id="puzzle2-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 3: HashMap -->
+                <!-- Mission 3: HashMap insert -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-yellow-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۲: نقشه گنج (HashMap)</span>
-                        <span class="lang-en">>> Step 2: Treasure Map (HashMap)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-slate-300 mb-4">ما به یک نقشه گنج نیاز داریم که نام مکان‌ها (کلید) را به تعداد سکه‌ها (مقدار) وصل کند. برای ثبت کردن اطلاعات در یک <code>HashMap</code> از چه متدی استفاده می‌کنیم؟</p>
-                    <p class="lang-en text-sm text-slate-300 mb-4">We need a treasure map that connects location names (Keys) to coin amounts (Values). Which method do we use to register info in a <code>HashMap</code>?</p>
-
+                    <div id="mission3-step" class="text-yellow-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
                     <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-pink-400">let mut</span> map = HashMap::new();<br>
                         <span class="text-slate-400 text-sm">// Key: "Cave", Value: 500 coins</span><br>
                         map.<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>(String::from(<span class="text-yellow-300">"Cave"</span>), <span class="text-orange-300">500</span>);
                     </div>
-
-                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-purple-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
                             <div class="code-option code-font" onclick="selectOption(this, 3, 'push')">push</div>
@@ -311,10 +255,9 @@
                             <div class="code-option code-font" onclick="selectOption(this, 3, 'insert')">insert</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle3-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
-                            <span class="lang-fa">ثبت روی نقشه 🗺️</span><span class="lang-en">Register on Map 🗺️</span>
+                            <span id="puzzle3-btn-text"></span>
                         </button>
                     </div>
                 </div>
@@ -322,178 +265,505 @@
                 <!-- Mission 4: RPG Simulator -->
                 <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
                     <div class="text-yellow-400 mb-2 border-b border-purple-800 pb-2 flex justify-between items-center">
-                        <div>
-                            <span class="lang-fa">>> مرحله نهایی: ماجراجویی (Simulator)</span>
-                            <span class="lang-en">>> Final Step: Adventure (Simulator)</span>
-                        </div>
-                        <div class="text-xs bg-purple-900 px-2 py-1 rounded text-white">
-                            <span class="lang-fa">پروژه ۸.۳</span><span class="lang-en">Project 8.3</span>
-                        </div>
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-purple-900 px-2 py-1 rounded text-white">Project 8.3</div>
                     </div>
-
-                    <div class="lang-fa text-sm mb-3 text-slate-300">با دکمه‌های نقشه (get) سکه پیدا کن و با دکمه‌های کوله (push) آیتم جمع کن! باید <strong>۳ آیتم</strong> و <strong>۵۰۰ سکه</strong> داشته باشی تا برنده شوی.</div>
-                    <div class="lang-en text-sm mb-3 text-slate-300">Use Map buttons (get) to find coins and Bag buttons (push) to collect items! You need <strong>3 items</strong> and <strong>500 coins</strong> to win.</div>
-
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
                     <div class="flex flex-col md:flex-row gap-4 flex-grow">
-
-                        <!-- Map Actions (HashMap) -->
+                        <!-- Map Actions -->
                         <div class="w-full md:w-1/2 flex flex-col gap-2 bg-black/30 p-3 rounded-lg border border-purple-900/50">
-                            <div class="text-amber-400 text-sm font-bold mb-1"><i class="fa-solid fa-map"></i> <span class="lang-fa">نقشه (map.get)</span><span class="lang-en">Map (map.get)</span></div>
-
+                            <div class="text-amber-400 text-sm font-bold mb-1"><i class="fa-solid fa-map"></i> <span id="map-title"></span></div>
                             <button class="rpg-btn" id="btn-cave" onclick="exploreMap('Cave', 500, this)">
-                                🦇 <span class="lang-fa">جستجوی غار تاریک</span><span class="lang-en">Explore Dark Cave</span>
+                                🦇 <span id="cave-btn-text"></span>
                             </button>
                             <button class="rpg-btn" id="btn-forest" onclick="exploreMap('Forest', 200, this)">
-                                🌲 <span class="lang-fa">جستجوی جنگل مه‌آلود</span><span class="lang-en">Explore Misty Forest</span>
+                                🌲 <span id="forest-btn-text"></span>
                             </button>
                             <button class="rpg-btn" id="btn-peak" onclick="exploreMap('Peak', 1000, this)">
-                                ⛰️ <span class="lang-fa">جستجوی قله برفی</span><span class="lang-en">Explore Snowy Peak</span>
+                                ⛰️ <span id="peak-btn-text"></span>
                             </button>
                         </div>
-
-                        <!-- Inventory Actions (Vector) -->
+                        <!-- Inventory Actions -->
                         <div class="w-full md:w-1/2 flex flex-col gap-2 bg-black/30 p-3 rounded-lg border border-fuchsia-900/50">
-                            <div class="text-fuchsia-400 text-sm font-bold mb-1"><i class="fa-solid fa-briefcase"></i> <span class="lang-fa">کوله (vec.push)</span><span class="lang-en">Bag (vec.push)</span></div>
-
+                            <div class="text-fuchsia-400 text-sm font-bold mb-1"><i class="fa-solid fa-briefcase"></i> <span id="bag-title"></span></div>
                             <div class="flex gap-2 justify-center mb-2" id="bag-display">
                                 <div class="inventory-slot"></div>
                                 <div class="inventory-slot"></div>
                                 <div class="inventory-slot"></div>
                             </div>
-
                             <button class="rpg-btn bg-fuchsia-800 border-fuchsia-500 hover:bg-fuchsia-700" id="btn-sword" onclick="lootItem('Sword', '🗡️', this)">
-                                <span class="lang-fa">برداشتن شمشیر</span><span class="lang-en">Loot Sword</span>
+                                <span id="sword-btn-text"></span>
                             </button>
                             <button class="rpg-btn bg-fuchsia-800 border-fuchsia-500 hover:bg-fuchsia-700" id="btn-potion" onclick="lootItem('Potion', '🧪', this)">
-                                <span class="lang-fa">برداشتن معجون</span><span class="lang-en">Loot Potion</span>
+                                <span id="potion-btn-text"></span>
                             </button>
                             <button class="rpg-btn bg-fuchsia-800 border-fuchsia-500 hover:bg-fuchsia-700" id="btn-apple" onclick="lootItem('Apple', '🍎', this)">
-                                <span class="lang-fa">برداشتن سیب</span><span class="lang-en">Loot Apple</span>
+                                <span id="apple-btn-text"></span>
                             </button>
                         </div>
                     </div>
-
                     <div id="rpg-feedback" class="text-center text-sm font-bold h-6 mt-3 text-emerald-400"></div>
-
                 </div>
 
             </div>
         </div>
 
-        <!-- Success overlay -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
-            <div class="text-7xl mb-4 animate-bounce">💎🦀🎒</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">ماجراجویی موفقیت‌آمیز بود!</span>
-                <span class="lang-en">Adventure Successful!</span>
-            </h2>
-            <p class="text-xl text-amber-400 mb-6 text-center px-4">
-                <span class="lang-fa">شما ابزارهای Vector و HashMap را برای ذخیره داده‌ها یاد گرفتید.</span>
-                <span class="lang-en">You've learned to use Vectors and HashMaps to store data.</span>
-            </p>
-            <button class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(168,85,247,0.6)]" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۸ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 8 - Play Again</span>
-            </button>
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">💎🦀🎒</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-amber-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(168,85,247,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State & Logic ---
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                itemsLabel: "آیتم‌ها:",
+                goldLabel: "سکه طلا:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "سلام! وقتشه بریم یک ماجراجویی بزرگ تو فضا و گنج پیدا کنیم! 🗺️",
+                    "تو این سفر وسایل زیادی پیدا می‌کنیم، پس به یک کوله‌پشتی جادویی نیاز داریم که بتونه کش بیاد و بزرگ بشه.",
+                    "در زبان راست (Rust) به این لیست‌های جادویی که تغییر اندازه میدن، وکتور (Vector) می‌گیم.",
+                    "همچنین یک نقشه گنج (HashMap) داریم که اسم مکان‌ها رو به تعداد سکه‌ها وصل می‌کنه. بیا کدهامون رو آماده کنیم! 🚀"
+                ],
+                afterDialog: "عالیه! به مانیتور پایین نگاه کن تا کوله‌پشتی (Vector) رو بسازیم.",
+                mission1Title: "فصل ۸: جعبه‌های جادویی (Collections) 🎒",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> در ماجراجویی فضایی، ما وسایل زیادی پیدا می‌کنیم. آرایه‌های معمولی اندازه ثابتی دارند و نمی‌توانند بزرگ شوند.</p>
+                    <p class="text-slate-300">> برای ساخت یک لیست هوشمند که بتواند بزرگ و کوچک شود، از ابزاری به نام <strong>Vector</strong> استفاده می‌کنیم.</p>
+                    <p class="text-amber-300 mt-4 font-bold">برای ساخت سریع یک وکتور با مقادیر اولیه، از چه ماکرویی (کلمه جادوییِ دارای علامت تعجب) استفاده می‌کنیم؟</p>
+                `,
+                puzzle1Btn: "باز کردن کوله‌پشتی 🎒",
+                puzzle1Success: "> کوله‌پشتی با موفقیت ساخته شد!",
+                puzzle1Error: "خطا: ماکروی ساخت وکتور در راست vec! است.",
+                mission2Step: ">> مرحله ۱: اضافه کردن آیتم (Vector)",
+                mission2Desc: "<p>حالا که وکتور ما ساخته شد، می‌خواهیم یک سیب جادویی 🍎 به انتهای آن اضافه کنیم تا لیست ما بزرگ‌تر شود.</p><p class='text-white font-bold'>کدام متد یک آیتم جدید را به انتهای وکتور (کوله‌پشتی) هل می‌دهد؟</p>",
+                puzzle2Btn: "انداختن در کوله 📥",
+                puzzle2Success: "> سیب با موفقیت اضافه شد!",
+                puzzle2Error: "خطا: برای اضافه کردن به انتهای وکتور از متد push استفاده می‌کنیم.",
+                mission3Step: ">> مرحله ۲: نقشه گنج (HashMap)",
+                mission3Desc: "ما به یک نقشه گنج نیاز داریم که نام مکان‌ها (کلید) را به تعداد سکه‌ها (مقدار) وصل کند. برای ثبت کردن اطلاعات در یک <code>HashMap</code> از چه متدی استفاده می‌کنیم؟",
+                puzzle3Btn: "ثبت روی نقشه 🗺️",
+                puzzle3Success: "> مکان روی نقشه ثبت شد!",
+                puzzle3Error: "خطا: در HashMap برای ثبت مقدار جدید از متد insert استفاده می‌کنیم.",
+                mission4Step: ">> مرحله نهایی: ماجراجویی (Simulator)",
+                mission4Desc: "با دکمه‌های نقشه (get) سکه پیدا کن و با دکمه‌های کوله (push) آیتم جمع کن! باید <strong>۳ آیتم</strong> و <strong>۵۰۰ سکه</strong> داشته باشی تا برنده شوی.",
+                mapTitle: "نقشه (map.get)",
+                bagTitle: "کوله (vec.push)",
+                caveBtn: "جستجوی غار تاریک",
+                forestBtn: "جستجوی جنگل مه‌آلود",
+                peakBtn: "جستجوی قله برفی",
+                swordBtn: "برداشتن شمشیر",
+                potionBtn: "برداشتن معجون",
+                appleBtn: "برداشتن سیب",
+                mapFeedback: (place, coins) => `> map.get("${place}") => Some(${coins}) سکه پیدا شد!`,
+                pushFeedback: (item) => `> vec.push("${item}") => آیتم به کوله اضافه شد!`,
+                winTitle: "ماجراجویی موفقیت‌آمیز بود!",
+                winMessage: "شما ابزارهای Vector و HashMap را برای ذخیره داده‌ها یاد گرفتید.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                itemsLabel: "Items:",
+                goldLabel: "Gold Coins:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hi! It's time to go on a grand space adventure and find treasure! 🗺️",
+                    "We'll find many items, so we need a magical backpack that can stretch and grow.",
+                    "In Rust, these magical resizable lists are called Vectors.",
+                    "We also have a treasure map (HashMap) connecting place names to coin amounts. Let's prep our code! 🚀"
+                ],
+                afterDialog: "Awesome! Look at the monitor below to build our Backpack (Vector).",
+                mission1Title: "Chapter 8: Magic Boxes (Collections) 🎒",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> On a space adventure, we find many items. Normal arrays have a fixed size and can't grow.</p>
+                    <p class="text-slate-300">> To make a smart list that can grow and shrink, we use a tool called a <strong>Vector</strong>.</p>
+                    <p class="text-amber-300 mt-4 font-bold">To quickly create a vector with initial values, which macro (magic word with an exclamation mark) do we use?</p>
+                `,
+                puzzle1Btn: "Open Backpack 🎒",
+                puzzle1Success: "> Backpack created successfully!",
+                puzzle1Error: "Error: The macro to create a vector in Rust is vec!.",
+                mission2Step: ">> Step 1: Adding an Item (Vector)",
+                mission2Desc: "<p>Now that our vector is created, we want to add a Magic Apple 🍎 to the end of it so our list grows.</p><p class='text-white font-bold'>Which method pushes a new item to the end of the vector (backpack)?</p>",
+                puzzle2Btn: "Drop into Bag 📥",
+                puzzle2Success: "> Apple pushed successfully!",
+                puzzle2Error: "Error: To add to the end of a vector, we use the 'push' method.",
+                mission3Step: ">> Step 2: Treasure Map (HashMap)",
+                mission3Desc: "We need a treasure map that connects location names (Keys) to coin amounts (Values). Which method do we use to register info in a <code>HashMap</code>?",
+                puzzle3Btn: "Register on Map 🗺️",
+                puzzle3Success: "> Location inserted into map!",
+                puzzle3Error: "Error: In a HashMap, we use the 'insert' method to add key-value pairs.",
+                mission4Step: ">> Final Step: Adventure (Simulator)",
+                mission4Desc: "Use Map buttons (get) to find coins and Bag buttons (push) to collect items! You need <strong>3 items</strong> and <strong>500 coins</strong> to win.",
+                mapTitle: "Map (map.get)",
+                bagTitle: "Bag (vec.push)",
+                caveBtn: "Explore Dark Cave",
+                forestBtn: "Explore Misty Forest",
+                peakBtn: "Explore Snowy Peak",
+                swordBtn: "Loot Sword",
+                potionBtn: "Loot Potion",
+                appleBtn: "Loot Apple",
+                mapFeedback: (place, coins) => `> map.get("${place}") => Found Some(${coins}) coins!`,
+                pushFeedback: (item) => `> vec.push("${item}") => Item pushed to bag!`,
+                winTitle: "Adventure Successful!",
+                winMessage: "You've learned to use Vectors and HashMaps to store data.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                itemsLabel: "Objetos:",
+                goldLabel: "Monedas de oro:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! ¡Es hora de ir a una gran aventura espacial y encontrar tesoros! 🗺️",
+                    "Encontraremos muchos objetos, así que necesitamos una mochila mágica que pueda estirarse y crecer.",
+                    "En Rust, estas listas mágicas redimensionables se llaman Vectores.",
+                    "También tenemos un mapa del tesoro (HashMap) que conecta nombres de lugares con cantidades de monedas. ¡Preparemos nuestro código! 🚀"
+                ],
+                afterDialog: "¡Genial! Mira el monitor a continuación para construir nuestra mochila (Vector).",
+                mission1Title: "Capítulo 8: Cajas mágicas (Colecciones) 🎒",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> En una aventura espacial, encontramos muchos objetos. Las matrices normales tienen un tamaño fijo y no pueden crecer.</p>
+                    <p class="text-slate-300">> Para hacer una lista inteligente que pueda crecer y encogerse, usamos una herramienta llamada <strong>Vector</strong>.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Para crear rápidamente un vector con valores iniciales, ¿qué macro (palabra mágica con signo de exclamación) usamos?</p>
+                `,
+                puzzle1Btn: "Abrir mochila 🎒",
+                puzzle1Success: "> ¡Mochila creada exitosamente!",
+                puzzle1Error: "Error: La macro para crear un vector en Rust es vec!.",
+                mission2Step: ">> Paso 1: Agregar un objeto (Vector)",
+                mission2Desc: "<p>Ahora que se creó nuestro vector, queremos agregar una Manzana Mágica 🍎 al final para que nuestra lista crezca.</p><p class='text-white font-bold'>¿Qué método empuja un nuevo elemento al final del vector (mochila)?</p>",
+                puzzle2Btn: "Dejar en la bolsa 📥",
+                puzzle2Success: "> ¡Manzana agregada exitosamente!",
+                puzzle2Error: "Error: Para agregar al final de un vector, usamos el método 'push'.",
+                mission3Step: ">> Paso 2: Mapa del tesoro (HashMap)",
+                mission3Desc: "Necesitamos un mapa del tesoro que conecte nombres de lugares (Claves) con cantidades de monedas (Valores). ¿Qué método usamos para registrar información en un <code>HashMap</code>?",
+                puzzle3Btn: "Registrar en el mapa 🗺️",
+                puzzle3Success: "> ¡Ubicación insertada en el mapa!",
+                puzzle3Error: "Error: En un HashMap, usamos el método 'insert' para agregar pares clave-valor.",
+                mission4Step: ">> Paso final: Aventura (Simulador)",
+                mission4Desc: "¡Usa los botones del mapa (get) para encontrar monedas y los botones de la bolsa (push) para recolectar objetos! Necesitas <strong>3 objetos</strong> y <strong>500 monedas</strong> para ganar.",
+                mapTitle: "Mapa (map.get)",
+                bagTitle: "Bolsa (vec.push)",
+                caveBtn: "Explorar cueva oscura",
+                forestBtn: "Explorar bosque brumoso",
+                peakBtn: "Explorar pico nevado",
+                swordBtn: "Tomar espada",
+                potionBtn: "Tomar poción",
+                appleBtn: "Tomar manzana",
+                mapFeedback: (place, coins) => `> map.get("${place}") => Se encontraron Some(${coins}) monedas!`,
+                pushFeedback: (item) => `> vec.push("${item}") => ¡Objeto agregado a la bolsa!`,
+                winTitle: "¡Aventura exitosa!",
+                winMessage: "Has aprendido a usar Vectores y HashMaps para almacenar datos.",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                itemsLabel: "Gegenstände:",
+                goldLabel: "Goldmünzen:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Es ist Zeit für ein großes Weltraumabenteuer und Schätze zu finden! 🗺️",
+                    "Wir werden viele Gegenstände finden, also brauchen wir einen magischen Rucksack, der sich dehnen und wachsen kann.",
+                    "In Rust werden diese magischen, skalierbaren Listen Vektoren genannt.",
+                    "Wir haben auch eine Schatzkarte (HashMap), die Ortsnamen mit Münzbeträgen verbindet. Lass uns unseren Code vorbereiten! 🚀"
+                ],
+                afterDialog: "Großartig! Schau auf den Monitor unten, um unseren Rucksack (Vector) zu bauen.",
+                mission1Title: "Kapitel 8: Magische Kisten (Sammlungen) 🎒",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> Auf einem Weltraumabenteuer finden wir viele Gegenstände. Normale Arrays haben eine feste Größe und können nicht wachsen.</p>
+                    <p class="text-slate-300">> Um eine intelligente Liste zu erstellen, die wachsen und schrumpfen kann, verwenden wir ein Werkzeug namens <strong>Vector</strong>.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Um schnell einen Vektor mit Anfangswerten zu erstellen, welches Makro (magisches Wort mit Ausrufezeichen) verwenden wir?</p>
+                `,
+                puzzle1Btn: "Rucksack öffnen 🎒",
+                puzzle1Success: "> Rucksack erfolgreich erstellt!",
+                puzzle1Error: "Fehler: Das Makro zum Erstellen eines Vektors in Rust ist vec!.",
+                mission2Step: ">> Schritt 1: Gegenstand hinzufügen (Vector)",
+                mission2Desc: "<p>Nachdem unser Vektor erstellt wurde, möchten wir einen magischen Apfel 🍎 an das Ende anhängen, damit unsere Liste wächst.</p><p class='text-white font-bold'>Welche Methode schiebt einen neuen Gegenstand ans Ende des Vektors (Rucksacks)?</p>",
+                puzzle2Btn: "In die Tasche stecken 📥",
+                puzzle2Success: "> Apfel erfolgreich hinzugefügt!",
+                puzzle2Error: "Fehler: Um an das Ende eines Vektors hinzuzufügen, verwenden wir die Methode 'push'.",
+                mission3Step: ">> Schritt 2: Schatzkarte (HashMap)",
+                mission3Desc: "Wir brauchen eine Schatzkarte, die Ortsnamen (Schlüssel) mit Münzbeträgen (Werten) verbindet. Welche Methode verwenden wir, um Informationen in eine <code>HashMap</code> einzutragen?",
+                puzzle3Btn: "Auf Karte eintragen 🗺️",
+                puzzle3Success: "> Ort in Karte eingefügt!",
+                puzzle3Error: "Fehler: In einer HashMap verwenden wir die Methode 'insert', um Schlüssel-Wert-Paare hinzuzufügen.",
+                mission4Step: ">> Letzter Schritt: Abenteuer (Simulator)",
+                mission4Desc: "Verwende die Karten-Buttons (get), um Münzen zu finden, und die Taschen-Buttons (push), um Gegenstände zu sammeln! Du benötigst <strong>3 Gegenstände</strong> und <strong>500 Münzen</strong>, um zu gewinnen.",
+                mapTitle: "Karte (map.get)",
+                bagTitle: "Tasche (vec.push)",
+                caveBtn: "Dunkle Höhle erkunden",
+                forestBtn: "Nebelwald erkunden",
+                peakBtn: "Verschneiten Gipfel erkunden",
+                swordBtn: "Schwert aufnehmen",
+                potionBtn: "Trank aufnehmen",
+                appleBtn: "Apfel aufnehmen",
+                mapFeedback: (place, coins) => `> map.get("${place}") => ${coins} Münzen gefunden!`,
+                pushFeedback: (item) => `> vec.push("${item}") => Gegenstand in die Tasche gelegt!`,
+                winTitle: "Abenteuer erfolgreich!",
+                winMessage: "Du hast gelernt, Vektoren und HashMaps zur Datenspeicherung zu verwenden.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                itemsLabel: "Items:",
+                goldLabel: "Goudstukken:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Het is tijd voor een groot ruimteavontuur en schatten te vinden! 🗺️",
+                    "We zullen veel voorwerpen vinden, dus we hebben een magische rugzak nodig die kan rekken en groeien.",
+                    "In Rust worden deze magische schaalbare lijsten Vectors genoemd.",
+                    "We hebben ook een schatkaart (HashMap) die plaatsnamen verbindt met muntaantallen. Laten we onze code voorbereiden! 🚀"
+                ],
+                afterDialog: "Geweldig! Kijk naar de monitor hieronder om onze rugzak (Vector) te bouwen.",
+                mission1Title: "Hoofdstuk 8: Magische dozen (Collecties) 🎒",
+                mission1Text: `
+                    <p class="text-fuchsia-300">> Tijdens een ruimteavontuur vinden we veel voorwerpen. Normale arrays hebben een vaste grootte en kunnen niet groeien.</p>
+                    <p class="text-slate-300">> Om een slimme lijst te maken die kan groeien en krimpen, gebruiken we een hulpmiddel genaamd <strong>Vector</strong>.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Om snel een vector met beginwaarden te maken, welke macro (magisch woord met uitroepteken) gebruiken we?</p>
+                `,
+                puzzle1Btn: "Rugzak openen 🎒",
+                puzzle1Success: "> Rugzak succesvol aangemaakt!",
+                puzzle1Error: "Fout: De macro om een vector in Rust te maken is vec!.",
+                mission2Step: ">> Stap 1: Item toevoegen (Vector)",
+                mission2Desc: "<p>Nu onze vector is gemaakt, willen we een Magische Appel 🍎 aan het einde toevoegen zodat onze lijst groeit.</p><p class='text-white font-bold'>Welke methode voegt een nieuw item toe aan het einde van de vector (rugzak)?</p>",
+                puzzle2Btn: "In de tas stoppen 📥",
+                puzzle2Success: "> Appel succesvol toegevoegd!",
+                puzzle2Error: "Fout: Om aan het einde van een vector toe te voegen, gebruiken we de 'push'-methode.",
+                mission3Step: ">> Stap 2: Schatkaart (HashMap)",
+                mission3Desc: "We hebben een schatkaart nodig die plaatsnamen (Sleutels) verbindt met muntaantallen (Waarden). Welke methode gebruiken we om informatie in een <code>HashMap</code> te registreren?",
+                puzzle3Btn: "Op kaart registreren 🗺️",
+                puzzle3Success: "> Locatie ingevoegd in kaart!",
+                puzzle3Error: "Fout: In een HashMap gebruiken we de 'insert'-methode om sleutel-waarde-paren toe te voegen.",
+                mission4Step: ">> Laatste stap: Avontuur (Simulator)",
+                mission4Desc: "Gebruik de kaartknoppen (get) om munten te vinden en de tasknoppen (push) om items te verzamelen! Je hebt <strong>3 items</strong> en <strong>500 munten</strong> nodig om te winnen.",
+                mapTitle: "Kaart (map.get)",
+                bagTitle: "Tas (vec.push)",
+                caveBtn: "Donkere grot verkennen",
+                forestBtn: "Mistig bos verkennen",
+                peakBtn: "Besneeuwde top verkennen",
+                swordBtn: "Zwaard oprapen",
+                potionBtn: "Toverdrank oprapen",
+                appleBtn: "Appel oprapen",
+                mapFeedback: (place, coins) => `> map.get("${place}") => ${coins} munten gevonden!`,
+                pushFeedback: (item) => `> vec.push("${item}") => Item toegevoegd aan tas!`,
+                winTitle: "Avontuur succesvol!",
+                winMessage: "Je hebt geleerd om Vectors en HashMaps te gebruiken om gegevens op te slaan.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
+        };
+
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
         let currentLang = 'fa';
         let currentStep = 0;
         let currentDialogIndex = 0;
-        let typeInterval;
-
-        // RPG System State
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
         let myGold = 0;
         let myBagCount = 0;
+        let mapButtonsDisabled = { cave: false, forest: false, peak: false };
+        let itemButtonsDisabled = { sword: false, potion: false, apple: false };
 
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "سلام! وقتشه بریم یک ماجراجویی بزرگ تو فضا و گنج پیدا کنیم! 🗺️",
-                "تو این سفر وسایل زیادی پیدا می‌کنیم، پس به یک کوله‌پشتی جادویی نیاز داریم که بتونه کش بیاد و بزرگ بشه.",
-                "در زبان راست (Rust) به این لیست‌های جادویی که تغییر اندازه میدن، وکتور (Vector) می‌گیم.",
-                "همچنین یک نقشه گنج (HashMap) داریم که اسم مکان‌ها رو به تعداد سکه‌ها وصل می‌کنه. بیا کدهامون رو آماده کنیم! 🚀"
-            ],
-            en: [
-                "Hi! It's time to go on a grand space adventure and find treasure! 🗺️",
-                "We'll find many items, so we need a magical backpack that can stretch and grow.",
-                "In Rust, these magical resizable lists are called Vectors.",
-                "We also have a treasure map (HashMap) connecting place names to coin amounts. Let's prep our code! 🚀"
-            ]
-        };
+        // DOM elements
+        const itemsLabelSpan = document.getElementById('items-label');
+        const goldLabelSpan = document.getElementById('gold-label');
+        const hudItemsSpan = document.getElementById('hud-items');
+        const hudGoldSpan = document.getElementById('hud-gold');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
 
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-purple-500 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hud-items').innerText = `${myBagCount.toLocaleString('fa-IR')} / ۳`;
-                document.getElementById('hud-gold').innerText = myGold.toLocaleString('fa-IR');
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-purple-500 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hud-items').innerText = `${myBagCount} / 3`;
-                document.getElementById('hud-gold').innerText = myGold;
-            }
-
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-purple-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
-            } else {
-                cb();
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
             }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
-            const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
-            nextBtn.classList.add('hidden');
-
-            typeWriter(text, 0, () => {
-                nextBtn.classList.remove('hidden');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.querySelector('.dashboard').classList.add('shake');
+                setTimeout(() => document.querySelector('.dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
             });
         }
 
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "عالیه! به مانیتور پایین نگاه کن تا کوله‌پشتی (Vector) رو بسازیم." :
-                    "Awesome! Look at the monitor below to build our Backpack (Vector).";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            itemsLabelSpan.innerText = pack.itemsLabel;
+            goldLabelSpan.innerText = pack.goldLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            hudItemsSpan.innerText = currentLang === 'fa' ? `${formatNumber(myBagCount, currentLang)} / ۳` : `${myBagCount} / 3`;
+            hudGoldSpan.innerText = formatNumber(myGold, currentLang);
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('map-title').innerHTML = pack.mapTitle;
+            document.getElementById('bag-title').innerHTML = pack.bagTitle;
+            document.getElementById('cave-btn-text').innerHTML = pack.caveBtn;
+            document.getElementById('forest-btn-text').innerHTML = pack.forestBtn;
+            document.getElementById('peak-btn-text').innerHTML = pack.peakBtn;
+            document.getElementById('sword-btn-text').innerHTML = pack.swordBtn;
+            document.getElementById('potion-btn-text').innerHTML = pack.potionBtn;
+            document.getElementById('apple-btn-text').innerHTML = pack.appleBtn;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-purple-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
         }
 
         function startMission(missionNum) {
@@ -501,14 +771,13 @@
             document.getElementById('mission-' + missionNum).classList.remove('hidden');
         }
 
-        // --- Puzzle System ---
+        // Puzzle handlers
         function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
-
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
@@ -517,9 +786,9 @@
         }
 
         function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
@@ -528,100 +797,98 @@
             document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
         }
 
-        function triggerError(puzzleNum, msgFa, msgEn) {
+        function triggerError(puzzleNum, msg) {
             const crt = document.getElementById('crt-monitor');
             const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
             crt.classList.add('glitch');
             setTimeout(() => crt.classList.remove('glitch'), 300);
-            feedback.innerText = currentLang === 'fa' ? msgFa : msgEn;
+            feedback.innerText = msg;
         }
 
         function checkPuzzle1() {
+            if (puzzle1Completed) return;
             const slotText = document.getElementById('slot1').innerText;
-            const feedback = document.getElementById('puzzle1-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'vec') {
-                feedback.className = "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> کوله‌پشتی با موفقیت ساخته شد!" : "> Backpack created successfully!";
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(2), 1500);
             } else {
-                triggerError(1, "خطا: ماکروی ساخت وکتور در راست vec! است.", "Error: The macro to create a vector in Rust is vec!.");
+                triggerError(1, pack.puzzle1Error);
             }
         }
 
         function checkPuzzle2() {
+            if (puzzle2Completed) return;
             const slotText = document.getElementById('slot2').innerText;
-            const feedback = document.getElementById('puzzle2-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'push') {
-                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> سیب با موفقیت اضافه شد!" : "> Apple pushed successfully!";
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(3), 1500);
             } else {
-                triggerError(2, "خطا: برای اضافه کردن به انتهای وکتور از متد push استفاده می‌کنیم.", "Error: To add to the end of a vector, we use the 'push' method.");
+                triggerError(2, pack.puzzle2Error);
             }
         }
 
         function checkPuzzle3() {
+            if (puzzle3Completed) return;
             const slotText = document.getElementById('slot3').innerText;
-            const feedback = document.getElementById('puzzle3-feedback');
-
+            const pack = languagePack[currentLang];
             if (slotText === 'insert') {
-                feedback.className = "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                feedback.innerText = currentLang === 'fa' ? "> مکان روی نقشه ثبت شد!" : "> Location inserted into map!";
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
-                triggerError(3, "خطا: در HashMap برای ثبت مقدار جدید از متد insert استفاده می‌کنیم.", "Error: In a HashMap, we use the 'insert' method to add key-value pairs.");
+                triggerError(3, pack.puzzle3Error);
             }
         }
 
-        // --- RPG Simulator ---
+        // RPG Simulator
         function exploreMap(place, coins, btnElement) {
             btnElement.disabled = true;
             myGold += coins;
-
+            const pack = languagePack[currentLang];
             const feedback = document.getElementById('rpg-feedback');
-            feedback.innerText = currentLang === 'fa' ?
-                `> map.get("${place}") => Some(${coins}) سکه پیدا شد!` :
-                `> map.get("${place}") => Found Some(${coins}) coins!`;
-
-            // Pulse effect on HUD
-            const goldHUD = document.getElementById('hud-gold');
-            goldHUD.innerText = currentLang === 'fa' ? myGold.toLocaleString('fa-IR') : myGold;
-            goldHUD.classList.add('pop-in', 'text-yellow-300');
-            setTimeout(() => goldHUD.classList.remove('pop-in', 'text-yellow-300'), 500);
-
-            checkRPGWinCondition();
+            feedback.innerText = pack.mapFeedback(place, coins);
+            feedback.className = "text-center text-sm font-bold h-6 mt-3 text-emerald-400";
+            hudGoldSpan.innerText = formatNumber(myGold, currentLang);
+            hudGoldSpan.classList.add('pop-in', 'text-yellow-300');
+            setTimeout(() => hudGoldSpan.classList.remove('pop-in', 'text-yellow-300'), 500);
+            checkWinCondition();
         }
 
         function lootItem(itemName, emoji, btnElement) {
             btnElement.disabled = true;
-
-            // Find next empty slot
             const slots = document.querySelectorAll('.inventory-slot');
             if (myBagCount < 3) {
                 slots[myBagCount].innerHTML = emoji;
                 slots[myBagCount].classList.add('filled', 'pop-in');
             }
-
             myBagCount++;
-
+            const pack = languagePack[currentLang];
             const feedback = document.getElementById('rpg-feedback');
+            feedback.innerText = pack.pushFeedback(itemName);
             feedback.className = "text-center text-sm font-bold h-6 mt-3 text-fuchsia-400";
-            feedback.innerText = currentLang === 'fa' ?
-                `> vec.push("${itemName}") => آیتم به کوله اضافه شد!` :
-                `> vec.push("${itemName}") => Item pushed to bag!`;
-
-            // Pulse effect on HUD
-            const itemsHUD = document.getElementById('hud-items');
-            itemsHUD.innerText = currentLang === 'fa' ? `${myBagCount.toLocaleString('fa-IR')} / ۳` : `${myBagCount} / 3`;
-            itemsHUD.classList.add('pop-in', 'text-fuchsia-300');
-            setTimeout(() => itemsHUD.classList.remove('pop-in', 'text-fuchsia-300'), 500);
-
-            checkRPGWinCondition();
+            hudItemsSpan.innerText = currentLang === 'fa' ? `${formatNumber(myBagCount, currentLang)} / ۳` : `${myBagCount} / 3`;
+            hudItemsSpan.classList.add('pop-in', 'text-fuchsia-300');
+            setTimeout(() => hudItemsSpan.classList.remove('pop-in', 'text-fuchsia-300'), 500);
+            checkWinCondition();
         }
 
-        function checkRPGWinCondition() {
+        function checkWinCondition() {
             if (myGold >= 500 && myBagCount >= 3) {
                 setTimeout(() => {
                     triggerConfetti();
@@ -630,17 +897,18 @@
             }
         }
 
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        function goToNextChapter() {
+            window.location.href = 'chapter-9.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
-        const possibleColors = ["#a855f7", "#fcd34d", "#fef3c7", "#d8b4fe", "#34d399"]; // Purple & Gold
-
+        const possibleColors = ["#a855f7", "#fcd34d", "#fef3c7", "#d8b4fe", "#34d399"];
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -650,7 +918,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -660,46 +927,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
-            if(!animationId) Draw();
+            if (!animationId) Draw();
         }
 
-        // Initialize Game
+        // Initialization
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

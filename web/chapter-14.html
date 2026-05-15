@@ -1,1069 +1,819 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 14</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 14</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #1e1b4b;
+            --crt-bg: #0f172a;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #f59e0b;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(139, 92, 246, 0.1) 2px, transparent 40px), radial-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .input-message, #ascii-output {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #4c1d95;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(139, 92, 246, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(245, 158, 11, 0.02), rgba(139, 92, 246, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(245, 243, 255, 0.95);
+            color: #2e1065;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(245, 243, 255, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(245, 243, 255, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #ede9fe; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: var(--accent-secondary); background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(139, 92, 246, 0.2); color: #ddd6fe; }
+        .code-option {
+            background: #1e1b4b; border: 2px solid #4c1d95;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #2e1065; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #c4b5fd; color: white; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .input-message {
+            background-color: #1e1b4b; border: 2px solid #6b21a8;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            outline: none; transition: border-color 0.3s;
+            width: 100%;
+        }
+        .input-message:focus { border-color: #a855f7; }
+        .ascii-art {
+            white-space: pre;
+            line-height: 1.2;
+            color: #fbbf24;
+        }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .input-message { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+            .ascii-art { font-size: 0.7rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #1e1b4b; /* Indigo 950 */
-                --crt-bg: #0f172a; /* Slate 900 */
-                --accent-primary: #8b5cf6; /* Violet 500 */
-                --accent-secondary: #f59e0b; /* Amber 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(139, 92, 246, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(245, 158, 11, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Supermarket Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 30px rgba(139, 92, 246, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.7);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-                border: 4px solid #4c1d95; /* Violet 900 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(139, 92, 246, 0.03) 50%,
-                        rgba(0, 0, 0, 0.25) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(245, 158, 11, 0.02),
-                        rgba(139, 92, 246, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(245, 243, 255, 0.95); /* Violet 50 */
-                color: #2e1065; /* Violet 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(245, 243, 255, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(245, 243, 255, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #ede9fe;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed var(--accent-secondary);
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: var(--accent-secondary);
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-primary);
-                background: rgba(139, 92, 246, 0.2);
-                color: #ddd6fe;
-            }
-
-            .code-option {
-                background: #1e1b4b;
-                border: 2px solid #4c1d95;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #e2e8f0;
-            }
-            .code-option:hover {
-                background: #2e1065;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-primary);
-                border-color: #c4b5fd;
-                color: white;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(139, 92, 246, 0.3);
-            }
-
-            /* Simulator Styles */
-            .input-message {
-                background-color: #1e1b4b;
-                border: 2px solid #6b21a8;
-                color: white;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                outline: none;
-                transition: border-color 0.3s;
-                font-family: "Vazirmatn", sans-serif;
-                width: 100%;
-            }
-            .input-message:focus {
-                border-color: #a855f7;
-            }
-
-            .ascii-art {
-                white-space: pre;
-                line-height: 1.2;
-                color: #fbbf24; /* Amber 400 */
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-violet-600 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-violet-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-violet-400"><i class="fa-solid fa-cart-shopping"></i> <span id="crates-label"></span> <span id="hud-crates">0 / 3</span></div>
+                <div class="text-amber-400"><i class="fa-solid fa-box-open"></i> <span id="cargo-version-label"></span> <span class="text-white">v1.14</span></div>
             </div>
+            <div class="text-violet-300 code-font text-xs md:text-sm opacity-70">CRATES-OS v14.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-violet-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-violet-400">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span class="lang-fa">بسته‌های در سبد:</span
-                        ><span class="lang-en">Crates in Cart:</span>
-                        <span class="text-white" id="hud-crates">۰ / ۳</span>
-                    </div>
-                    <div class="text-amber-400">
-                        <i class="fa-solid fa-box-open"></i>
-                        <span class="lang-fa">نسخه کارگو:</span
-                        ><span class="lang-en">Cargo Version:</span>
-                        <span class="text-white">v1.14</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🛒🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-violet-500">
+                <h3 id="ferris-name" class="font-bold text-violet-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-violet-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-violet-300 code-font text-sm opacity-70">
-                    CRATES-OS v14.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🛒🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-violet-500"
-                >
-                    <h3 class="font-bold text-violet-700 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-violet-700 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-violet-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-violet-200 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: Cargo.toml -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-violet-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۴: سوپرمارکت اسباب‌بازی (Crates.io) 🛒
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 14: The Toy Supermarket (Crates.io) 🛒
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-violet-300">
-                                > لازم نیست همه برنامه‌ها را خودت از صفر بنویسی!
-                                به جای آن، می‌توانیم ابزارهای آماده را از
-                                فروشگاه **crates.io** قرض بگیریم.
-                            </p>
-                            <p class="text-slate-300">
-                                > برای اینکه کارگو (Cargo) بداند چه بسته‌ای را
-                                می‌خواهیم، باید اسم آن را در یک فایل خاص
-                                بنویسیم.
-                            </p>
-                            <p class="text-amber-300 mt-4 font-bold">
-                                برای اضافه کردن یک ابزار جدید به پروژه، آن را
-                                زیر کدام کلمه در فایل `Cargo.toml` می‌نویسیم؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-violet-300">
-                                > You don't have to write everything from
-                                scratch! Instead, we can borrow ready-made tools
-                                from **crates.io**.
-                            </p>
-                            <p class="text-slate-300">
-                                > For Cargo to know which package we want, we
-                                must write its name in a specific file.
-                            </p>
-                            <p class="text-amber-300 mt-4 font-bold">
-                                To add a new tool to our project, under which
-                                word in `Cargo.toml` do we write it?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-slate-400 text-sm"
-                                ># Cargo.toml</span
-                            ><br />
-                            <span
-                                class="text-pink-400"
-                                id="slot1"
-                                class="code-slot"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            ><br />
-                            rand = <span class="text-yellow-300">"0.9.0"</span
-                            ><br />
-                            ferris-says =
-                            <span class="text-yellow-300">"0.3"</span>
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-violet-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, '[crates]')"
-                                >
-                                    [crates]
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, '[imports]')"
-                                >
-                                    [imports]
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="
-                                        selectOption(this, 1, '[dependencies]')
-                                    "
-                                >
-                                    [dependencies]
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="
-                                        selectOption(this, 1, '[packages]')
-                                    "
-                                >
-                                    [packages]
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >اضافه کردن به سبد خرید 🛒</span
-                                ><span class="lang-en">Add to Cart 🛒</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: Using the Crate (use) -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-amber-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: وارد کردن بسته به کد</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Bringing the Crate into Code</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                وقتی کارگو ابزار `rand` را دانلود کرد، باید به
-                                کامپایلر بگوییم که می‌خواهیم از آن در فایلمان
-                                استفاده کنیم.
-                            </p>
-                            <p class="text-white font-bold">
-                                از کدام کلمه کلیدی برای آوردن توابع یک Crate به
-                                داخل برنامه استفاده می‌کنیم؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                Once Cargo downloads the `rand` tool, we need to
-                                tell the compiler we want to use it in our file.
-                            </p>
-                            <p class="text-white font-bold">
-                                Which keyword do we use to bring a Crate's
-                                functions into our program?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span
-                                class="text-pink-400"
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >
-                            rand::Rng;<br /><br />
-                            <span class="text-pink-400">fn</span>
-                            <span class="text-blue-300">main</span>() {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400"
-                                >let</span
-                            >
-                            num = rand::thread_rng().gen();<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-violet-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'import')"
-                                >
-                                    import
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'include')"
-                                >
-                                    include
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'use')"
-                                >
-                                    use
-                                </div>
-                                <div
-                                    class="code-option code-font"
-                                    onclick="selectOption(this, 2, 'get')"
-                                >
-                                    get
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">باز کردن جعبه 📦</span
-                                ><span class="lang-en">Open the Box 📦</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: Creating a Library -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-amber-400 mb-2 font-bold">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: ساختن اسباب‌بازی خودمان</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Making Our Own Toy</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            ما هم می‌توانیم کدهایمان را به عنوان یک Crate برای
-                            بقیه منتشر کنیم! برای این کار باید پروژه‌مان را به
-                            جای برنامه اجرایی، به عنوان یک **کتابخانه** بسازیم.
-                            کدام پرچم (Flag) در دستور `cargo new` این کار را
-                            می‌کند؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            We can also publish our code as a Crate for others!
-                            To do this, we must build our project as a
-                            **Library** instead of an executable. Which flag in
-                            `cargo new` does this?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-slate-400">$</span> cargo new
-                            pig_latin
-                            <span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            ><br />
-                            <span class="text-slate-400 text-sm">
-                                Created library `pig_latin` package</span
-                            >
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-violet-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-xl px-6"
-                                    onclick="selectOption(this, 3, '--bin')"
-                                >
-                                    --bin
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl px-6"
-                                    onclick="selectOption(this, 3, '--lib')"
-                                >
-                                    --lib
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl px-6"
-                                    onclick="selectOption(this, 3, '--crate')"
-                                >
-                                    --crate
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl px-6"
-                                    onclick="selectOption(this, 3, '--toy')"
-                                >
-                                    --toy
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >تاسیس کارخانه کوچک 🏗️</span
-                                ><span class="lang-en"
-                                    >Establish Mini Factory 🏗️</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Ferris Says Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-amber-400 mb-2 border-b border-violet-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: شبیه‌ساز ferris-says</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: ferris-says Simulator</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-violet-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۴.۶</span
-                                ><span class="lang-en">Project 14.6</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            حالا بیا از ابزار معروف `ferris-says` استفاده کنیم!
-                            یک پیام بنویس و دکمه را بزن تا فریس آن را با هنر
-                            ASCII چاپ کند. **۳ پیام مختلف** چاپ کن تا برنده شوی!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            Now let's use the famous `ferris-says` tool! Write a
-                            message and press the button so Ferris prints it
-                            with ASCII art. Print **3 different messages** to
-                            win!
-                        </div>
-
-                        <div class="flex flex-col gap-3 flex-grow">
-                            <!-- Control Panel -->
-                            <div
-                                class="flex flex-wrap gap-2 items-center w-full"
-                            >
-                                <input
-                                    type="text"
-                                    id="ferris-msg-input"
-                                    class="input-message flex-grow text-sm md:text-base"
-                                    placeholder="Enter a message for Ferris..."
-                                />
-                                <button
-                                    class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded font-bold whitespace-nowrap"
-                                    onclick="runFerrisSays()"
-                                >
-                                    <i class="fa-solid fa-terminal"></i>
-                                    <span class="lang-fa">cargo run</span
-                                    ><span class="lang-en">cargo run</span>
-                                </button>
-                            </div>
-
-                            <!-- Terminal Output -->
-                            <div
-                                class="terminal-block flex-grow overflow-hidden flex items-center justify-center bg-black/80 p-2"
-                                style="min-height: 180px"
-                            >
-                                <div
-                                    id="ascii-output"
-                                    class="ascii-art code-font text-xs sm:text-sm"
-                                ></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">📦🦀🌟</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa">سبد خرید تکمیل شد!</span>
-                    <span class="lang-en">Shopping Cart Full!</span>
-                </h2>
-                <p class="text-xl text-violet-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما یاد گرفتید چطور از جامعه‌ی بزرگ Rust کمک بگیرید و
-                        کتابخانه‌های خودتان را بسازید.</span
-                    >
-                    <span class="lang-en"
-                        >You learned how to get help from the great Rust
-                        community and build your own libraries.</span
-                    >
-                </p>
-                <button
-                    class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(139,92,246,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۴ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 14 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-violet-200 code-font min-h-[400px] flex flex-col">
 
-            let cratesUsed = 0;
+                <!-- Mission 1: Cargo.toml dependencies -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-violet-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-slate-400 text-sm"># Cargo.toml</span><br>
+                        <span class="text-pink-400" id="slot1" class="code-slot" onclick="clearSlot(1)">---</span><br>
+                        rand = <span class="text-yellow-300">"0.9.0"</span><br>
+                        ferris-says = <span class="text-yellow-300">"0.3"</span>
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-violet-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, '[crates]')">[crates]</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, '[imports]')">[imports]</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, '[dependencies]')">[dependencies]</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, '[packages]')">[packages]</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: use -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-amber-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400" id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> rand::Rng;<br><br>
+                        <span class="text-pink-400">fn</span> <span class="text-blue-300">main</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400">let</span> num = rand::thread_rng().gen();<br>
+                        }
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-violet-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'import')">import</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'include')">include</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'use')">use</div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'get')">get</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: --lib -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-amber-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-slate-400">$</span> cargo new pig_latin <span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span><br>
+                        <span class="text-slate-400 text-sm">  Created library `pig_latin` package</span>
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-violet-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-xl px-6" onclick="selectOption(this, 3, '--bin')">--bin</div>
+                            <div class="code-option code-font text-xl px-6" onclick="selectOption(this, 3, '--lib')">--lib</div>
+                            <div class="code-option code-font text-xl px-6" onclick="selectOption(this, 3, '--crate')">--crate</div>
+                            <div class="code-option code-font text-xl px-6" onclick="selectOption(this, 3, '--toy')">--toy</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: ferris-says Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-amber-400 mb-2 border-b border-violet-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-violet-900 px-2 py-1 rounded text-white">Project 14.6</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="flex flex-col gap-3 flex-grow">
+                        <div class="flex flex-wrap gap-2 items-center w-full">
+                            <input type="text" id="ferris-msg-input" class="input-message flex-grow text-sm md:text-base" placeholder="">
+                            <button id="cargo-run-btn" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded font-bold whitespace-nowrap" onclick="runFerrisSays()">
+                                <i class="fa-solid fa-terminal"></i> <span id="cargo-run-text"></span>
+                            </button>
+                        </div>
+                        <div class="terminal-block flex-grow overflow-hidden flex items-center justify-center bg-black/80 p-2" style="min-height: 180px;">
+                            <div id="ascii-output" class="ascii-art code-font text-xs sm:text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">📦🦀🌟</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-violet-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(139,92,246,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                cratesLabel: "بسته‌های در سبد:",
+                cargoVersionLabel: "نسخه کارگو:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
                     "سلام! به سوپرمارکت بزرگ اسباب‌بازی‌های راست خوش اومدی! 🛒",
                     "اینجا پر از بسته‌ها (Crates) است که بقیه برنامه‌نویس‌ها ساختن و رایگان گذاشتن تا ما استفاده کنیم.",
                     "به این فروشگاه اینترنتی crates.io میگن. دستیار ما یعنی کارگو (Cargo) می‌تونه بره و اونا رو برامون بیاره.",
-                    "بیا با هم سبد خریدمون رو پر کنیم و یاد بگیریم چطور از کدهای بقیه استفاده کنیم! 📦✨",
+                    "بیا با هم سبد خریدمون رو پر کنیم و یاد بگیریم چطور از کدهای بقیه استفاده کنیم! 📦✨"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا یاد بگیریم چطور به Cargo.toml اضافه کنیم.",
+                mission1Title: "فصل ۱۴: سوپرمارکت اسباب‌بازی (Crates.io) 🛒",
+                mission1Text: `
+                    <p class="text-violet-300">> لازم نیست همه برنامه‌ها را خودت از صفر بنویسی! به جای آن، می‌توانیم ابزارهای آماده را از فروشگاه **crates.io** قرض بگیریم.</p>
+                    <p class="text-slate-300">> برای اینکه کارگو (Cargo) بداند چه بسته‌ای را می‌خواهیم، باید اسم آن را در یک فایل خاص بنویسیم.</p>
+                    <p class="text-amber-300 mt-4 font-bold">برای اضافه کردن یک ابزار جدید به پروژه، آن را زیر کدام کلمه در فایل `Cargo.toml` می‌نویسیم؟</p>
+                `,
+                puzzle1Btn: "اضافه کردن به سبد خرید 🛒",
+                puzzle1Success: "> لیست وابستگی‌ها تکمیل شد!",
+                puzzle1Error: "خطا: در فایل Cargo.toml ابزارهای بیرونی را زیر بخش [dependencies] قرار می‌دهیم.",
+                mission2Step: ">> مرحله ۱: وارد کردن بسته به کد",
+                mission2Desc: "<p>وقتی کارگو ابزار `rand` را دانلود کرد، باید به کامپایلر بگوییم که می‌خواهیم از آن در فایلمان استفاده کنیم.</p><p class='text-white font-bold'>از کدام کلمه کلیدی برای آوردن توابع یک Crate به داخل برنامه استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "باز کردن جعبه 📦",
+                puzzle2Success: "> عالی! ابزار وارد کد شد.",
+                puzzle2Error: "خطا: برای آوردن یک تابع یا ابزار از یک crate، از دستور use استفاده می‌کنیم.",
+                mission3Step: ">> مرحله ۲: ساختن اسباب‌بازی خودمان",
+                mission3Desc: "ما هم می‌توانیم کدهایمان را به عنوان یک Crate برای بقیه منتشر کنیم! برای این کار باید پروژه‌مان را به جای برنامه اجرایی، به عنوان یک **کتابخانه** بسازیم. کدام پرچم (Flag) در دستور `cargo new` این کار را می‌کند؟",
+                puzzle3Btn: "تاسیس کارخانه کوچک 🏗️",
+                puzzle3Success: "> پروژه کتابخانه ایجاد شد!",
+                puzzle3Error: "خطا: برای ساخت یک کتابخانه که توسط دیگران استفاده شود از پرچم --lib استفاده می‌کنیم.",
+                mission4Step: ">> مرحله نهایی: شبیه‌ساز ferris-says",
+                mission4Desc: "حالا بیا از ابزار معروف `ferris-says` استفاده کنیم! یک پیام بنویس و دکمه را بزن تا فریس آن را با هنر ASCII چاپ کند. **۳ پیام مختلف** چاپ کن تا برنده شوی!",
+                cargoRunText: "cargo run",
+                msgPlaceholder: "یک پیام برای فریس بنویس...",
+                waitingMsg: "...در انتظار پیام...",
+                winTitle: "سبد خرید تکمیل شد!",
+                winMessage: "شما یاد گرفتید چطور از جامعه‌ی بزرگ Rust کمک بگیرید و کتابخانه‌های خودتان را بسازید.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                cratesLabel: "Crates in Cart:",
+                cargoVersionLabel: "Cargo Version:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
                     "Hi! Welcome to the giant Rust toy supermarket! 🛒",
                     "It's full of packages (Crates) that other programmers built and shared for free.",
                     "This online store is called crates.io. Our assistant, Cargo, can go and fetch them for us.",
-                    "Let's fill our shopping cart and learn how to use other people's code! 📦✨",
+                    "Let's fill our shopping cart and learn how to use other people's code! 📦✨"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-                const msgInput = document.getElementById("ferris-msg-input");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-violet-600 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-crates").innerText =
-                        `${cratesUsed.toLocaleString("fa-IR")} / ۳`;
-                    msgInput.placeholder = "یک پیام برای فریس بنویس...";
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-violet-600 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-crates").innerText =
-                        `${cratesUsed} / 3`;
-                    msgInput.placeholder = "Enter a message for Ferris...";
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below to learn how to add to Cargo.toml.",
+                mission1Title: "Chapter 14: The Toy Supermarket (Crates.io) 🛒",
+                mission1Text: `
+                    <p class="text-violet-300">> You don't have to write everything from scratch! Instead, we can borrow ready-made tools from **crates.io**.</p>
+                    <p class="text-slate-300">> For Cargo to know which package we want, we must write its name in a specific file.</p>
+                    <p class="text-amber-300 mt-4 font-bold">To add a new tool to our project, under which word in `Cargo.toml` do we write it?</p>
+                `,
+                puzzle1Btn: "Add to Cart 🛒",
+                puzzle1Success: "> Dependencies list completed!",
+                puzzle1Error: "Error: In Cargo.toml, external tools go under the [dependencies] section.",
+                mission2Step: ">> Step 1: Bringing the Crate into Code",
+                mission2Desc: "<p>Once Cargo downloads the `rand` tool, we need to tell the compiler we want to use it in our file.</p><p class='text-white font-bold'>Which keyword do we use to bring a Crate's functions into our program?</p>",
+                puzzle2Btn: "Open the Box 📦",
+                puzzle2Success: "> Great! Tool imported into code.",
+                puzzle2Error: "Error: To bring a function or tool from a crate, we use the 'use' keyword.",
+                mission3Step: ">> Step 2: Making Our Own Toy",
+                mission3Desc: "We can also publish our code as a Crate for others! To do this, we must build our project as a **Library** instead of an executable. Which flag in `cargo new` does this?",
+                puzzle3Btn: "Establish Mini Factory 🏗️",
+                puzzle3Success: "> Library project created!",
+                puzzle3Error: "Error: To create a library to be used by others, we use the --lib flag.",
+                mission4Step: ">> Final Step: ferris-says Simulator",
+                mission4Desc: "Now let's use the famous `ferris-says` tool! Write a message and press the button so Ferris prints it with ASCII art. Print **3 different messages** to win!",
+                cargoRunText: "cargo run",
+                msgPlaceholder: "Enter a message for Ferris...",
+                waitingMsg: "...Waiting for message...",
+                winTitle: "Shopping Cart Full!",
+                winMessage: "You learned how to get help from the great Rust community and build your own libraries.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                cratesLabel: "Cajas en el carrito:",
+                cargoVersionLabel: "Versión de Cargo:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! ¡Bienvenido al supermercado gigante de juguetes de Rust! 🛒",
+                    "Está lleno de paquetes (Crates) que otros programadores construyeron y compartieron gratis.",
+                    "Esta tienda en línea se llama crates.io. Nuestro asistente, Cargo, puede ir a buscarlos por nosotros.",
+                    "¡Llenemos nuestro carrito de compras y aprendamos a usar el código de otras personas! 📦✨"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para aprender a agregar a Cargo.toml.",
+                mission1Title: "Capítulo 14: El supermercado de juguetes (Crates.io) 🛒",
+                mission1Text: `
+                    <p class="text-violet-300">> ¡No tienes que escribir todo desde cero! En su lugar, podemos tomar prestadas herramientas ya hechas de **crates.io**.</p>
+                    <p class="text-slate-300">> Para que Cargo sepa qué paquete queremos, debemos escribir su nombre en un archivo específico.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Para agregar una nueva herramienta a nuestro proyecto, ¿bajo qué palabra en `Cargo.toml` la escribimos?</p>
+                `,
+                puzzle1Btn: "Agregar al carrito 🛒",
+                puzzle1Success: "> ¡Lista de dependencias completada!",
+                puzzle1Error: "Error: En Cargo.toml, las herramientas externas van bajo la sección [dependencies].",
+                mission2Step: ">> Paso 1: Trayendo la caja al código",
+                mission2Desc: "<p>Una vez que Cargo descarga la herramienta `rand`, debemos decirle al compilador que queremos usarla en nuestro archivo.</p><p class='text-white font-bold'>¿Qué palabra clave usamos para traer las funciones de una Crate a nuestro programa?</p>",
+                puzzle2Btn: "Abrir la caja 📦",
+                puzzle2Success: "> ¡Genial! Herramienta importada al código.",
+                puzzle2Error: "Error: Para traer una función o herramienta de una crate, usamos la palabra clave 'use'.",
+                mission3Step: ">> Paso 2: Haciendo nuestro propio juguete",
+                mission3Desc: "¡También podemos publicar nuestro código como una Crate para otros! Para hacer esto, debemos construir nuestro proyecto como una **Biblioteca** en lugar de un ejecutable. ¿Qué bandera en `cargo new` hace esto?",
+                puzzle3Btn: "Establecer mini fábrica 🏗️",
+                puzzle3Success: "> ¡Proyecto de biblioteca creado!",
+                puzzle3Error: "Error: Para crear una biblioteca para que otros la usen, usamos la bandera --lib.",
+                mission4Step: ">> Paso final: Simulador de ferris-says",
+                mission4Desc: "¡Ahora usemos la famosa herramienta `ferris-says`! Escribe un mensaje y presiona el botón para que Ferris lo imprima con arte ASCII. ¡Imprime **3 mensajes diferentes** para ganar!",
+                cargoRunText: "cargo run",
+                msgPlaceholder: "Escribe un mensaje para Ferris...",
+                waitingMsg: "...Esperando mensaje...",
+                winTitle: "¡Carrito de compras lleno!",
+                winMessage: "Aprendiste a obtener ayuda de la gran comunidad de Rust y a construir tus propias bibliotecas.",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                cratesLabel: "Kisten im Warenkorb:",
+                cargoVersionLabel: "Cargo-Version:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Willkommen im riesigen Rust-Spielzeug-Supermarkt! 🛒",
+                    "Er ist voller Pakete (Crates), die andere Programmierer gebaut und kostenlos geteilt haben.",
+                    "Dieser Online-Shop heißt crates.io. Unser Assistent Cargo kann sie für uns abholen.",
+                    "Füllen wir unseren Einkaufswagen und lernen wir, wie wir den Code anderer Leute verwenden! 📦✨"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um zu lernen, wie man zu Cargo.toml hinzufügt.",
+                mission1Title: "Kapitel 14: Der Spielzeug-Supermarkt (Crates.io) 🛒",
+                mission1Text: `
+                    <p class="text-violet-300">> Du musst nicht alles von Grund auf schreiben! Stattdessen können wir vorgefertigte Werkzeuge von **crates.io** ausleihen.</p>
+                    <p class="text-slate-300">> Damit Cargo weiß, welches Paket wir wollen, müssen wir seinen Namen in eine bestimmte Datei schreiben.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Um ein neues Werkzeug zu unserem Projekt hinzuzufügen, unter welchem Wort in `Cargo.toml` schreiben wir es?</p>
+                `,
+                puzzle1Btn: "In den Warenkorb legen 🛒",
+                puzzle1Success: "> Abhängigkeitsliste vervollständigt!",
+                puzzle1Error: "Fehler: In Cargo.toml gehen externe Werkzeuge in den Abschnitt [dependencies].",
+                mission2Step: ">> Schritt 1: Die Kiste in den Code bringen",
+                mission2Desc: "<p>Sobald Cargo das `rand`-Werkzeug heruntergeladen hat, müssen wir dem Compiler mitteilen, dass wir es in unserer Datei verwenden wollen.</p><p class='text-white font-bold'>Welches Schlüsselwort verwenden wir, um die Funktionen einer Kiste in unser Programm zu bringen?</p>",
+                puzzle2Btn: "Kiste öffnen 📦",
+                puzzle2Success: "> Großartig! Werkzeug in Code importiert.",
+                puzzle2Error: "Fehler: Um eine Funktion oder ein Werkzeug aus einer Kiste zu importieren, verwenden wir das Schlüsselwort 'use'.",
+                mission3Step: ">> Schritt 2: Unser eigenes Spielzeug herstellen",
+                mission3Desc: "Wir können unseren Code auch als Kiste für andere veröffentlichen! Dazu müssen wir unser Projekt als **Bibliothek** statt als ausführbare Datei bauen. Welche Flagge in `cargo new` tut dies?",
+                puzzle3Btn: "Mini-Fabrik einrichten 🏗️",
+                puzzle3Success: "> Bibliotheksprojekt erstellt!",
+                puzzle3Error: "Fehler: Um eine Bibliothek zu erstellen, die von anderen verwendet werden kann, verwenden wir die --lib-Flagge.",
+                mission4Step: ">> Letzter Schritt: ferris-says-Simulator",
+                mission4Desc: "Jetzt verwenden wir das berühmte `ferris-says`-Werkzeug! Schreibe eine Nachricht und drücke den Knopf, damit Ferris sie mit ASCII-Kunst ausgibt. Gib **3 verschiedene Nachrichten** aus, um zu gewinnen!",
+                cargoRunText: "cargo run",
+                msgPlaceholder: "Gib eine Nachricht für Ferris ein...",
+                waitingMsg: "...Warte auf Nachricht...",
+                winTitle: "Einkaufswagen voll!",
+                winMessage: "Du hast gelernt, wie du Hilfe von der großartigen Rust-Community bekommst und deine eigenen Bibliotheken erstellst.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                cratesLabel: "Kratten in winkelwagen:",
+                cargoVersionLabel: "Cargo-versie:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Welkom bij de gigantische Rust-speelgoedsupermarkt! 🛒",
+                    "Het zit vol met pakketten (Crates) die andere programmeurs hebben gebouwd en gratis hebben gedeeld.",
+                    "Deze online winkel heet crates.io. Onze assistent, Cargo, kan ze voor ons ophalen.",
+                    "Laten we onze winkelwagen vullen en leren hoe we de code van anderen kunnen gebruiken! 📦✨"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om te leren hoe je toevoegt aan Cargo.toml.",
+                mission1Title: "Hoofdstuk 14: De speelgoedsupermarkt (Crates.io) 🛒",
+                mission1Text: `
+                    <p class="text-violet-300">> Je hoeft niet alles van nul af aan te schrijven! In plaats daarvan kunnen we kant-en-klare tools lenen van **crates.io**.</p>
+                    <p class="text-slate-300">> Zodat Cargo weet welk pakket we willen, moeten we de naam ervan in een specifiek bestand schrijven.</p>
+                    <p class="text-amber-300 mt-4 font-bold">Om een nieuwe tool aan ons project toe te voegen, onder welk woord in `Cargo.toml` schrijven we het?</p>
+                `,
+                puzzle1Btn: "Toevoegen aan winkelwagen 🛒",
+                puzzle1Success: "> Afhankelijkhedenlijst voltooid!",
+                puzzle1Error: "Fout: In Cargo.toml gaan externe tools onder de sectie [dependencies].",
+                mission2Step: ">> Stap 1: De krat in de code brengen",
+                mission2Desc: "<p>Zodra Cargo de `rand`-tool heeft gedownload, moeten we de compiler vertellen dat we het in ons bestand willen gebruiken.</p><p class='text-white font-bold'>Welk trefwoord gebruiken we om de functies van een Crate in ons programma te brengen?</p>",
+                puzzle2Btn: "Krat openen 📦",
+                puzzle2Success: "> Geweldig! Tool geïmporteerd in code.",
+                puzzle2Error: "Fout: Om een functie of tool uit een crate te importeren, gebruiken we het trefwoord 'use'.",
+                mission3Step: ">> Stap 2: Ons eigen speelgoed maken",
+                mission3Desc: "We kunnen onze code ook publiceren als een Crate voor anderen! Om dit te doen, moeten we ons project bouwen als een **Bibliotheek** in plaats van een uitvoerbaar bestand. Welke vlag in `cargo new` doet dit?",
+                puzzle3Btn: "Mini-fabriek opzetten 🏗️",
+                puzzle3Success: "> Bibliotheekproject aangemaakt!",
+                puzzle3Error: "Fout: Om een bibliotheek te maken die door anderen kan worden gebruikt, gebruiken we de --lib-vlag.",
+                mission4Step: ">> Laatste stap: ferris-says-simulator",
+                mission4Desc: "Laten we nu de beroemde `ferris-says`-tool gebruiken! Schrijf een bericht en druk op de knop zodat Ferris het afdrukt met ASCII-kunst. Druk **3 verschillende berichten** af om te winnen!",
+                cargoRunText: "cargo run",
+                msgPlaceholder: "Voer een bericht in voor Ferris...",
+                waitingMsg: "...Wachten op bericht...",
+                winTitle: "Winkelwagen vol!",
+                winMessage: "Je hebt geleerd hoe je hulp kunt krijgen van de geweldige Rust-gemeenschap en je eigen bibliotheken kunt bouwen.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let cratesUsed = 0;
+
+        // DOM elements
+        const cratesLabelSpan = document.getElementById('crates-label');
+        const cargoVersionLabelSpan = document.getElementById('cargo-version-label');
+        const hudCratesSpan = document.getElementById('hud-crates');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-violet-500 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
+                showDialog();
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
 
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            cratesLabelSpan.innerText = pack.cratesLabel;
+            cargoVersionLabelSpan.innerText = pack.cargoVersionLabel;
+            hudCratesSpan.innerText = currentLang === 'fa' ? `${formatNumber(cratesUsed, currentLang)} / ۳` : `${cratesUsed} / 3`;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('cargo-run-text').innerHTML = pack.cargoRunText;
+            document.getElementById('ferris-msg-input').placeholder = pack.msgPlaceholder;
+
+            // Set initial ASCII art
+            const asciiEl = document.getElementById('ascii-output');
+            if (asciiEl && asciiEl.innerText.includes("Waiting")) {
+                asciiEl.innerText = ` __________________________
+< ${pack.waitingMsg} >
+ --------------------------
+        \\
+         \\
+            _~^~^~_
+        \\) /  o o  \\ (/
+          '_   -   _'
+          / '-----' \\`;
             }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
 
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
                 } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا یاد بگیریم چطور به Cargo.toml اضافه کنیم."
-                            : "Let's go! Look at the monitor below to learn how to add to Cargo.toml.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
+                    dialogTextP.innerHTML = pack.afterDialog;
                 }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
             }
+        }
 
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-violet-500 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
 
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+        }
 
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
 
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
 
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
 
-                slot.innerText = "---";
-                slot.classList.remove("filled");
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === '[dependencies]') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
                 runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
             }
+        }
 
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'use') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
             }
+        }
 
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "[dependencies]") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> لیست وابستگی‌ها تکمیل شد!"
-                            : "> Dependencies list completed!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: در فایل Cargo.toml ابزارهای بیرونی را زیر بخش [dependencies] قرار می‌دهیم.",
-                        "Error: In Cargo.toml, external tools go under the [dependencies] section.",
-                    );
-                }
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === '--lib') {
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
             }
+        }
 
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "use") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> عالی! ابزار وارد کد شد."
-                            : "> Great! Tool imported into code.";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: برای آوردن یک تابع یا ابزار از یک crate، از دستور use استفاده می‌کنیم.",
-                        "Error: To bring a function or tool from a crate, we use the 'use' keyword.",
-                    );
-                }
+        // Ferris-says Simulator
+        function runFerrisSays() {
+            const pack = languagePack[currentLang];
+            const inputEl = document.getElementById('ferris-msg-input');
+            let msg = inputEl.value.trim();
+            if (!msg) {
+                msg = currentLang === 'fa' ? "سلام راستاسین!" : (currentLang === 'en' ? "Hello Rustacean!" : (currentLang === 'es' ? "¡Hola Rustacean!" : (currentLang === 'de' ? "Hallo Rustazean!" : "Hallo Rustacean!")));
             }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "--lib") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> پروژه کتابخانه ایجاد شد!"
-                            : "> Library project created!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: برای ساخت یک کتابخانه که توسط دیگران استفاده شود از پرچم --lib استفاده می‌کنیم.",
-                        "Error: To create a library to be used by others, we use the --lib flag.",
-                    );
-                }
-            }
-
-            // --- Ferris Says Simulator ---
-            function runFerrisSays() {
-                const inputEl = document.getElementById("ferris-msg-input");
-                let msg = inputEl.value.trim();
-
-                if (!msg) {
-                    msg =
-                        currentLang === "fa"
-                            ? "سلام راستاسین!"
-                            : "Hello Rustacean!";
-                }
-
-                // Calculate approximate visual length (Persian is tricky but we just use char count for game)
-                let len = msg.length;
-                if (len < 5) len = 5;
-
-                const topBorder = " _" + "_".repeat(len + 2);
-                const bottomBorder = " -" + "-".repeat(len + 2);
-
-                const ferrisAscii = `${topBorder}
+            let len = msg.length;
+            if (len < 5) len = 5;
+            const topBorder = " _" + "_".repeat(len + 2);
+            const bottomBorder = " -" + "-".repeat(len + 2);
+            const ferrisAscii = `${topBorder}
 < ${msg} >
  ${bottomBorder}
         \\
@@ -1072,134 +822,89 @@
         \\) /  o o  \\ (/
           '_   -   _'
           / '-----' \\`;
+            const outputEl = document.getElementById('ascii-output');
+            outputEl.innerHTML = ferrisAscii.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            outputEl.style.animation = 'none';
+            outputEl.offsetHeight;
+            outputEl.style.animation = null;
+            outputEl.classList.add('pop-in');
+            cratesUsed++;
+            hudCratesSpan.innerText = currentLang === 'fa' ? `${formatNumber(cratesUsed, currentLang)} / ۳` : `${cratesUsed} / 3`;
+            inputEl.value = "";
+            if (cratesUsed >= 3) {
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
 
-                const outputEl = document.getElementById("ascii-output");
-                outputEl.innerHTML = ferrisAscii
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;");
+        function goToNextChapter() {
+            window.location.href = 'chapter-15.html';
+        }
 
-                // Animation reset
-                outputEl.style.animation = "none";
-                outputEl.offsetHeight; /* trigger reflow */
-                outputEl.style.animation = null;
-                outputEl.classList.add("pop-in");
-
-                // Game Logic
-                cratesUsed++;
-                setLang(currentLang); // Update HUD
-
-                inputEl.value = "";
-
-                if (cratesUsed >= 3) {
-                    setTimeout(() => {
-                        triggerConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
-                    }, 1000);
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#8b5cf6", "#c4b5fd", "#f59e0b", "#fcd34d", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
 
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#8b5cf6",
-                "#c4b5fd",
-                "#f59e0b",
-                "#fcd34d",
-                "#ffffff",
-            ]; // Violet & Amber
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
-                showDialog();
-
-                // Set initial ascii art
-                const outputEl = document.getElementById("ascii-output");
-                outputEl.innerText = ` __________________________
-< ...Waiting for message... >
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+            const asciiEl = document.getElementById('ascii-output');
+            asciiEl.innerText = ` __________________________
+< ${languagePack.fa.waitingMsg} >
  --------------------------
         \\
          \\
@@ -1207,7 +912,7 @@
         \\) /  o o  \\ (/
           '_   -   _'
           / '-----' \\`;
-            }, 500);
-        </script>
-    </body>
+        }, 500);
+    </script>
+</body>
 </html>

@@ -2,45 +2,37 @@
 <html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Land of Rust: Chapter 3</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
-            --bg-color: #1e111a; /* Deep dark pink/brown */
-            --crt-bg: #2d1b2e; /* Dark purple/brownish */
+            --bg-color: #1e111a;
+            --crt-bg: #2d1b2e;
         }
-
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(rgba(244, 114, 182, 0.1) 2px, transparent 40px),
-                radial-gradient(rgba(251, 191, 36, 0.05) 1px, transparent 30px);
+            background-image: radial-gradient(rgba(244, 114, 182, 0.1) 2px, transparent 40px), radial-gradient(rgba(251, 191, 36, 0.05) 1px, transparent 30px);
             background-size: 550px 550px, 350px 350px;
             color: white;
             overflow-x: hidden;
-            transition: all 0.3s ease;
         }
-
         html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
         html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
         .code-font { font-family: 'JetBrains Mono', monospace !important; }
-
-        /* Spaceship Dashboard UI - Bakery Edition */
+        /* Force LTR for code blocks */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, #calc-console, select.op-select {
+            direction: ltr !important;
+            text-align: left !important;
+        }
         .dashboard {
             background: linear-gradient(180deg, #3f2033 0%, #1e111a 100%);
             border: 4px solid #831843;
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
         }
-
-        /* CRT Screen Effect */
         .screen-crt {
             background-color: var(--crt-bg);
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
@@ -60,10 +52,8 @@
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
-
-        /* Dialog Box */
         .dialog-box {
-            background: rgba(255, 241, 242, 0.95); /* Light pinkish white */
+            background: rgba(255, 241, 242, 0.95);
             color: #4c0519;
             border-radius: 15px;
             border: 3px solid #f43f5e;
@@ -77,7 +67,6 @@
             content: ''; position: absolute; bottom: -15px; left: 40px;
             border-width: 15px 15px 0; border-style: solid; border-color: rgba(255, 241, 242, 0.95) transparent transparent transparent;
         }
-
         .ferris-avatar {
             width: 90px; height: 90px;
             background: #fff1f2; border-radius: 50%;
@@ -85,14 +74,11 @@
             font-size: 2.5rem; border: 4px solid #f43f5e;
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-
-        /* Interactive Elements */
         .code-slot {
             display: inline-block; min-width: 50px; height: 30px;
             border-bottom: 3px dashed #fbbf24; margin: 0 5px;
@@ -101,7 +87,6 @@
             border-radius: 5px; cursor: pointer; transition: all 0.3s;
         }
         .code-slot.filled { border: 2px solid #f472b6; background: rgba(244, 114, 182, 0.2); color: #fdf2f8; }
-
         .code-option {
             background: #4a044e; border: 2px solid #86198f;
             padding: 8px 15px; border-radius: 8px; cursor: pointer;
@@ -109,8 +94,6 @@
         }
         .code-option:hover { background: #701a75; transform: scale(1.05); }
         .code-option.selected { background: #db2777; border-color: #fbcfe8; color: white; font-weight: bold; }
-
-        /* Animations */
         .glitch { animation: glitch-skew 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite; }
         @keyframes glitch-skew {
             0% { transform: skew(0deg); }
@@ -132,23 +115,23 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .lang-fa { display: block; }
-        .lang-en { display: none; }
-        html[dir="ltr"] .lang-fa { display: none; }
-        html[dir="ltr"] .lang-en { display: block; }
-
         .terminal-block {
             background: rgba(0,0,0,0.4); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);
         }
-
-        /* Select Dropdown for Calculator */
-        select.op-select {
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 45px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+        }
+        .op-select {
             appearance: none; background-color: #4a044e; border: 2px solid #86198f;
-            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; text-align: center;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
             cursor: pointer; font-weight: bold;
         }
-        select.op-select:focus { outline: none; border-color: #f472b6; }
+        .op-select:focus { outline: none; border-color: #f472b6; }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
@@ -157,111 +140,57 @@
 
     <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative">
 
-        <!-- Language Toggle -->
-        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg" dir="ltr">
-            <button onclick="setLang('en')" id="btn-en" class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white">English</button>
-            <button onclick="setLang('fa')" id="btn-fa" class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-pink-600 text-white">فارسی</button>
-        </div>
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-        <!-- Top HUD -->
+        <!-- HUD -->
         <div class="flex justify-between items-center mb-6 border-b border-pink-900 pb-4 mt-2">
             <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
-                <div class="text-rose-500"><i class="fa-solid fa-utensils"></i> <span class="lang-fa">گرسنگی فریس:</span><span class="lang-en">Ferris's Hunger:</span> <span id="hunger-level">۱۰۰٪</span></div>
-                <div class="text-amber-400"><i class="fa-solid fa-cake-candles"></i> <span class="lang-fa">کیک‌های پخته شده:</span><span class="lang-en">Cakes Baked:</span> <span id="cakes-baked">۰</span></div>
+                <div class="text-rose-500"><i class="fa-solid fa-utensils"></i> <span id="hunger-label"></span> <span id="hunger-value">100%</span></div>
+                <div class="text-amber-400"><i class="fa-solid fa-cake-candles"></i> <span id="cakes-label"></span> <span id="cakes-value">0</span></div>
             </div>
-            <div class="text-pink-300 code-font text-sm opacity-70">BAKERY-OS v3.0 (Function Module)</div>
+            <div class="text-pink-300 code-font text-xs md:text-sm opacity-70">BAKERY-OS v3.0 (Function Module)</div>
         </div>
 
-        <!-- Story Section -->
+        <!-- Dialog Box -->
         <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
             <div class="ferris-avatar shadow-lg z-10 shrink-0">🦀</div>
-
             <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-rose-500">
-                <h3 class="font-bold text-rose-600 mb-2 lang-fa">فریس خرچنگ:</h3>
-                <h3 class="font-bold text-rose-600 mb-2 lang-en">Ferris the Crab:</h3>
-
-                <p id="dialog-text" class="text-lg leading-relaxed min-h-[60px] font-bold"></p>
-
+                <h3 id="ferris-name" class="font-bold text-rose-600 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold"></p>
                 <div class="mt-3 flex justify-end">
                     <button id="next-dialog-btn" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
-                        <span class="lang-fa">بعدی <i class="fa-solid fa-chevron-left ml-1"></i></span>
-                        <span class="lang-en">Next <i class="fa-solid fa-chevron-right ml-1"></i></span>
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Screen -->
+        <!-- Game Area -->
         <div id="game-area" class="hidden fade-in">
             <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-pink-300 code-font min-h-[400px] flex flex-col">
 
-                <!-- Mission 1: The Function Concept -->
+                <!-- Mission 1: Intro -->
                 <div id="mission-1" class="mission-view flex-grow">
                     <div class="text-center mb-4 border-b border-pink-900 pb-2">
-                        <h2 class="text-xl font-bold text-white lang-fa">فصل ۳: دستور پخت کیک شکلاتی 🍰</h2>
-                        <h2 class="text-xl font-bold text-white lang-en">Chapter 3: Space Chocolate Cake Recipe 🍰</h2>
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
                     </div>
-
-                    <div class="lang-fa leading-relaxed space-y-3">
-                        <p class="text-amber-200">> در برنامه‌نویسی وقتی یک کار تکراری داریم، به جای نوشتن دوباره کدها، از <strong>تابع (Function)</strong> استفاده می‌کنیم.</p>
-                        <p class="text-slate-300">> تابع دقیقا مثل یک «دستور پخت جادویی» است. یک بار آن را می‌نویسیم و هر چند بار که بخواهیم از آن کیک (خروجی) می‌گیریم!</p>
-                        <div class="terminal-block mt-4 text-emerald-300">
-                            <span class="text-slate-400">// ساخت یک ماشین پخت کیک</span><br>
-                            <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
-                            }<br>
-                            <span class="text-slate-400">// حالا می‌تونیم هزار بار صداش بزنیم:</span><br>
-                            <span class="text-pink-200">bake_cake();</span>
-                        </div>
-                    </div>
-
-                    <div class="lang-en leading-relaxed space-y-3">
-                        <p class="text-amber-200">> When we have repetitive tasks, instead of rewriting code, we use a <strong>Function</strong>.</p>
-                        <p class="text-slate-300">> A function is like a "magic recipe". We write it once, and we can get cakes (outputs) from it as many times as we want!</p>
-                        <div class="terminal-block mt-4 text-emerald-300">
-                            <span class="text-slate-400">// Creating a cake baking machine</span><br>
-                            <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
-                            }<br>
-                            <span class="text-slate-400">// Now we can call it a thousand times:</span><br>
-                            <span class="text-pink-200">bake_cake();</span>
-                        </div>
-                    </div>
-
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
                     <div class="mt-8 text-center">
-                        <button class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded font-bold code-font" onclick="startMission(2)">
-                            <span class="lang-fa">ورود به مرحله ساخت ماشین [Enter]</span>
-                            <span class="lang-en">Enter Machine Builder [Enter]</span>
-                        </button>
+                        <button id="mission1-btn" class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded font-bold code-font" onclick="startMission(2)"></button>
                     </div>
                 </div>
 
-                <!-- Mission 2: Return Type Puzzle (The -> Arrow) -->
+                <!-- Mission 2: Return Arrow Puzzle -->
                 <div id="mission-2" class="mission-view hidden flex-grow">
-                    <div class="text-amber-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۱: خروجی ماشین (Return Values)</span>
-                        <span class="lang-en">>> Step 1: Machine Output (Return Values)</span>
-                    </div>
-
-                    <div class="lang-fa text-sm text-slate-300 mb-4 space-y-2">
-                        <p>توابع می‌توانند خروجی داشته باشند (مثلاً یک تابع، دو عدد را جمع کند و جواب را پس بدهد).</p>
-                        <p>در زبان راست، برای نشان دادن اینکه این تابع قرار است یک عدد (<code class="text-pink-300">i32</code>) را پس بدهد، از یک <strong>فلش (Arrow)</strong> استفاده می‌کنیم.</p>
-                        <p class="text-amber-300 font-bold">شکل درست این فلش کدام است؟ آن را در جای خالی قرار بده:</p>
-                    </div>
-                    <div class="lang-en text-sm text-slate-300 mb-4 space-y-2">
-                        <p>Functions can return an output (like adding two numbers and giving back the result).</p>
-                        <p>In Rust, to show that a function will return a number (<code class="text-pink-300">i32</code>), we use an <strong>Arrow</strong> symbol.</p>
-                        <p class="text-amber-300 font-bold">Which one is the correct arrow? Place it in the blank:</p>
-                    </div>
-
-                    <div class="terminal-block text-lg mb-4 text-emerald-300">
+                    <div id="mission2-step" class="text-amber-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
                         <span class="text-rose-400">fn</span> add_sugar(a: i32, b: i32) <span id="slot1" class="code-slot" onclick="clearSlot(1)">---</span> i32 {<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;a + b <span class="text-slate-500 text-sm">// No semicolon means return!</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;a + b
                         }
                     </div>
-
-                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-pink-900 pt-3">
                         <div class="flex flex-wrap gap-2 justify-center">
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 1, '=>')">=&gt;</div>
@@ -270,221 +199,543 @@
                             <div class="code-option code-font text-xl" onclick="selectOption(this, 1, '>>')">&gt;&gt;</div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle1-btn" class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
-                            <span class="lang-fa">تکمیل لوله خروجی 🔧</span><span class="lang-en">Fix Output Pipe 🔧</span>
+                            <span id="puzzle1-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 3: Data Types Puzzle -->
+                <!-- Mission 3: Data Type Puzzle -->
                 <div id="mission-3" class="mission-view hidden flex-grow">
-                    <div class="text-amber-400 mb-2">
-                        <span class="lang-fa">>> مرحله ۲: دسته‌بندی مواد اولیه (Data Types)</span>
-                        <span class="lang-en">>> Step 2: Sorting Ingredients (Data Types)</span>
-                    </div>
-
-                    <p class="lang-fa text-sm text-slate-300 mb-4">کامپایلر خیلی حساس است! نمی‌توان به جای شکر، نمک ریخت. هر متغیر باید <strong>نوع (Type)</strong> مشخصی داشته باشد. نوع داده برای عدد اعشاری (مثل جاذبه زمین 9.81) چیست؟</p>
-                    <p class="lang-en text-sm text-slate-300 mb-4">The compiler is strict! You can't use salt instead of sugar. Every variable needs a specific <strong>Type</strong>. What is the data type for a decimal number (like gravity 9.81)?</p>
-
+                    <div id="mission3-step" class="text-amber-400 mb-2 text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
                     <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
-                        <span class="text-slate-400">// جاذبه سیاره فریس اعشاری است</span><br>
+                        <span class="text-slate-400">// Ferris planet gravity</span><br>
                         <span class="text-rose-400">let</span> gravity: <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> = 9.81;
                     </div>
-
-                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-sm font-bold"></div>
-
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
                     <div class="border-t border-pink-900 pt-3">
                         <div class="flex flex-wrap gap-4 justify-center">
-                            <div class="code-option code-font" onclick="selectOption(this, 2, 'i32')">i32 <span class="text-xs text-slate-400 block">(عدد صحیح)</span></div>
-                            <div class="code-option code-font" onclick="selectOption(this, 2, 'f64')">f64 <span class="text-xs text-slate-400 block">(عدد اعشاری)</span></div>
-                            <div class="code-option code-font" onclick="selectOption(this, 2, 'bool')">bool <span class="text-xs text-slate-400 block">(صحیح/غلط)</span></div>
-                            <div class="code-option code-font" onclick="selectOption(this, 2, 'char')">char <span class="text-xs text-slate-400 block">(کاراکتر)</span></div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'i32')">i32 <span class="text-xs text-slate-400 block">(int)</span></div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'f64')">f64 <span class="text-xs text-slate-400 block">(float)</span></div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'bool')">bool <span class="text-xs text-slate-400 block">(bool)</span></div>
+                            <div class="code-option code-font" onclick="selectOption(this, 2, 'char')">char <span class="text-xs text-slate-400 block">(char)</span></div>
                         </div>
                     </div>
-
                     <div class="mt-4 text-center">
                         <button id="run-puzzle2-btn" class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
-                            <span class="lang-fa">تایید نوع داده 🔍</span><span class="lang-en">Verify Type 🔍</span>
+                            <span id="puzzle2-btn-text"></span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mission 4: The Function Calculator Terminal -->
+                <!-- Mission 4: Calculator Terminal -->
                 <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
                     <div class="text-amber-400 mb-2 border-b border-pink-800 pb-2 flex justify-between items-center">
-                        <div>
-                            <span class="lang-fa">>> مرحله نهایی: کنسول ماشین حساب تابع</span>
-                            <span class="lang-en">>> Final Step: Function Calculator Console</span>
-                        </div>
-                        <div class="text-xs bg-pink-900 px-2 py-1 rounded">
-                            <span class="lang-fa">پروژه ۳.۵.۲</span><span class="lang-en">Project 3.5.2</span>
-                        </div>
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-pink-900 px-2 py-1 rounded">Project 3.5.2</div>
                     </div>
-
-                    <div class="lang-fa text-sm mb-2 text-slate-300">برای پختن کیک‌ها باید از توابع ریاضیاتی (ماشین حساب) استفاده کنی تا فریس سیر بشه!</div>
-                    <div class="lang-en text-sm mb-2 text-slate-300">Use the math functions (calculator) to bake cakes and feed Ferris!</div>
-
-                    <div id="calc-console" class="terminal-block flex-grow overflow-y-auto mb-4 text-sm code-font" style="max-height: 180px;">
-                        <div class="text-pink-400 mb-2">
-                            <span class="lang-fa">> سیستم ماشین حساب روشن شد...</span>
-                            <span class="lang-en">> Calculator system initialized...</span>
-                        </div>
+                    <div id="calc-mission-desc" class="text-sm mb-2 text-slate-300"></div>
+                    <div id="calc-console" class="terminal-block flex-grow overflow-y-auto mb-4 text-xs md:text-sm code-font" style="max-height: 180px;">
+                        <div id="calc-initial" class="text-pink-400 mb-2"></div>
                         <div id="calc-history"></div>
                     </div>
-
-                    <!-- Calculator Inputs -->
                     <div class="flex flex-wrap gap-2 items-center bg-slate-900/50 p-2 rounded-lg border border-pink-900">
-                        <input type="number" id="num-a" class="w-16 md:w-20 bg-slate-800 text-white border border-pink-700 rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500 code-font text-center" placeholder="A" value="5">
-
+                        <input type="number" id="num-a" class="w-16 md:w-20 bg-slate-800 text-white border border-pink-700 rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500 code-font text-center" value="5">
                         <select id="op-select" class="op-select code-font">
                             <option value="add">+</option>
                             <option value="subtract">-</option>
                             <option value="multiply">*</option>
                             <option value="divide">/</option>
                         </select>
-
-                        <input type="number" id="num-b" class="w-16 md:w-20 bg-slate-800 text-white border border-pink-700 rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500 code-font text-center" placeholder="B" value="3">
-
-                        <button class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded font-bold ml-auto" onclick="runCalculator()">
-                            <span class="lang-fa">اجرای تابع ()</span><span class="lang-en">Call fn()</span>
-                        </button>
+                        <input type="number" id="num-b" class="w-16 md:w-20 bg-slate-800 text-white border border-pink-700 rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-rose-500 code-font text-center" value="3">
+                        <button id="calc-run-btn" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded font-bold ml-auto" onclick="runCalculator()"></button>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- Success overlay -->
-        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in">
-            <div class="text-7xl mb-4 animate-bounce">🎂🦀🎓</div>
-            <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                <span class="lang-fa">فریس سیر شد!</span>
-                <span class="lang-en">Ferris is Full!</span>
-            </h2>
-            <p class="text-xl text-pink-400 mb-6 text-center px-4">
-                <span class="lang-fa">شما مفهوم توابع، پارامترها و Data Type ها را یاد گرفتید.</span>
-                <span class="lang-en">You've mastered Functions, Parameters, and Data Types.</span>
-            </p>
-            <button class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(225,29,72,0.6)]" onclick="location.reload()">
-                <span class="lang-fa">پایان فصل ۳ - دوباره بازی کن</span>
-                <span class="lang-en">End of Chapter 3 - Play Again</span>
-            </button>
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🎂🦀🎓</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-pink-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(225,29,72,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
         </div>
-
     </div>
 
     <script>
-        // --- Game State & Logic ---
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                hungerLabel: "گرسنگی فریس:",
+                cakesLabel: "کیک‌های پخته شده:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
+                    "سلام! من خیلی گرسنه‌ام و دلم کیک شکلاتی فضایی می‌خواد! 🍰",
+                    "من دستور پخت مادربزرگم رو دارم، اما نوشتن و تکرار همه این مراحل برای هر کیک، چنگک‌هام رو خسته می‌کنه! 🦀",
+                    "توی برنامه‌نویسی وقتی یک کار تکراری داریم، از «تابع» (Function) استفاده می‌کنیم.",
+                    "یک تابع مثل یک ماشین جادوییه. مواد اولیه (پارامتر) رو می‌گیره و کیک (خروجی) تحویل میده. کمکم می‌کنی بسازمش؟ 🚀"
+                ],
+                afterDialog: "عالیه! به مانیتور پایین نگاه کن تا ماشین تابع رو بسازیم.",
+                mission1Title: "فصل ۳: دستور پخت کیک شکلاتی 🍰",
+                mission1Text: `
+                    <p class="text-amber-200">> در برنامه‌نویسی وقتی یک کار تکراری داریم، به جای نوشتن دوباره کدها، از <strong>تابع (Function)</strong> استفاده می‌کنیم.</p>
+                    <p class="text-slate-300">> تابع دقیقا مثل یک «دستور پخت جادویی» است. یک بار آن را می‌نویسیم و هر چند بار که بخواهیم از آن کیک (خروجی) می‌گیریم!</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// ساخت یک ماشین پخت کیک</span><br>
+                        <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
+                        }<br>
+                        <span class="text-slate-400">// حالا می‌تونیم هزار بار صداش بزنیم:</span><br>
+                        <span class="text-pink-200">bake_cake();</span>
+                    </div>
+                `,
+                mission1Btn: "ورود به مرحله ساخت ماشین [Enter]",
+                mission2Step: ">> مرحله ۱: خروجی ماشین (Return Values)",
+                mission2Desc: "<p>توابع می‌توانند خروجی داشته باشند (مثلاً یک تابع، دو عدد را جمع کند و جواب را پس بدهد).</p><p>در زبان راست، برای نشان دادن اینکه این تابع قرار است یک عدد (<code class='text-pink-300'>i32</code>) را پس بدهد، از یک <strong>فلش (Arrow)</strong> استفاده می‌کنیم.</p><p class='text-amber-300 font-bold'>شکل درست این فلش کدام است؟ آن را در جای خالی قرار بده:</p>",
+                puzzle1Btn: "تکمیل لوله خروجی 🔧",
+                puzzle1Success: "> عالی! حالا تابع می‌تواند نتیجه را برگرداند.",
+                puzzle1Error: "خطا: در زبان راست فلش خروجی یک خط و یک علامت بزرگتر است (->).",
+                mission3Step: ">> مرحله ۲: دسته‌بندی مواد اولیه (Data Types)",
+                mission3Desc: "کامپایلر خیلی حساس است! نمی‌توان به جای شکر، نمک ریخت. هر متغیر باید <strong>نوع (Type)</strong> مشخصی داشته باشد. نوع داده برای عدد اعشاری (مثل جاذبه زمین 9.81) چیست؟",
+                puzzle2Btn: "تایید نوع داده 🔍",
+                puzzle2Success: "> نوع داده درست است! (Floating-Point)",
+                puzzle2Error: "خطا: 9.81 یک عدد اعشاری است. نوع درست را انتخاب کن.",
+                mission4Step: ">> مرحله نهایی: کنسول ماشین حساب تابع",
+                calcMissionDesc: "برای پختن کیک‌ها باید از توابع ریاضیاتی (ماشین حساب) استفاده کنی تا فریس سیر بشه!",
+                calcInitialMsg: "> سیستم ماشین حساب روشن شد...",
+                calcRunBtn: "اجرای تابع ()",
+                calcCallMsg: (op, a, b) => `> calling <span class="text-blue-300">${op}</span>(<span class="text-orange-300">${a}</span>, <span class="text-orange-300">${b}</span>)`,
+                calcReturnMsg: (res) => `> <span class="text-rose-400">fn</span> returns: <span class="text-emerald-400 font-bold">${res}</span>`,
+                calcCakeMsg: (cakes) => `🍰 فریس <span class="text-amber-400 font-bold">${cakes}</span> کیک فضایی خورد!`,
+                calcZeroResultMsg: "تعداد کیک نمی‌تواند منفی یا صفر باشد!",
+                errorNotNumber: "❌ خطا: لطفا عدد معتبر وارد کنید!",
+                errorDivisionZero: "❌ خطا: تقسیم بر صفر ممکن نیست! (Crash avoided 🛡️)",
+                winTitle: "فریس سیر شد!",
+                winMessage: "شما مفهوم توابع، پارامترها و Data Type ها را یاد گرفتید.",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                hungerLabel: "Ferris's Hunger:",
+                cakesLabel: "Cakes Baked:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hi! I'm so hungry and craving space chocolate cake! 🍰",
+                    "I have my grandma's recipe, but rewriting the steps for every cake is exhausting for my claws! 🦀",
+                    "In programming, when we have a repetitive task, we use a 'Function'.",
+                    "A function is like a magic machine. It takes ingredients (parameters) and gives back a cake (output). Help me build it! 🚀"
+                ],
+                afterDialog: "Awesome! Look at the monitor below to build the Function Machine.",
+                mission1Title: "Chapter 3: Space Chocolate Cake Recipe 🍰",
+                mission1Text: `
+                    <p class="text-amber-200">> When we have repetitive tasks, instead of rewriting code, we use a <strong>Function</strong>.</p>
+                    <p class="text-slate-300">> A function is like a "magic recipe". We write it once, and we can get cakes (outputs) as many times as we want!</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Creating a cake baking machine</span><br>
+                        <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
+                        }<br>
+                        <span class="text-slate-400">// Now we can call it a thousand times:</span><br>
+                        <span class="text-pink-200">bake_cake();</span>
+                    </div>
+                `,
+                mission1Btn: "Enter Machine Builder [Enter]",
+                mission2Step: ">> Step 1: Machine Output (Return Values)",
+                mission2Desc: "<p>Functions can return an output (like adding two numbers and giving back the result).</p><p>In Rust, to show that a function will return a number (<code class='text-pink-300'>i32</code>), we use an <strong>Arrow</strong> symbol.</p><p class='text-amber-300 font-bold'>Which one is the correct arrow? Place it in the blank:</p>",
+                puzzle1Btn: "Fix Output Pipe 🔧",
+                puzzle1Success: "> Great! The function can now return a result.",
+                puzzle1Error: "Error: In Rust, the return arrow is a dash and greater-than sign (->).",
+                mission3Step: ">> Step 2: Sorting Ingredients (Data Types)",
+                mission3Desc: "The compiler is strict! You can't use salt instead of sugar. Every variable needs a specific <strong>Type</strong>. What is the data type for a decimal number (like gravity 9.81)?",
+                puzzle2Btn: "Verify Type 🔍",
+                puzzle2Success: "> Data Type Correct! (Floating-Point)",
+                puzzle2Error: "Error: 9.81 is a decimal number. Pick the correct float type.",
+                mission4Step: ">> Final Step: Function Calculator Console",
+                calcMissionDesc: "Use the math functions (calculator) to bake cakes and feed Ferris!",
+                calcInitialMsg: "> Calculator system initialized...",
+                calcRunBtn: "Call fn()",
+                calcCallMsg: (op, a, b) => `> calling <span class="text-blue-300">${op}</span>(<span class="text-orange-300">${a}</span>, <span class="text-orange-300">${b}</span>)`,
+                calcReturnMsg: (res) => `> <span class="text-rose-400">fn</span> returns: <span class="text-emerald-400 font-bold">${res}</span>`,
+                calcCakeMsg: (cakes) => `🍰 Ferris ate <span class="text-amber-400 font-bold">${cakes}</span> space cakes!`,
+                calcZeroResultMsg: "Number of cakes cannot be negative or zero!",
+                errorNotNumber: "❌ Error: Please enter valid numbers!",
+                errorDivisionZero: "❌ Error: Division by zero is impossible! (Crash avoided 🛡️)",
+                winTitle: "Ferris is Full!",
+                winMessage: "You've mastered Functions, Parameters, and Data Types.",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                hungerLabel: "Hambre de Ferris:",
+                cakesLabel: "Pasteles horneados:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola! Tengo mucha hambre y anhelo un pastel de chocolate espacial! 🍰",
+                    "Tengo la receta de mi abuela, pero reescribir los pasos para cada pastel es agotador para mis pinzas! 🦀",
+                    "En programación, cuando tenemos una tarea repetitiva, usamos una 'Función'.",
+                    "Una función es como una máquina mágica. Toma ingredientes (parámetros) y devuelve un pastel (salida). ¡Ayúdame a construirla! 🚀"
+                ],
+                afterDialog: "¡Genial! Mira el monitor de abajo para construir la máquina de funciones.",
+                mission1Title: "Capítulo 3: Receta de pastel de chocolate espacial 🍰",
+                mission1Text: `
+                    <p class="text-amber-200">> Cuando tenemos tareas repetitivas, en lugar de reescribir código, usamos una <strong>Función</strong>.</p>
+                    <p class="text-slate-300">> Una función es como una "receta mágica". ¡La escribimos una vez y podemos obtener pasteles (salidas) tantas veces como queramos!</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Creando una máquina para hornear pasteles</span><br>
+                        <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
+                        }<br>
+                        <span class="text-slate-400">// Ahora podemos llamarla mil veces:</span><br>
+                        <span class="text-pink-200">bake_cake();</span>
+                    </div>
+                `,
+                mission1Btn: "Entrar al constructor de máquinas [Enter]",
+                mission2Step: ">> Paso 1: Salida de la máquina (Valores de retorno)",
+                mission2Desc: "<p>Las funciones pueden devolver una salida (como sumar dos números y devolver el resultado).</p><p>En Rust, para mostrar que una función devolverá un número (<code class='text-pink-300'>i32</code>), usamos un símbolo de <strong>Flecha</strong>.</p><p class='text-amber-300 font-bold'>¿Cuál es la flecha correcta? Colócala en el espacio en blanco:</p>",
+                puzzle1Btn: "Arreglar tubería de salida 🔧",
+                puzzle1Success: "> ¡Genial! La función ahora puede devolver un resultado.",
+                puzzle1Error: "Error: En Rust, la flecha de retorno es un guión y un signo mayor que (->).",
+                mission3Step: ">> Paso 2: Clasificación de ingredientes (Tipos de datos)",
+                mission3Desc: "¡El compilador es estricto! No puedes usar sal en lugar de azúcar. Cada variable necesita un <strong>Tipo</strong> específico. ¿Cuál es el tipo de dato para un número decimal (como la gravedad 9.81)?",
+                puzzle2Btn: "Verificar tipo 🔍",
+                puzzle2Success: "> ¡Tipo de dato correcto! (Punto flotante)",
+                puzzle2Error: "Error: 9.81 es un número decimal. Elige el tipo flotante correcto.",
+                mission4Step: ">> Paso final: Consola de calculadora de funciones",
+                calcMissionDesc: "¡Usa las funciones matemáticas (calculadora) para hornear pasteles y alimentar a Ferris!",
+                calcInitialMsg: "> Sistema de calculadora inicializado...",
+                calcRunBtn: "Llamar fn()",
+                calcCallMsg: (op, a, b) => `> llamando <span class="text-blue-300">${op}</span>(<span class="text-orange-300">${a}</span>, <span class="text-orange-300">${b}</span>)`,
+                calcReturnMsg: (res) => `> <span class="text-rose-400">fn</span> devuelve: <span class="text-emerald-400 font-bold">${res}</span>`,
+                calcCakeMsg: (cakes) => `🍰 Ferris comió <span class="text-amber-400 font-bold">${cakes}</span> pasteles espaciales!`,
+                calcZeroResultMsg: "¡El número de pasteles no puede ser negativo o cero!",
+                errorNotNumber: "❌ Error: ¡Ingresa números válidos!",
+                errorDivisionZero: "❌ Error: ¡División por cero imposible! (Choque evitado 🛡️)",
+                winTitle: "¡Ferris está lleno!",
+                winMessage: "Has dominado las funciones, los parámetros y los tipos de datos.",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                hungerLabel: "Ferris' Hunger:",
+                cakesLabel: "Gebackene Kuchen:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ich habe großen Hunger und sehne mich nach Weltraumschokoladenkuchen! 🍰",
+                    "Ich habe das Rezept meiner Großmutter, aber das Umschreiben der Schritte für jeden Kuchen ist anstrengend für meine Scheren! 🦀",
+                    "In der Programmierung verwenden wir bei sich wiederholenden Aufgaben eine 'Funktion'.",
+                    "Eine Funktion ist wie eine magische Maschine. Sie nimmt Zutaten (Parameter) und gibt einen Kuchen (Ausgabe) zurück. Hilf mir, sie zu bauen! 🚀"
+                ],
+                afterDialog: "Großartig! Schau auf den Monitor unten, um die Funktionsmaschine zu bauen.",
+                mission1Title: "Kapitel 3: Weltraum-Schokoladenkuchen-Rezept 🍰",
+                mission1Text: `
+                    <p class="text-amber-200">> Bei sich wiederholenden Aufgaben verwenden wir anstelle von neuem Code eine <strong>Funktion</strong>.</p>
+                    <p class="text-slate-300">> Eine Funktion ist wie ein "magisches Rezept". Wir schreiben es einmal und können so oft Kuchen (Ausgaben) daraus bekommen, wie wir wollen!</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Eine Kuchenbackmaschine erstellen</span><br>
+                        <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
+                        }<br>
+                        <span class="text-slate-400">// Jetzt können wir sie tausendmal aufrufen:</span><br>
+                        <span class="text-pink-200">bake_cake();</span>
+                    </div>
+                `,
+                mission1Btn: "Maschinenbauer betreten [Enter]",
+                mission2Step: ">> Schritt 1: Maschinenausgabe (Rückgabewerte)",
+                mission2Desc: "<p>Funktionen können eine Ausgabe zurückgeben (z. B. zwei Zahlen addieren und das Ergebnis zurückliefern).</p><p>In Rust verwenden wir ein <strong>Pfeilsymbol</strong>, um anzuzeigen, dass eine Funktion eine Zahl (<code class='text-pink-300'>i32</code>) zurückgibt.</p><p class='text-amber-300 font-bold'>Welcher Pfeil ist richtig? Setze ihn in die Lücke:</p>",
+                puzzle1Btn: "Ausgangsrohr reparieren 🔧",
+                puzzle1Success: "> Großartig! Die Funktion kann jetzt ein Ergebnis zurückgeben.",
+                puzzle1Error: "Fehler: In Rust ist der Rückgabepfeil ein Bindestrich und ein Größer-als-Zeichen (->).",
+                mission3Step: ">> Schritt 2: Zutaten sortieren (Datentypen)",
+                mission3Desc: "Der Compiler ist streng! Du kannst kein Salz anstelle von Zucker verwenden. Jede Variable benötigt einen bestimmten <strong>Typ</strong>. Welcher Datentyp ist für eine Dezimalzahl (wie die Schwerkraft 9.81) richtig?",
+                puzzle2Btn: "Typ überprüfen 🔍",
+                puzzle2Success: "> Datentyp korrekt! (Gleitkommazahl)",
+                puzzle2Error: "Fehler: 9.81 ist eine Dezimalzahl. Wähle den richtigen Gleitkommatyp.",
+                mission4Step: ">> Letzter Schritt: Funktionsrechner-Konsole",
+                calcMissionDesc: "Verwende die mathematischen Funktionen (Taschenrechner), um Kuchen zu backen und Ferris zu füttern!",
+                calcInitialMsg: "> Taschenrechnersystem initialisiert...",
+                calcRunBtn: "fn() aufrufen",
+                calcCallMsg: (op, a, b) => `> rufe <span class="text-blue-300">${op}</span>(<span class="text-orange-300">${a}</span>, <span class="text-orange-300">${b}</span>) auf`,
+                calcReturnMsg: (res) => `> <span class="text-rose-400">fn</span> gibt zurück: <span class="text-emerald-400 font-bold">${res}</span>`,
+                calcCakeMsg: (cakes) => `🍰 Ferris aß <span class="text-amber-400 font-bold">${cakes}</span> Weltraumkuchen!`,
+                calcZeroResultMsg: "Anzahl der Kuchen kann nicht negativ oder null sein!",
+                errorNotNumber: "❌ Fehler: Bitte gültige Zahlen eingeben!",
+                errorDivisionZero: "❌ Fehler: Division durch Null ist unmöglich! (Absturz vermieden 🛡️)",
+                winTitle: "Ferris ist satt!",
+                winMessage: "Du hast Funktionen, Parameter und Datentypen gemeistert.",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                hungerLabel: "Ferris' Honger:",
+                cakesLabel: "Gebakken taarten:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo! Ik heb veel honger en verlang naar ruimte chocoladetaart! 🍰",
+                    "Ik heb het recept van mijn oma, maar het herschrijven van de stappen voor elke taart is vermoeiend voor mijn scharen! 🦀",
+                    "In programmeren gebruiken we een 'Functie' wanneer we een repetitieve taak hebben.",
+                    "Een functie is als een magische machine. Het neemt ingrediënten (parameters) en geeft een taart (uitvoer) terug. Help me hem te bouwen! 🚀"
+                ],
+                afterDialog: "Geweldig! Kijk naar het beeldscherm hieronder om de functiemachine te bouwen.",
+                mission1Title: "Hoofdstuk 3: Ruimte chocoladetaart recept 🍰",
+                mission1Text: `
+                    <p class="text-amber-200">> Wanneer we repetitieve taken hebben, gebruiken we een <strong>Functie</strong> in plaats van code te herschrijven.</p>
+                    <p class="text-slate-300">> Een functie is als een "magisch recept". We schrijven het een keer en kunnen er zo vaak taarten (uitvoer) uit halen als we willen!</p>
+                    <div class="terminal-block mt-4 text-emerald-300">
+                        <span class="text-slate-400">// Een taartbakmachine maken</span><br>
+                        <span class="text-rose-400">fn</span> <span class="text-blue-300">bake_cake</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Baking a chocolate cake! 🍰"</span>);<br>
+                        }<br>
+                        <span class="text-slate-400">// Nu kunnen we het duizend keer aanroepen:</span><br>
+                        <span class="text-pink-200">bake_cake();</span>
+                    </div>
+                `,
+                mission1Btn: "Machinebouwer betreden [Enter]",
+                mission2Step: ">> Stap 1: Machine-uitvoer (Retourwaarden)",
+                mission2Desc: "<p>Functies kunnen een uitvoer teruggeven (zoals twee getallen optellen en het resultaat teruggeven).</p><p>In Rust gebruiken we een <strong>Pijlsymbool</strong> om aan te geven dat een functie een getal (<code class='text-pink-300'>i32</code>) zal retourneren.</p><p class='text-amber-300 font-bold'>Welke pijl is correct? Plaats hem in het lege veld:</p>",
+                puzzle1Btn: "Uitvoerpijp repareren 🔧",
+                puzzle1Success: "> Geweldig! De functie kan nu een resultaat retourneren.",
+                puzzle1Error: "Fout: In Rust is de retourpijl een streepje en een groter-dan-teken (->).",
+                mission3Step: ">> Stap 2: Ingrediënten sorteren (Gegevenstypen)",
+                mission3Desc: "De compiler is streng! Je kunt geen zout gebruiken in plaats van suiker. Elke variabele heeft een specifiek <strong>Type</strong> nodig. Welk gegevenstype is voor een decimaal getal (zoals zwaartekracht 9.81)?",
+                puzzle2Btn: "Type verifiëren 🔍",
+                puzzle2Success: "> Gegevenstype correct! (Drijvende komma)",
+                puzzle2Error: "Fout: 9.81 is een decimaal getal. Kies het juiste float-type.",
+                mission4Step: ">> Laatste stap: Functierekenmachine-console",
+                calcMissionDesc: "Gebruik de wiskundige functies (rekenmachine) om taarten te bakken en Ferris te voeden!",
+                calcInitialMsg: "> Rekenmachinesysteem geïnitialiseerd...",
+                calcRunBtn: "fn() aanroepen",
+                calcCallMsg: (op, a, b) => `> roep <span class="text-blue-300">${op}</span>(<span class="text-orange-300">${a}</span>, <span class="text-orange-300">${b}</span>) aan`,
+                calcReturnMsg: (res) => `> <span class="text-rose-400">fn</span> retourneert: <span class="text-emerald-400 font-bold">${res}</span>`,
+                calcCakeMsg: (cakes) => `🍰 Ferris at <span class="text-amber-400 font-bold">${cakes}</span> ruimtetaarten!`,
+                calcZeroResultMsg: "Aantal taarten kan niet negatief of nul zijn!",
+                errorNotNumber: "❌ Fout: Voer geldige getallen in!",
+                errorDivisionZero: "❌ Fout: Delen door nul is onmogelijk! (Crash vermeden 🛡️)",
+                winTitle: "Ferris is vol!",
+                winMessage: "Je hebt functies, parameters en gegevenstypen onder de knie.",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
+            }
+        };
+
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
         let currentLang = 'fa';
         let currentStep = 0;
         let currentDialogIndex = 0;
-        let typeInterval;
-
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
         let hunger = 100;
         let totalCakes = 0;
+        let puzzle1Completed = false, puzzle2Completed = false;
 
-        // --- Dialog Data ---
-        const dialogs = {
-            fa: [
-                "سلام! من خیلی گرسنه‌ام و دلم کیک شکلاتی فضایی می‌خواد! 🍰",
-                "من دستور پخت مادربزرگم رو دارم، اما نوشتن و تکرار همه این مراحل برای هر کیک، چنگک‌هام رو خسته می‌کنه! 🦀",
-                "توی برنامه‌نویسی وقتی یک کار تکراری داریم، از «تابع» (Function) استفاده می‌کنیم.",
-                "یک تابع مثل یک ماشین جادوییه. مواد اولیه (پارامتر) رو می‌گیره و کیک (خروجی) تحویل میده. کمکم می‌کنی بسازمش؟ 🚀"
-            ],
-            en: [
-                "Hi! I'm so hungry and craving space chocolate cake! 🍰",
-                "I have my grandma's recipe, but rewriting the steps for every cake is exhausting for my claws! 🦀",
-                "In programming, when we have a repetitive task, we use a 'Function'.",
-                "A function is like a magic machine. It takes ingredients (parameters) and gives back a cake (output). Help me build it! 🚀"
-            ]
-        };
+        // DOM elements
+        const hungerLabelSpan = document.getElementById('hunger-label');
+        const cakesLabelSpan = document.getElementById('cakes-label');
+        const hungerValueSpan = document.getElementById('hunger-value');
+        const cakesValueSpan = document.getElementById('cakes-value');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
 
-        function setLang(lang) {
-            currentLang = lang;
-            const htmlRoot = document.getElementById('html-root');
-            const btnEn = document.getElementById('btn-en');
-            const btnFa = document.getElementById('btn-fa');
-
-            if(lang === 'fa') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-pink-600 text-white";
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                // Update HUD dynamically
-                document.getElementById('hunger-level').innerText = "۱۰۰٪";
-                document.getElementById('cakes-baked').innerText = totalCakes.toLocaleString('fa-IR');
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                btnEn.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-pink-600 text-white";
-                btnFa.className = "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                document.getElementById('hunger-level').innerText = "100%";
-                document.getElementById('cakes-baked').innerText = totalCakes;
-            }
-
-            if(currentStep === 0) {
-                clearTimeout(typeInterval);
-                document.getElementById('dialog-text').innerHTML = dialogs[currentLang][currentDialogIndex];
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-pink-600 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
             }
         }
 
-        function typeWriter(text, i, cb) {
-            const el = document.getElementById('dialog-text');
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                typeInterval = setTimeout(function() { typeWriter(text, i, cb) }, 30);
-            } else {
-                cb();
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
+                    i++;
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
+                }
             }
+            typeNext();
         }
 
         function showDialog() {
-            const text = dialogs[currentLang][currentDialogIndex];
-            const el = document.getElementById('dialog-text');
-            const nextBtn = document.getElementById('next-dialog-btn');
-
-            el.innerHTML = '';
-            nextBtn.classList.add('hidden');
-
-            typeWriter(text, 0, () => {
-                nextBtn.classList.remove('hidden');
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.querySelector('.dashboard').classList.add('shake');
+                setTimeout(() => document.querySelector('.dashboard').classList.remove('shake'), 500);
+            }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
             });
         }
 
         function nextDialog() {
-            clearTimeout(typeInterval);
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
             currentDialogIndex++;
-
-            if (currentDialogIndex < dialogs[currentLang].length) {
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
             } else {
                 currentStep = 1;
-                document.getElementById('next-dialog-btn').classList.add('hidden');
-                document.getElementById('dialog-text').innerHTML = currentLang === 'fa' ?
-                    "عالیه! به مانیتور پایین نگاه کن تا ماشین تابع رو بسازیم." :
-                    "Awesome! Look at the monitor below to build the Function Machine.";
-
-                document.getElementById('game-area').classList.remove('hidden');
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
                 startMission(1);
             }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            hungerLabelSpan.innerText = pack.hungerLabel;
+            cakesLabelSpan.innerText = pack.cakesLabel;
+            hungerValueSpan.innerText = formatNumber(hunger, currentLang) + '%';
+            cakesValueSpan.innerText = formatNumber(totalCakes, currentLang);
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('mission1-btn').innerHTML = pack.mission1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('calc-mission-desc').innerHTML = pack.calcMissionDesc;
+            document.getElementById('calc-initial').innerHTML = pack.calcInitialMsg;
+            document.getElementById('calc-run-btn').innerHTML = pack.calcRunBtn;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-pink-600 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
         }
 
         function startMission(missionNum) {
             document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
             document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            if (missionNum === 4) {
+                // focus on first input
+                setTimeout(() => document.getElementById('num-a').focus(), 200);
+            }
         }
 
-        // --- Puzzle System ---
+        // Puzzle handlers
         function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed)) return;
             element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
-
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = word;
             slot.classList.add('filled');
             runBtn.disabled = false;
@@ -493,115 +744,118 @@
         }
 
         function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed)) return;
             const slot = document.getElementById('slot' + puzzleNum);
             const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
-
             slot.innerText = "---";
             slot.classList.remove('filled');
             runBtn.disabled = true;
             runBtn.classList.add('opacity-50', 'cursor-not-allowed');
             document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
-            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll(`#mission-${puzzleNum+1} .code-option`).forEach(el => el.classList.remove('selected'));
         }
 
         function checkPuzzle1() {
+            if (puzzle1Completed) return;
             const slotText = document.getElementById('slot1').innerText;
             const feedback = document.getElementById('puzzle1-feedback');
             const crt = document.getElementById('crt-monitor');
-
             if (slotText === '->') {
                 feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
-                feedback.innerText = currentLang === 'fa' ? "> عالی! حالا تابع می‌تواند نتیجه را برگرداند." : "> Great! The function can now return a result.";
+                feedback.innerText = languagePack[currentLang].puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(3), 1500);
             } else {
                 crt.classList.add('glitch');
                 setTimeout(() => crt.classList.remove('glitch'), 400);
-                feedback.innerText = currentLang === 'fa' ? "خطا: در زبان راست فلش خروجی یک خط و یک علامت بزرگتر است (->)." : "Error: In Rust, the return arrow is a dash and greater-than sign (->).";
+                feedback.innerText = languagePack[currentLang].puzzle1Error;
             }
         }
 
         function checkPuzzle2() {
+            if (puzzle2Completed) return;
             const slotText = document.getElementById('slot2').innerText;
             const feedback = document.getElementById('puzzle2-feedback');
             const crt = document.getElementById('crt-monitor');
-
             if (slotText === 'f64') {
                 feedback.className = "text-emerald-400 h-6 mb-4 font-bold text-sm";
-                feedback.innerText = currentLang === 'fa' ? "> نوع داده درست است! (Floating-Point)" : "> Data Type Correct! (Floating-Point)";
+                feedback.innerText = languagePack[currentLang].puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 setTimeout(() => startMission(4), 1500);
             } else {
                 crt.classList.add('glitch');
                 setTimeout(() => crt.classList.remove('glitch'), 400);
-                feedback.innerText = currentLang === 'fa' ? "خطا: 9.81 یک عدد اعشاری است. نوع درست را انتخاب کن." : "Error: 9.81 is a decimal number. Pick the correct float type.";
+                feedback.innerText = languagePack[currentLang].puzzle2Error;
             }
         }
 
-        // --- Interactive Calculator Terminal ---
+        // Calculator logic
         function appendHistory(text, colorClass) {
             const history = document.getElementById('calc-history');
             const div = document.createElement('div');
             div.className = `mt-1 ${colorClass}`;
-            div.innerHTML = text; // Allow HTML for emojis
+            div.innerHTML = text;
             history.appendChild(div);
-
             const consoleBox = document.getElementById('calc-console');
             consoleBox.scrollTop = consoleBox.scrollHeight;
         }
 
         function runCalculator() {
-            const a_val = parseFloat(document.getElementById('num-a').value);
-            const b_val = parseFloat(document.getElementById('num-b').value);
-            const op = document.getElementById('op-select').value;
+            const pack = languagePack[currentLang];
+            const a = parseFloat(document.getElementById('num-a').value);
+            const b = parseFloat(document.getElementById('num-b').value);
+            const opSelect = document.getElementById('op-select');
+            const op = opSelect.value;
+            const opSymbol = opSelect.options[opSelect.selectedIndex].text;
 
-            if(isNaN(a_val) || isNaN(b_val)) {
-                appendHistory(currentLang === 'fa' ? "❌ خطا: لطفا عدد معتبر وارد کنید!" : "❌ Error: Please enter valid numbers!", "text-rose-500");
+            if (isNaN(a) || isNaN(b)) {
+                appendHistory(pack.errorNotNumber, "text-rose-500");
                 return;
             }
 
             let result = 0;
-            let opSymbol = '';
-
-            switch(op) {
-                case 'add': result = a_val + b_val; opSymbol = '+'; break;
-                case 'subtract': result = a_val - b_val; opSymbol = '-'; break;
-                case 'multiply': result = a_val * b_val; opSymbol = '*'; break;
+            switch (op) {
+                case 'add': result = a + b; break;
+                case 'subtract': result = a - b; break;
+                case 'multiply': result = a * b; break;
                 case 'divide':
-                    if(b_val === 0) {
-                        appendHistory(currentLang === 'fa' ? "❌ خطا: تقسیم بر صفر ممکن نیست! (Crash avoided 🛡️)" : "❌ Error: Division by zero is impossible! (Crash avoided 🛡️)", "text-rose-500 bg-rose-900/30 p-1 rounded");
+                    if (b === 0) {
+                        appendHistory(pack.errorDivisionZero, "text-rose-500 bg-rose-900/30 p-1 rounded");
                         return;
                     }
-                    result = a_val / b_val; opSymbol = '/';
+                    result = a / b;
                     break;
             }
-
-            // Limit decimal places
             result = Math.round(result * 100) / 100;
 
             // Log function call
-            appendHistory(`> calling <span class="text-blue-300">${op}</span>(<span class="text-orange-300">${a_val}</span>, <span class="text-orange-300">${b_val}</span>)`, "text-slate-400");
+            appendHistory(pack.calcCallMsg(opSymbol, a, b), "text-slate-400");
+            appendHistory(pack.calcReturnMsg(result), "text-white");
 
-            // Add positive results to cakes
-            if(result > 0) {
-                const addedCakes = Math.floor(result);
-                totalCakes += addedCakes;
-                hunger = Math.max(0, hunger - (addedCakes * 5)); // Each cake reduces hunger by 5%
-
-                appendHistory(`> <span class="text-rose-400">fn</span> returns: <span class="text-emerald-400 font-bold">${result}</span>`, "text-white");
-                appendHistory(`🍰 فریس <span class="text-amber-400 font-bold">${addedCakes}</span> کیک فضایی خورد!`, "text-amber-200 mt-1 mb-2 border-b border-pink-900/50 pb-1");
+            if (result > 0) {
+                const cakesEaten = Math.floor(result);
+                totalCakes += cakesEaten;
+                hunger = Math.max(0, hunger - cakesEaten * 5);
+                appendHistory(pack.calcCakeMsg(cakesEaten), "text-amber-200 mt-1 mb-2 border-b border-pink-900/50 pb-1");
             } else {
-                appendHistory(`> <span class="text-rose-400">fn</span> returns: <span class="text-slate-300 font-bold">${result}</span> (تعداد کیک نمی‌تواند منفی یا صفر باشد!)`, "text-slate-400 mb-2 border-b border-pink-900/50 pb-1");
+                appendHistory(`<span class="text-slate-400">${pack.calcZeroResultMsg}</span>`, "text-slate-400 mb-2 border-b border-pink-900/50 pb-1");
             }
 
             // Update HUD
-            document.getElementById('hunger-level').innerText = currentLang === 'fa' ? `${hunger.toLocaleString('fa-IR')}٪` : `${hunger}%`;
-            document.getElementById('cakes-baked').innerText = currentLang === 'fa' ? totalCakes.toLocaleString('fa-IR') : totalCakes;
+            hungerValueSpan.innerText = formatNumber(hunger, currentLang) + '%';
+            cakesValueSpan.innerText = formatNumber(totalCakes, currentLang);
 
-            if(hunger <= 50) {
-                document.getElementById('hunger-level').parentElement.classList.replace('text-rose-500', 'text-emerald-400');
+            if (hunger <= 50) {
+                hungerValueSpan.parentElement.classList.replace('text-rose-500', 'text-emerald-400');
             }
 
-            // Win condition
-            if(hunger <= 0) {
+            if (hunger <= 0) {
                 triggerConfetti();
                 setTimeout(() => {
                     document.getElementById('success-screen').classList.remove('hidden');
@@ -609,17 +863,18 @@
             }
         }
 
-        // --- Confetti System ---
-        let W = window.innerWidth;
-        let H = window.innerHeight;
+        function goToNextChapter() {
+            window.location.href = 'chapter-4.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
         const canvas = document.getElementById('confetti');
         const context = canvas.getContext('2d');
         const maxConfettis = 100;
         const particles = [];
-        const possibleColors = ["#f472b6", "#fbbf24", "#fb923c", "#fdf2f8"]; // Cake colors
-
+        const possibleColors = ["#f472b6", "#fbbf24", "#fb923c", "#fdf2f8"];
         function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
-
         function confettiParticle() {
             this.x = Math.random() * W;
             this.y = Math.random() * H - H;
@@ -629,7 +884,6 @@
             this.tilt = Math.floor(Math.random() * 33) - 11;
             this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
             this.tiltAngle = 0;
-
             this.draw = function() {
                 context.beginPath();
                 context.lineWidth = this.r / 2;
@@ -639,46 +893,40 @@
                 return context.stroke();
             };
         }
-
         let animationId = null;
         function Draw() {
             animationId = requestAnimationFrame(Draw);
             context.clearRect(0, 0, W, H);
             for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-            let particle = {};
             for (let i = 0; i < maxConfettis; i++) {
-                particle = particles[i];
-                particle.tiltAngle += particle.tiltAngleIncremental;
-                particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                if (particle.x > W + 30 || particle.x < -30 || particle.y > H) {
-                    particle.x = Math.random() * W;
-                    particle.y = -30;
-                    particle.tilt = Math.floor(Math.random() * 10) - 20;
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
         }
-
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', () => {
             W = window.innerWidth; H = window.innerHeight;
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        }, false);
-
+            canvas.width = W; canvas.height = H;
+        });
         function triggerConfetti() {
             canvas.width = W; canvas.height = H;
             particles.length = 0;
             for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
-            if(!animationId) Draw();
+            if (!animationId) Draw();
         }
 
-        // Initialize Game
+        // Initialization
+        buildLanguageButtons();
         setTimeout(() => {
-            setLang('fa'); // Start in Persian
+            setLang('fa');
             showDialog();
         }, 500);
-
     </script>
 </body>
 </html>

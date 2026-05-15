@@ -1,1353 +1,991 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 20 (Finale)</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 20 (Finale)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --crt-bg: #083344;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #3b82f6;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(6, 182, 212, 0.1) 2px, transparent 40px), radial-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .chat-input, .chat-box, .chat-msg, .server-hub, #sim-terminal {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #020617 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            border: 4px solid #0369a1;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(6, 182, 212, 0.04) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(59, 130, 246, 0.02), rgba(6, 182, 212, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(236, 254, 255, 0.95);
+            color: #083344;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(236, 254, 255, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(236, 254, 255, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #cffafe; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: var(--accent-secondary); background: rgba(59, 130, 246, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-secondary); background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .code-option {
+            background: #082f49; border: 2px solid #0369a1;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #bae6fd;
+        }
+        .code-option:hover { background: #0c4a6e; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-secondary); border-color: #bfdbfe; color: #eff6ff; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .glow-pulse { animation: glowPulse 1.5s infinite alternate; }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(6, 182, 212, 1); }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .chat-input {
+            background-color: #082f49; border: 2px solid #0369a1;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            outline: none; transition: border-color 0.3s; width: 100%;
+        }
+        .chat-input:focus { border-color: var(--accent-primary); }
+        .chat-box {
+            background: rgba(0,0,0,0.4); border: 1px solid #0284c7; border-radius: 8px;
+            height: 100px; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px;
+        }
+        .chat-msg {
+            background: #0c4a6e; border: 1px solid #0369a1; border-radius: 6px; padding: 4px 8px;
+            font-size: 0.75rem; color: #e0f2fe; animation: popIn 0.3s forwards;
+            word-wrap: break-word;
+        }
+        .chat-msg.self { background: #065f46; border-color: #059669; align-self: flex-end; }
+        .server-hub {
+            border: 2px dashed #0ea5e9; border-radius: 50%; width: 60px; height: 60px;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto;
+            background: rgba(14, 165, 233, 0.1); position: relative;
+        }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .chat-input { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+            .chat-box { height: 80px; }
+            .server-hub { width: 45px; height: 45px; }
+            .server-hub i { font-size: 1.2rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #020617; /* Slate 950 */
-                --crt-bg: #083344; /* Cyan 950 */
-                --accent-primary: #06b6d4; /* Cyan 500 */
-                --accent-secondary: #3b82f6; /* Blue 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(6, 182, 212, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(59, 130, 246, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Comms Center Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #1e293b 0%, #020617 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 40px rgba(6, 182, 212, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.8);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
-                border: 4px solid #0369a1; /* Sky 700 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(6, 182, 212, 0.04) 50%,
-                        rgba(0, 0, 0, 0.3) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(59, 130, 246, 0.02),
-                        rgba(6, 182, 212, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(236, 254, 255, 0.95); /* Cyan 50 */
-                color: #083344; /* Cyan 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(236, 254, 255, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(236, 254, 255, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #cffafe;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed var(--accent-secondary);
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: var(--accent-secondary);
-                background: rgba(59, 130, 246, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-secondary);
-                background: rgba(59, 130, 246, 0.2);
-                color: #93c5fd;
-            }
-
-            .code-option {
-                background: #082f49;
-                border: 2px solid #0369a1;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #bae6fd;
-            }
-            .code-option:hover {
-                background: #0c4a6e;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-secondary);
-                border-color: #bfdbfe;
-                color: #eff6ff;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-            .glow-pulse {
-                animation: glowPulse 1.5s infinite alternate;
-            }
-            @keyframes glowPulse {
-                0% {
-                    box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
-                }
-                100% {
-                    box-shadow: 0 0 20px rgba(6, 182, 212, 1);
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(6, 182, 212, 0.3);
-            }
-
-            /* Chat Simulator Styles */
-            .chat-input {
-                background-color: #082f49;
-                border: 2px solid #0369a1;
-                color: white;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                outline: none;
-                transition: border-color 0.3s;
-                width: 100%;
-                font-family: "Vazirmatn", sans-serif;
-            }
-            .chat-input:focus {
-                border-color: var(--accent-primary);
-            }
-
-            .chat-box {
-                background: rgba(0, 0, 0, 0.4);
-                border: 1px solid #0284c7;
-                border-radius: 8px;
-                height: 100px;
-                overflow-y: auto;
-                padding: 8px;
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .chat-msg {
-                background: #0c4a6e;
-                border: 1px solid #0369a1;
-                border-radius: 6px;
-                padding: 4px 8px;
-                font-size: 0.75rem;
-                color: #e0f2fe;
-                animation: popIn 0.3s forwards;
-                word-wrap: break-word;
-            }
-            .chat-msg.self {
-                background: #065f46;
-                border-color: #059669;
-                align-self: flex-end;
-            }
-
-            .server-hub {
-                border: 2px dashed #0ea5e9;
-                border-radius: 50%;
-                width: 60px;
-                height: 60px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto;
-                background: rgba(14, 165, 233, 0.1);
-                position: relative;
-            }
-
-            /* Connection Lines */
-            .conn-line {
-                position: absolute;
-                border-left: 2px dashed #38bdf8;
-                height: 30px;
-                top: 60px;
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-cyan-600 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-cyan-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-cyan-400"><i class="fa-solid fa-satellite-dish"></i> <span id="network-label"></span> <span id="network-status" class="text-emerald-400"></span></div>
+                <div class="text-blue-400"><i class="fa-solid fa-envelope-circle-check"></i> <span id="messages-label"></span> <span id="hud-msgs">0 / 3</span></div>
             </div>
+            <div class="text-cyan-300 code-font text-xs md:text-sm opacity-70">NET-OS v20.0 (FINALE)</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-cyan-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-cyan-400">
-                        <i class="fa-solid fa-satellite-dish"></i>
-                        <span class="lang-fa">شبکه:</span
-                        ><span class="lang-en">Network:</span>
-                        <span class="text-emerald-400">فریس‌نت آنلاین 🟢</span>
-                    </div>
-                    <div class="text-blue-400">
-                        <i class="fa-solid fa-envelope-circle-check"></i>
-                        <span class="lang-fa">پیام‌های موفق:</span
-                        ><span class="lang-en">Messages Sent:</span>
-                        <span class="text-white" id="hud-msgs">۰ / ۳</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">📡🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-cyan-500">
+                <h3 id="ferris-name" class="font-bold text-cyan-800 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-cyan-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-cyan-300 code-font text-sm opacity-70">
-                    NET-OS v20.0 (FINALE)
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">📡🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-cyan-500"
-                >
-                    <h3 class="font-bold text-cyan-800 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-cyan-800 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-cyan-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-cyan-100 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: TcpListener -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-cyan-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۲۰: فریس‌نت (ارتباطات شبکه) 🌐
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 20: FerrisNet (Network Comms) 🌐
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-cyan-300">
-                                > دیوارهای سفینه‌ها خیلی ضخیم‌اند. اما ما
-                                می‌توانیم با ساختن یک **سرور (Server)**،
-                                کانال‌های ارتباطی باز کنیم!
-                            </p>
-                            <p class="text-slate-300">
-                                > سرور باید روی یک درگاه (پورت) منتظر بماند تا
-                                بقیه مثل مهمان در بزنند و وصل شوند.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                در `TcpListener`، با چه متدی به پورت متصل
-                                می‌شویم تا گوش به زنگ بمانیم؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-cyan-300">
-                                > Spaceship walls are too thick. But we can open
-                                communication channels by building a **Server**!
-                            </p>
-                            <p class="text-slate-300">
-                                > The server must wait on a port for guests to
-                                knock and connect.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                In `TcpListener`, which method attaches us to
-                                the port to start listening?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-pink-400">use</span>
-                            std::net::TcpListener;<br /><br />
-                            <span class="text-slate-400 text-sm"
-                                >// Server listens on port 7878</span
-                            ><br />
-                            <span class="text-pink-400">let</span> listener =
-                            TcpListener::<span
-                                id="slot1"
-                                class="code-slot text-blue-300"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            >(<span class="text-yellow-300"
-                                >"127.0.0.1:7878"</span
-                            >)?;
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-cyan-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'start')"
-                                >
-                                    start
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'bind')"
-                                >
-                                    bind
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'open')"
-                                >
-                                    open
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'listen')"
-                                >
-                                    listen
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-cyan-700 hover:bg-cyan-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >باز کردن درگاه سرور 🚪</span
-                                ><span class="lang-en"
-                                    >Open Server Port 🚪</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: TcpStream Connect -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-blue-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: وصل شدن کلاینت (Client)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Client Connection</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                وقتی سرور آماده شد، برنامه‌ی دیگر که **کلاینت
-                                (Client)** نام دارد باید در بزند تا خط تلفن وصل
-                                شود!
-                            </p>
-                            <p class="text-white font-bold">
-                                با استفاده از `TcpStream`، از چه متدی برای وصل
-                                شدن به آدرس سرور استفاده می‌کنیم؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                When the server is ready, the other program
-                                called the **Client** must knock to connect the
-                                phone line!
-                            </p>
-                            <p class="text-white font-bold">
-                                Using `TcpStream`, which method is used to reach
-                                out to the server's address?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">use</span>
-                            std::net::TcpStream;<br /><br />
-                            <span class="text-slate-400 text-sm"
-                                >// Client knocking on the door</span
-                            ><br />
-                            <span class="text-pink-400">let mut</span> stream =
-                            TcpStream::<span
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >(<span class="text-yellow-300"
-                                >"127.0.0.1:7878"</span
-                            >)?;<br />
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Connected!"</span
-                            >);
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-cyan-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'join')"
-                                >
-                                    join
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'connect')"
-                                >
-                                    connect
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'link')"
-                                >
-                                    link
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'attach')"
-                                >
-                                    attach
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">برقراری تماس 📞</span
-                                ><span class="lang-en">Make the Call 📞</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: try_clone -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-blue-400 mb-2 font-bold">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: دو طرفه کردن خط!</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Two-Way Radio!</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            برای چت همزمان (تایپ کردن و پیام خواندن همزمان)،
-                            باید سوکت را در دو ریسه (Thread) جداگانه بگذاریم.
-                            اما سوکت یک شیء انحصاری است! برای گرفتن یک کپی معتبر
-                            از سوکت برای ریسه‌ی دوم، از چه متدی استفاده می‌کنیم؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            For simultaneous chat (typing and reading at the
-                            same time), we need to put the socket in two
-                            separate Threads. But a socket is exclusive! Which
-                            method do we use to safely duplicate the socket for
-                            the second thread?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-slate-400 text-sm"
-                                >// Create a copy of the socket for the listener
-                                thread</span
-                            ><br />
-                            <span class="text-pink-400">let mut</span>
-                            stream_clone = stream.<span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >()?;<br /><br />
-                            thread::spawn(<span class="text-pink-400"
-                                >move</span
-                            >
-                            || {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;listen_to_server(stream_clone);<br />
-                            });
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-cyan-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-lg px-4"
-                                    onclick="selectOption(this, 3, 'clone')"
-                                >
-                                    clone
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg px-4"
-                                    onclick="selectOption(this, 3, 'try_clone')"
-                                >
-                                    try_clone
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg px-4"
-                                    onclick="selectOption(this, 3, 'split')"
-                                >
-                                    split
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg px-4"
-                                    onclick="selectOption(this, 3, 'dup')"
-                                >
-                                    dup
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa">تقسیم خط تلفن 🔀</span
-                                ><span class="lang-en"
-                                    >Split the Phone Line 🔀</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: FerrisNet Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-cyan-400 mb-2 border-b border-blue-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: شبیه‌ساز چت گروهی
-                                    فریس‌نت</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: FerrisNet Group Chat
-                                    Simulator</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-blue-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۲۰.۴</span
-                                ><span class="lang-en">Project 20.4</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            شما در نقش فریس (You) هستید! پیامی تایپ کنید و دکمه
-                            ارسال را بزنید. سرور آن را دریافت کرده و به
-                            دوستانتان (بیل و لونا) پخش (Broadcast) می‌کند.
-                            <strong>۳ پیام</strong> بفرستید تا اینترنت فضایی
-                            افتتاح شود!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            You play as Ferris (You)! Type a message and hit
-                            Send. The server will receive it and Broadcast it to
-                            your friends (Bill and Luna). Send
-                            <strong>3 messages</strong> to launch the space
-                            internet!
-                        </div>
-
-                        <div class="flex flex-col gap-2 flex-grow">
-                            <!-- Network Topology Visualization -->
-                            <div
-                                class="bg-black/30 p-2 rounded border border-cyan-900/50 flex flex-col items-center"
-                            >
-                                <!-- Server -->
-                                <div
-                                    class="server-hub glow-pulse"
-                                    id="server-node"
-                                >
-                                    <i
-                                        class="fa-solid fa-server text-2xl text-cyan-400"
-                                    ></i>
-                                </div>
-                                <div
-                                    class="text-[0.65rem] text-cyan-400 font-bold mb-2"
-                                >
-                                    Arc&lt;Mutex&lt;Vec&lt;TcpStream&gt;&gt;&gt;
-                                </div>
-
-                                <!-- Clients Display -->
-                                <div
-                                    class="grid grid-cols-3 gap-2 w-full mt-2 relative"
-                                >
-                                    <!-- User (Ferris) -->
-                                    <div class="flex flex-col items-center">
-                                        <div
-                                            class="text-xs font-bold text-emerald-400 mb-1"
-                                        >
-                                            شما (You)
-                                        </div>
-                                        <div
-                                            class="chat-box w-full"
-                                            id="chat-ferris"
-                                        ></div>
-                                    </div>
-
-                                    <!-- Bill -->
-                                    <div class="flex flex-col items-center">
-                                        <div
-                                            class="text-xs font-bold text-amber-400 mb-1"
-                                        >
-                                            بیل (Bill)
-                                        </div>
-                                        <div
-                                            class="chat-box w-full"
-                                            id="chat-bill"
-                                        ></div>
-                                    </div>
-
-                                    <!-- Luna -->
-                                    <div class="flex flex-col items-center">
-                                        <div
-                                            class="text-xs font-bold text-fuchsia-400 mb-1"
-                                        >
-                                            لونا (Luna)
-                                        </div>
-                                        <div
-                                            class="chat-box w-full"
-                                            id="chat-luna"
-                                        ></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Chat Input -->
-                            <div class="flex gap-2 mt-auto">
-                                <input
-                                    type="text"
-                                    id="chat-input-msg"
-                                    class="chat-input"
-                                    placeholder="Type message here..."
-                                    onkeypress="handleEnter(event)"
-                                />
-                                <button
-                                    class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2 rounded font-bold"
-                                    onclick="sendMessage()"
-                                >
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                    <span class="lang-fa">ارسال</span
-                                    ><span class="lang-en">Send</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-50 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">🌍🏆🎓</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa">فریس‌نت متصل شد! تبریک!</span>
-                    <span class="lang-en"
-                        >FerrisNet is Online! Congratulations!</span
-                    >
-                </h2>
-                <p
-                    class="text-xl text-cyan-400 mb-4 text-center px-4 max-w-2xl leading-relaxed"
-                >
-                    <span class="lang-fa"
-                        >تو از یک مبتدی که «سلام دنیا» می‌نوشت، به جادوگری تبدیل
-                        شدی که بین کامپیوترها ارتباط برقرار می‌کند.
-                        <br /><br /><strong
-                            >تو حالا رسماً یک Rustacean واقعی هستی! 🦀✨</strong
-                        ></span
-                    >
-                    <span class="lang-en"
-                        >You went from a beginner writing "Hello World" to a
-                        wizard connecting computers together.
-                        <br /><br /><strong
-                            >You are now officially a true Rustacean!
-                            🦀✨</strong
-                        ></span
-                    >
-                </p>
-                <button
-                    class="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-[0_0_20px_rgba(6,182,212,0.8)] mt-4"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان ماجراجویی (شروع دوباره)</span>
-                    <span class="lang-en">End of Adventure (Play Again)</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-cyan-100 code-font min-h-[400px] flex flex-col">
 
-            let messagesSent = 0;
-            let isSimulating = false;
+                <!-- Mission 1: TcpListener::bind -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-cyan-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-pink-400">use</span> std::net::TcpListener;<br><br>
+                        <span class="text-slate-400 text-sm">// Server listens on port 7878</span><br>
+                        <span class="text-pink-400">let</span> listener = TcpListener::<span id="slot1" class="code-slot text-blue-300" onclick="clearSlot(1)">---</span>(<span class="text-yellow-300">"127.0.0.1:7878"</span>)?;
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-cyan-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'start')">start</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'bind')">bind</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'open')">open</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'listen')">listen</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-cyan-700 hover:bg-cyan-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: TcpStream::connect -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-blue-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">use</span> std::net::TcpStream;<br><br>
+                        <span class="text-slate-400 text-sm">// Client knocking on the door</span><br>
+                        <span class="text-pink-400">let mut</span> stream = TcpStream::<span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span>(<span class="text-yellow-300">"127.0.0.1:7878"</span>)?;<br>
+                        <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Connected!"</span>);
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-cyan-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'join')">join</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'connect')">connect</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'link')">link</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'attach')">attach</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: try_clone -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-blue-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-slate-400 text-sm">// Create a copy of the socket for the listener thread</span><br>
+                        <span class="text-pink-400">let mut</span> stream_clone = stream.<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>()?;<br><br>
+                        thread::spawn(<span class="text-pink-400">move</span> || {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;listen_to_server(stream_clone);<br>
+                        });
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-cyan-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'clone')">clone</div>
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'try_clone')">try_clone</div>
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'split')">split</div>
+                            <div class="code-option code-font text-lg px-4" onclick="selectOption(this, 3, 'dup')">dup</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: FerrisNet Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-cyan-400 mb-2 border-b border-blue-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-blue-900 px-2 py-1 rounded text-white">Project 20.4</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="flex flex-col gap-2 flex-grow">
+                        <div class="bg-black/30 p-2 rounded border border-cyan-900/50 flex flex-col items-center">
+                            <div class="server-hub glow-pulse" id="server-node">
+                                <i class="fa-solid fa-server text-2xl text-cyan-400"></i>
+                            </div>
+                            <div id="server-badge" class="text-[0.65rem] text-cyan-400 font-bold mb-2">Arc&lt;Mutex&lt;Vec&lt;TcpStream&gt;&gt;&gt;</div>
+                            <div class="grid grid-cols-3 gap-2 w-full mt-2 relative">
+                                <div class="flex flex-col items-center">
+                                    <div id="you-label" class="text-xs font-bold text-emerald-400 mb-1"></div>
+                                    <div class="chat-box w-full" id="chat-ferris"></div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div id="bill-label" class="text-xs font-bold text-amber-400 mb-1"></div>
+                                    <div class="chat-box w-full" id="chat-bill"></div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div id="luna-label" class="text-xs font-bold text-fuchsia-400 mb-1"></div>
+                                    <div class="chat-box w-full" id="chat-luna"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-auto">
+                            <input type="text" id="chat-input-msg" class="chat-input" onkeypress="handleEnter(event)">
+                            <button id="send-msg-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2 rounded font-bold" onclick="sendMessage()">
+                                <i class="fa-solid fa-paper-plane"></i> <span id="send-btn-text"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-50 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🌍🏆🎓</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-cyan-400 mb-4 text-center px-4 max-w-2xl leading-relaxed"></p>
+            <div class="flex flex-col sm:flex-row gap-4 mt-2">
+                <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(6,182,212,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="index-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToIndex()">
+                    <i class="fa-solid fa-house ml-2"></i> <span id="index-btn-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                networkLabel: "شبکه:",
+                messagesLabel: "پیام‌های موفق:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                networkStatus: "فریس‌نت آنلاین 🟢",
+                dialogues: [
                     "این آخرین ماجراجویی ماست! دلم خیلی برای دوستم بیل که تو سفینه بغلیه تنگ شده. 🚀",
                     "دیوارهای سفینه خیلی ضخیمه و صدا رد نمیشه. اما کامپیوترها می‌تونن با هم حرف بزنن! به این میگن شبکه (Networking). 📡",
                     "با استفاده از Socketها می‌تونیم به یک پورت متصل بشیم و پیام بفرستیم. حتی می‌تونیم یک چت‌روم بزرگ برای همه دوستان بسازیم!",
-                    "بیا با هم سرور فریس‌نت رو راه‌اندازی کنیم و اولین پیاممون رو به فضا بفرستیم. آماده‌ای جادوگر؟ 🦀✨",
+                    "بیا با هم سرور فریس‌نت رو راه‌اندازی کنیم و اولین پیاممون رو به فضا بفرستیم. آماده‌ای جادوگر؟ 🦀✨"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا سرور رو روشن کنیم.",
+                mission1Title: "فصل ۲۰: فریس‌نت (ارتباطات شبکه) 🌐",
+                mission1Text: `
+                    <p class="text-cyan-300">> دیوارهای سفینه‌ها خیلی ضخیم‌اند. اما ما می‌توانیم با ساختن یک **سرور (Server)**، کانال‌های ارتباطی باز کنیم!</p>
+                    <p class="text-slate-300">> سرور باید روی یک درگاه (پورت) منتظر بماند تا بقیه مثل مهمان در بزنند و وصل شوند.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">در `TcpListener`، با چه متدی به پورت متصل می‌شویم تا گوش به زنگ بمانیم؟</p>
+                `,
+                puzzle1Btn: "باز کردن درگاه سرور 🚪",
+                puzzle1Success: "> درگاه باز شد و سرور آماده شنیدن است!",
+                puzzle1Error: "خطا: متد متصل شدن سرور به پورت، bind نام دارد.",
+                mission2Step: ">> مرحله ۱: وصل شدن کلاینت (Client)",
+                mission2Desc: "<p>وقتی سرور آماده شد، برنامه‌ی دیگر که **کلاینت (Client)** نام دارد باید در بزند تا خط تلفن وصل شود!</p><p class='text-white font-bold'>با استفاده از `TcpStream`، از چه متدی برای وصل شدن به آدرس سرور استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "برقراری تماس 📞",
+                puzzle2Success: "> تماس برقرار شد! کلاینت متصل است.",
+                puzzle2Error: "خطا: کلاینت برای وصل شدن به سرور از متد connect استفاده می‌کند.",
+                mission3Step: ">> مرحله ۲: دو طرفه کردن خط!",
+                mission3Desc: "برای چت همزمان (تایپ کردن و پیام خواندن همزمان)، باید سوکت را در دو ریسه (Thread) جداگانه بگذاریم. اما سوکت یک شیء انحصاری است! برای گرفتن یک کپی معتبر از سوکت برای ریسه‌ی دوم، از چه متدی استفاده می‌کنیم؟",
+                puzzle3Btn: "تقسیم خط تلفن 🔀",
+                puzzle3Success: "> خط با موفقیت دوطرفه شد!",
+                puzzle3Error: "خطا: سوکت‌ها منابع انحصاری سیستم‌عامل هستند، برای کپی کردن آن‌ها باید از try_clone استفاده شود.",
+                mission4Step: ">> مرحله نهایی: شبیه‌ساز چت گروهی فریس‌نت",
+                mission4Desc: "شما در نقش فریس (You) هستید! پیامی تایپ کنید و دکمه ارسال را بزنید. سرور آن را دریافت کرده و به دوستانتان (بیل و لونا) پخش (Broadcast) می‌کند. <strong>۳ پیام</strong> بفرستید تا اینترنت فضایی افتتاح شود!",
+                youLabel: "شما (You)",
+                billLabel: "بیل (Bill)",
+                lunaLabel: "لونا (Luna)",
+                sendBtn: "ارسال",
+                chatPlaceholder: "پیام خود را تایپ کنید...",
+                broadcastPrefix: "شما: ",
+                botReply: "بیل: سلام فریس! بالاخره وصل شدی! 🎉",
+                winTitle: "فریس‌نت متصل شد! تبریک!",
+                winMessage: "تو از یک مبتدی که «سلام دنیا» می‌نوشت، به جادوگری تبدیل شدی که بین کامپیوترها ارتباط برقرار می‌کند. <br><br><strong>تو حالا رسماً یک Rustacean واقعی هستی! 🦀✨</strong>",
+                restartBtn: "بازی مجدد",
+                indexBtn: "بازگشت به صفحه اصلی"
+            },
+            en: {
+                name: "English",
+                networkLabel: "Network:",
+                messagesLabel: "Messages Sent:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                networkStatus: "FerrisNet Online 🟢",
+                dialogues: [
                     "This is our final adventure! I miss my friend Bill in the next spaceship so much. 🚀",
                     "The ship walls are too thick for sound. But computers can talk to each other! This is called Networking. 📡",
                     "Using Sockets, we can connect to a port and send messages. We can even build a giant chatroom for all our friends!",
-                    "Let's launch the FerrisNet server together and send our first message to space. Ready, Wizard? 🦀✨",
+                    "Let's launch the FerrisNet server together and send our first message to space. Ready, Wizard? 🦀✨"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-cyan-600 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-msgs").innerText =
-                        `${messagesSent.toLocaleString("fa-IR")} / ۳`;
-                    document.getElementById("chat-input-msg").placeholder =
-                        "پیام خود را تایپ کنید...";
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-cyan-600 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    document.getElementById("hud-msgs").innerText =
-                        `${messagesSent} / 3`;
-                    document.getElementById("chat-input-msg").placeholder =
-                        "Type your message...";
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below to turn on the server.",
+                mission1Title: "Chapter 20: FerrisNet (Network Comms) 🌐",
+                mission1Text: `
+                    <p class="text-cyan-300">> Spaceship walls are too thick. But we can open communication channels by building a **Server**!</p>
+                    <p class="text-slate-300">> The server must wait on a port for guests to knock and connect.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">In `TcpListener`, which method attaches us to the port to start listening?</p>
+                `,
+                puzzle1Btn: "Open Server Port 🚪",
+                puzzle1Success: "> Port opened and server is listening!",
+                puzzle1Error: "Error: The method to attach a server to a port is called bind.",
+                mission2Step: ">> Step 1: Client Connection",
+                mission2Desc: "<p>When the server is ready, the other program called the **Client** must knock to connect the phone line!</p><p class='text-white font-bold'>Using `TcpStream`, which method is used to reach out to the server's address?</p>",
+                puzzle2Btn: "Make the Call 📞",
+                puzzle2Success: "> Call established! Client connected.",
+                puzzle2Error: "Error: A client uses the connect method to link to a server.",
+                mission3Step: ">> Step 2: Two-Way Radio!",
+                mission3Desc: "For simultaneous chat (typing and reading at the same time), we need to put the socket in two separate Threads. But a socket is exclusive! Which method do we use to safely duplicate the socket for the second thread?",
+                puzzle3Btn: "Split the Phone Line 🔀",
+                puzzle3Success: "> Line successfully duplicated for two-way chat!",
+                puzzle3Error: "Error: Sockets are exclusive OS resources; to copy them, you must use try_clone.",
+                mission4Step: ">> Final Step: FerrisNet Group Chat Simulator",
+                mission4Desc: "You play as Ferris (You)! Type a message and hit Send. The server will receive it and Broadcast it to your friends (Bill and Luna). Send <strong>3 messages</strong> to launch the space internet!",
+                youLabel: "You",
+                billLabel: "Bill",
+                lunaLabel: "Luna",
+                sendBtn: "Send",
+                chatPlaceholder: "Type your message...",
+                broadcastPrefix: "You: ",
+                botReply: "Bill: Hi Ferris! You finally connected! 🎉",
+                winTitle: "FerrisNet is Online! Congratulations!",
+                winMessage: "You went from a beginner writing \"Hello World\" to a wizard connecting computers together. <br><br><strong>You are now officially a true Rustacean! 🦀✨</strong>",
+                restartBtn: "Play Again",
+                indexBtn: "Back to Home"
+            },
+            es: {
+                name: "Español",
+                networkLabel: "Red:",
+                messagesLabel: "Mensajes enviados:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                networkStatus: "FerrisNet en línea 🟢",
+                dialogues: [
+                    "¡Esta es nuestra aventura final! Echo mucho de menos a mi amigo Bill en la nave de al lado. 🚀",
+                    "Las paredes de la nave son demasiado gruesas para el sonido. ¡Pero las computadoras pueden hablar entre sí! Esto se llama Redes. 📡",
+                    "Usando Sockets, podemos conectarnos a un puerto y enviar mensajes. ¡Incluso podemos construir una gran sala de chat para todos nuestros amigos!",
+                    "¡Lanzamos el servidor FerrisNet juntos y enviemos nuestro primer mensaje al espacio! ¿Listo, mago? 🦀✨"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para encender el servidor.",
+                mission1Title: "Capítulo 20: FerrisNet (Comunicaciones de red) 🌐",
+                mission1Text: `
+                    <p class="text-cyan-300">> ¡Las paredes de la nave son demasiado gruesas! Pero podemos abrir canales de comunicación construyendo un **Servidor**.</p>
+                    <p class="text-slate-300">> El servidor debe esperar en un puerto a que los invitados toquen y se conecten.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">En `TcpListener`, ¿qué método nos adjunta al puerto para empezar a escuchar?</p>
+                `,
+                puzzle1Btn: "Abrir puerto del servidor 🚪",
+                puzzle1Success: "> ¡Puerto abierto y servidor escuchando!",
+                puzzle1Error: "Error: El método para adjuntar un servidor a un puerto se llama bind.",
+                mission2Step: ">> Paso 1: Conexión del cliente",
+                mission2Desc: "<p>Cuando el servidor está listo, el otro programa llamado **Cliente** debe tocar para conectar la línea telefónica.</p><p class='text-white font-bold'>Usando `TcpStream`, ¿qué método se usa para contactar la dirección del servidor?</p>",
+                puzzle2Btn: "Hacer la llamada 📞",
+                puzzle2Success: "> ¡Llamada establecida! Cliente conectado.",
+                puzzle2Error: "Error: Un cliente usa el método connect para enlazar con un servidor.",
+                mission3Step: ">> Paso 2: ¡Radio de dos vías!",
+                mission3Desc: "Para chat simultáneo (escribir y leer al mismo tiempo), necesitamos poner el socket en dos hilos separados. Pero un socket es exclusivo. ¿Qué método usamos para duplicar el socket de manera segura para el segundo hilo?",
+                puzzle3Btn: "Dividir la línea telefónica 🔀",
+                puzzle3Success: "> ¡Línea duplicada exitosamente para chat bidireccional!",
+                puzzle3Error: "Error: Los sockets son recursos exclusivos del SO; para copiarlos, debes usar try_clone.",
+                mission4Step: ">> Paso final: Simulador de chat grupal FerrisNet",
+                mission4Desc: "¡Juegas como Ferris (Tú)! Escribe un mensaje y presiona Enviar. El servidor lo recibirá y lo transmitirá a tus amigos (Bill y Luna). ¡Envía <strong>3 mensajes</strong> para lanzar el internet espacial!",
+                youLabel: "Tú",
+                billLabel: "Bill",
+                lunaLabel: "Luna",
+                sendBtn: "Enviar",
+                chatPlaceholder: "Escribe tu mensaje...",
+                broadcastPrefix: "Tú: ",
+                botReply: "Bill: ¡Hola Ferris! ¡Por fin te conectaste! 🎉",
+                winTitle: "¡FerrisNet está en línea! ¡Felicidades!",
+                winMessage: "Pasaste de ser un principiante que escribía \"Hola Mundo\" a un mago que conecta computadoras. <br><br><strong>¡Ahora eres oficialmente un verdadero Rustacean! 🦀✨</strong>",
+                restartBtn: "Jugar de nuevo",
+                indexBtn: "Volver al inicio"
+            },
+            de: {
+                name: "Deutsch",
+                networkLabel: "Netzwerk:",
+                messagesLabel: "Gesendete Nachrichten:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                networkStatus: "FerrisNet online 🟢",
+                dialogues: [
+                    "Das ist unser letztes Abenteuer! Ich vermisse meinen Freund Bill im nächsten Raumschiff so sehr. 🚀",
+                    "Die Schiffswände sind zu dick für Schall. Aber Computer können miteinander sprechen! Das nennt man Netzwerken. 📡",
+                    "Mit Sockets können wir uns mit einem Port verbinden und Nachrichten senden. Wir können sogar einen riesigen Chatroom für all unsere Freunde bauen!",
+                    "Lass uns gemeinsam den FerrisNet-Server starten und unsere erste Nachricht ins All senden. Bereit, Zauberer? 🦀✨"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um den Server einzuschalten.",
+                mission1Title: "Kapitel 20: FerrisNet (Netzwerkkommunikation) 🌐",
+                mission1Text: `
+                    <p class="text-cyan-300">> Raumschiffwände sind zu dick. Aber wir können Kommunikationskanäle öffnen, indem wir einen **Server** bauen!</p>
+                    <p class="text-slate-300">> Der Server muss an einem Port warten, bis Gäste klopfen und sich verbinden.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">In `TcpListener`, welche Methode verbindet uns mit dem Port, um zu lauschen?</p>
+                `,
+                puzzle1Btn: "Server-Port öffnen 🚪",
+                puzzle1Success: "> Port geöffnet und Server lauscht!",
+                puzzle1Error: "Fehler: Die Methode zum Verbinden eines Servers mit einem Port heißt bind.",
+                mission2Step: ">> Schritt 1: Client-Verbindung",
+                mission2Desc: "<p>Wenn der Server bereit ist, muss das andere Programm namens **Client** klopfen, um die Telefonleitung zu verbinden.</p><p class='text-white font-bold'>Mit `TcpStream`, welche Methode wird verwendet, um die Serveradresse zu erreichen?</p>",
+                puzzle2Btn: "Anruf tätigen 📞",
+                puzzle2Success: "> Verbindung hergestellt! Client verbunden.",
+                puzzle2Error: "Fehler: Ein Client verwendet die connect-Methode, um sich mit einem Server zu verbinden.",
+                mission3Step: ">> Schritt 2: Zwei-Wege-Funk!",
+                mission3Desc: "Für gleichzeitigen Chat (Schreiben und Lesen gleichzeitig) müssen wir den Socket in zwei separate Threads legen. Aber ein Socket ist exklusiv. Welche Methode verwenden wir, um den Socket sicher für den zweiten Thread zu duplizieren?",
+                puzzle3Btn: "Telefonleitung teilen 🔀",
+                puzzle3Success: "> Leitung erfolgreich für Zwei-Wege-Chat dupliziert!",
+                puzzle3Error: "Fehler: Sockets sind exklusive Betriebssystemressourcen; zum Kopieren müssen Sie try_clone verwenden.",
+                mission4Step: ">> Letzter Schritt: FerrisNet-Gruppenchat-Simulator",
+                mission4Desc: "Du spielst als Ferris (Du)! Tippe eine Nachricht und drücke Senden. Der Server empfängt sie und sendet sie an deine Freunde (Bill und Luna). Sende <strong>3 Nachrichten</strong>, um das Weltraum-Internet zu starten!",
+                youLabel: "Du",
+                billLabel: "Bill",
+                lunaLabel: "Luna",
+                sendBtn: "Senden",
+                chatPlaceholder: "Nachricht eingeben...",
+                broadcastPrefix: "Du: ",
+                botReply: "Bill: Hallo Ferris! Endlich verbunden! 🎉",
+                winTitle: "FerrisNet ist online! Herzlichen Glückwunsch!",
+                winMessage: "Du bist vom Anfänger, der \"Hallo Welt\" schrieb, zu einem Zauberer geworden, der Computer miteinander verbindet. <br><br><strong>Du bist jetzt offiziell ein echter Rustacean! 🦀✨</strong>",
+                restartBtn: "Nochmal spielen",
+                indexBtn: "Zurück zur Startseite"
+            },
+            nl: {
+                name: "Nederlands",
+                networkLabel: "Netwerk:",
+                messagesLabel: "Verzonden berichten:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                networkStatus: "FerrisNet online 🟢",
+                dialogues: [
+                    "Dit is ons laatste avontuur! Ik mis mijn vriend Bill in het volgende ruimteschip zo erg. 🚀",
+                    "De wanden van het schip zijn te dik voor geluid. Maar computers kunnen met elkaar praten! Dit heet Netwerken. 📡",
+                    "Met Sockets kunnen we verbinding maken met een poort en berichten verzenden. We kunnen zelfs een gigantische chatroom bouwen voor al onze vrienden!",
+                    "Laten we samen de FerrisNet-server lanceren en ons eerste bericht de ruimte in sturen. Klaar, tovenaar? 🦀✨"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om de server in te schakelen.",
+                mission1Title: "Hoofdstuk 20: FerrisNet (Netwerkcommunicatie) 🌐",
+                mission1Text: `
+                    <p class="text-cyan-300">> Ruimteschipmuren zijn te dik. Maar we kunnen communicatiekanalen openen door een **Server** te bouwen!</p>
+                    <p class="text-slate-300">> De server moet op een poort wachten tot gasten kloppen en verbinding maken.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">In `TcpListener`, welke methode koppelt ons aan de poort om te gaan luisteren?</p>
+                `,
+                puzzle1Btn: "Serverpoort openen 🚪",
+                puzzle1Success: "> Poort geopend en server luistert!",
+                puzzle1Error: "Fout: De methode om een server aan een poort te koppelen heet bind.",
+                mission2Step: ">> Stap 1: Clientverbinding",
+                mission2Desc: "<p>Als de server klaar is, moet het andere programma genaamd **Client** kloppen om de telefoonlijn aan te sluiten.</p><p class='text-white font-bold'>Met `TcpStream`, welke methode wordt gebruikt om het serveradres te bereiken?</p>",
+                puzzle2Btn: "Het gesprek voeren 📞",
+                puzzle2Success: "> Verbinding tot stand gebracht! Client verbonden.",
+                puzzle2Error: "Fout: Een client gebruikt de connect-methode om verbinding te maken met een server.",
+                mission3Step: ">> Stap 2: Tweerichtingsradio!",
+                mission3Desc: "Voor gelijktijdige chat (typen en lezen tegelijk) moeten we de socket in twee aparte threads plaatsen. Maar een socket is exclusief. Welke methode gebruiken we om de socket veilig te dupliceren voor de tweede thread?",
+                puzzle3Btn: "Telefoonlijn splitsen 🔀",
+                puzzle3Success: "> Lijn succesvol gedupliceerd voor tweerichtingschat!",
+                puzzle3Error: "Fout: Sockets zijn exclusieve bronnen van het besturingssysteem; om ze te kopiëren, moet je try_clone gebruiken.",
+                mission4Step: ">> Laatste stap: FerrisNet-groepschatsimulator",
+                mission4Desc: "Jij speelt als Ferris (Jij)! Typ een bericht en druk op Verzenden. De server ontvangt het en zendt het uit naar je vrienden (Bill en Luna). Stuur <strong>3 berichten</strong> om het ruimte-internet te lanceren!",
+                youLabel: "Jij",
+                billLabel: "Bill",
+                lunaLabel: "Luna",
+                sendBtn: "Verzenden",
+                chatPlaceholder: "Typ je bericht...",
+                broadcastPrefix: "Jij: ",
+                botReply: "Bill: Hallo Ferris! Eindelijk verbonden! 🎉",
+                winTitle: "FerrisNet is online! Gefeliciteerd!",
+                winMessage: "Je bent gegaan van een beginner die \"Hallo Wereld\" schreef naar een tovenaar die computers met elkaar verbindt. <br><br><strong>Je bent nu officieel een echte Rustacean! 🦀✨</strong>",
+                restartBtn: "Opnieuw spelen",
+                indexBtn: "Terug naar home"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let messagesSent = 0;
+        let isSimulating = false;
+
+        // DOM elements
+        const networkLabelSpan = document.getElementById('network-label');
+        const messagesLabelSpan = document.getElementById('messages-label');
+        const networkStatusSpan = document.getElementById('network-status');
+        const hudMsgsSpan = document.getElementById('hud-msgs');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-cyan-600 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
-
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
-                } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا سرور رو روشن کنیم."
-                            : "Let's go! Look at the monitor below to turn on the server.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
-                }
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
             }
-
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
-
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
-
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
-
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
-                runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
-            }
-
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
-            }
-
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "bind") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> درگاه باز شد و سرور آماده شنیدن است!"
-                            : "> Port opened and server is listening!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: متد متصل شدن سرور به پورت، bind نام دارد.",
-                        "Error: The method to attach a server to a port is called bind.",
-                    );
-                }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "connect") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> تماس برقرار شد! کلاینت متصل است."
-                            : "> Call established! Client connected.";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: کلاینت برای وصل شدن به سرور از متد connect استفاده می‌کند.",
-                        "Error: A client uses the connect method to link to a server.",
-                    );
-                }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "try_clone") {
-                    feedback.className =
-                        "text-cyan-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> خط با موفقیت دوطرفه شد!"
-                            : "> Line successfully duplicated for two-way chat!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: سوکت‌ها منابع انحصاری سیستم‌عامل هستند، برای کپی کردن آن‌ها باید از try_clone استفاده شود.",
-                        "Error: Sockets are exclusive OS resources; to copy them, you must use try_clone.",
-                    );
-                }
-            }
-
-            // --- Chat Simulator ---
-            function handleEnter(e) {
-                if (e.key === "Enter") sendMessage();
-            }
-
-            function appendMsg(boxId, text, isSelf) {
-                const box = document.getElementById(boxId);
-                const msgDiv = document.createElement("div");
-                msgDiv.className = `chat-msg ${isSelf ? "self" : ""}`;
-                msgDiv.innerText = text;
-                box.appendChild(msgDiv);
-                box.scrollTop = box.scrollHeight;
-            }
-
-            // Simulating the Network Broadcast Latency
-            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-            async function sendMessage() {
-                if (isSimulating) return;
-
-                const inputEl = document.getElementById("chat-input-msg");
-                const msg = inputEl.value.trim();
-                if (!msg) return;
-
-                isSimulating = true;
-                inputEl.value = "";
-
-                // 1. User sees their own message immediately
-                appendMsg("chat-ferris", msg, true);
-
-                // 2. Network Pulse Effect to Server
-                const serverHub = document.getElementById("server-node");
-                serverHub.style.transform = "scale(1.2)";
-                serverHub.style.background = "rgba(6, 182, 212, 0.4)";
-
-                await sleep(400); // network delay
-
-                serverHub.style.transform = "scale(1)";
-                serverHub.style.background = "rgba(14, 165, 233, 0.1)";
-
-                // 3. Server Broadcasts to others
-                const broadcastMsg = `You: ${msg}`;
-                appendMsg("chat-bill", broadcastMsg, false);
-                appendMsg("chat-luna", broadcastMsg, false);
-
-                messagesSent++;
-                setLang(currentLang); // Update HUD counter
-
-                isSimulating = false;
-
-                // Occasional automated reply from bots to make it feel alive
-                if (messagesSent === 1) {
-                    setTimeout(async () => {
-                        const reply =
-                            currentLang === "fa"
-                                ? "بیل: سلام فریس! بالاخره وصل شدی! 🎉"
-                                : "Bill: Hi Ferris! You finally connected! 🎉";
-                        serverHub.style.transform = "scale(1.2)";
-                        await sleep(300);
-                        serverHub.style.transform = "scale(1)";
-                        appendMsg("chat-ferris", reply, false);
-                        appendMsg("chat-bill", reply, true); // Bill sees his own msg
-                        appendMsg("chat-luna", reply, false);
-                    }, 1500);
-                }
-
-                // Check Win Condition
-                if (messagesSent >= 3) {
-                    setTimeout(() => {
-                        triggerMassiveConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
-                    }, 1000);
-                }
-            }
-
-            // --- Grand Finale Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 250; // MORE CONFETTI FOR FINALE!
-            const particles = [];
-            const possibleColors = [
-                "#06b6d4",
-                "#3b82f6",
-                "#10b981",
-                "#f59e0b",
-                "#d946ef",
-                "#ffffff",
-                "#facc15",
-            ];
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(10, 30); // Bigger pieces
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerMassiveConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
-            }, 500);
-        </script>
-    </body>
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            networkLabelSpan.innerText = pack.networkLabel;
+            messagesLabelSpan.innerText = pack.messagesLabel;
+            networkStatusSpan.innerHTML = pack.networkStatus;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            hudMsgsSpan.innerText = currentLang === 'fa' ? `${formatNumber(messagesSent, currentLang)} / ۳` : `${messagesSent} / 3`;
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('you-label').innerHTML = pack.youLabel;
+            document.getElementById('bill-label').innerHTML = pack.billLabel;
+            document.getElementById('luna-label').innerHTML = pack.lunaLabel;
+            document.getElementById('send-btn-text').innerHTML = pack.sendBtn;
+            document.getElementById('chat-input-msg').placeholder = pack.chatPlaceholder;
+            document.getElementById('server-badge').innerHTML = "Arc&lt;Mutex&lt;Vec&lt;TcpStream&gt;&gt;&gt;";
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('index-btn-text').innerHTML = pack.indexBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-cyan-600 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            if (missionNum === 4) {
+                // Reset chat simulator state
+                messagesSent = 0;
+                isSimulating = false;
+                hudMsgsSpan.innerText = currentLang === 'fa' ? `۰ / ۳` : `0 / 3`;
+                const chatBoxes = ['chat-ferris', 'chat-bill', 'chat-luna'];
+                chatBoxes.forEach(boxId => {
+                    document.getElementById(boxId).innerHTML = '';
+                });
+                document.getElementById('chat-input-msg').value = '';
+            }
+        }
+
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
+
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'bind') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
+            }
+        }
+
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'connect') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
+            }
+        }
+
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'try_clone') {
+                document.getElementById('puzzle3-feedback').className = "text-cyan-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
+
+        // Chat Simulator
+        function appendMsg(boxId, text, isSelf) {
+            const box = document.getElementById(boxId);
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-msg ${isSelf ? 'self' : ''}`;
+            msgDiv.innerText = text;
+            box.appendChild(msgDiv);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        async function sendMessage() {
+            const pack = languagePack[currentLang];
+            if (isSimulating) return;
+            const inputEl = document.getElementById('chat-input-msg');
+            const msg = inputEl.value.trim();
+            if (!msg) return;
+            isSimulating = true;
+            inputEl.value = '';
+            appendMsg('chat-ferris', msg, true);
+            const serverHub = document.getElementById('server-node');
+            serverHub.style.transform = 'scale(1.2)';
+            serverHub.style.background = 'rgba(6, 182, 212, 0.4)';
+            await sleep(400);
+            serverHub.style.transform = 'scale(1)';
+            serverHub.style.background = 'rgba(14, 165, 233, 0.1)';
+            const broadcastMsg = `${pack.broadcastPrefix}${msg}`;
+            appendMsg('chat-bill', broadcastMsg, false);
+            appendMsg('chat-luna', broadcastMsg, false);
+            messagesSent++;
+            hudMsgsSpan.innerText = currentLang === 'fa' ? `${formatNumber(messagesSent, currentLang)} / ۳` : `${messagesSent} / 3`;
+            isSimulating = false;
+            if (messagesSent === 1) {
+                setTimeout(async () => {
+                    const reply = pack.botReply;
+                    serverHub.style.transform = 'scale(1.2)';
+                    await sleep(300);
+                    serverHub.style.transform = 'scale(1)';
+                    appendMsg('chat-ferris', reply, false);
+                    appendMsg('chat-bill', reply, true);
+                    appendMsg('chat-luna', reply, false);
+                }, 1500);
+            }
+            if (messagesSent >= 3) {
+                setTimeout(() => {
+                    triggerMassiveConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function goToIndex() {
+            window.location.href = 'index.html';
+        }
+
+        // --- Grand Finale Confetti System ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 250;
+        const particles = [];
+        const possibleColors = ["#06b6d4", "#3b82f6", "#10b981", "#f59e0b", "#d946ef", "#ffffff", "#facc15"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(10, 30);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerMassiveConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
+
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>

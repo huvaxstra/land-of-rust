@@ -1,1361 +1,1024 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 19</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 19</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #1c1917;
+            --crt-bg: #2a0606;
+            --accent-primary: #ef4444;
+            --accent-secondary: #a855f7;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(239, 68, 68, 0.1) 2px, transparent 40px), radial-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .spell-input, select.spell-select, #sim-terminal, .objective-badge {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #292524 0%, #1c1917 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            border: 4px solid #991b1b;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(239, 68, 68, 0.04) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(168, 85, 247, 0.02), rgba(239, 68, 68, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(254, 242, 242, 0.95);
+            color: #450a0a;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(254, 242, 242, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(254, 242, 242, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #fef2f2; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: var(--accent-secondary); background: rgba(168, 85, 247, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-secondary); background: rgba(168, 85, 247, 0.2); color: #e9d5ff; }
+        .code-option {
+            background: #2a0606; border: 2px solid #991b1b;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #fecaca;
+        }
+        .code-option:hover { background: #450a0a; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-secondary); border-color: #e9d5ff; color: #2e1065; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .spell-input {
+            background-color: #2a0606; border: 2px solid #b91c1c;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            outline: none; transition: border-color 0.3s; width: 100%; font-family: 'JetBrains Mono', monospace;
+        }
+        .spell-input:focus { border-color: var(--accent-secondary); }
+        select.spell-select {
+            appearance: none; background-color: #2a0606; border: 2px solid #b91c1c;
+            color: #fecaca; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer;
+            outline: none; font-family: 'JetBrains Mono', monospace; width: 100%;
+        }
+        select.spell-select:focus { border-color: var(--accent-secondary); }
+        .objective-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 8px; border-radius: 99px; background: rgba(0,0,0,0.5);
+            border: 1px solid #7f1d1d; color: #fca5a5; font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+        .objective-badge.done {
+            background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe;
+        }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .spell-input, select.spell-select { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #1c1917; /* Stone 900 */
-                --crt-bg: #2a0606; /* Very dark red */
-                --accent-primary: #ef4444; /* Red 500 */
-                --accent-secondary: #a855f7; /* Purple 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(239, 68, 68, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(168, 85, 247, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Engine Room Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #292524 0%, #1c1917 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 40px rgba(239, 68, 68, 0.3),
-                    inset 0 0 20px rgba(0, 0, 0, 0.8);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
-                border: 4px solid #991b1b; /* Red 800 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(239, 68, 68, 0.04) 50%,
-                        rgba(0, 0, 0, 0.3) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(168, 85, 247, 0.02),
-                        rgba(239, 68, 68, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(254, 242, 242, 0.95); /* Red 50 */
-                color: #450a0a; /* Red 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(254, 242, 242, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(254, 242, 242, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #fef2f2;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed var(--accent-secondary);
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: var(--accent-secondary);
-                background: rgba(168, 85, 247, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-secondary);
-                background: rgba(168, 85, 247, 0.2);
-                color: #e9d5ff;
-            }
-
-            .code-option {
-                background: #2a0606;
-                border: 2px solid #991b1b;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #fecaca;
-            }
-            .code-option:hover {
-                background: #450a0a;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-secondary);
-                border-color: #e9d5ff;
-                color: #2e1065;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(239, 68, 68, 0.3);
-            }
-
-            /* Spell Caster Simulator Styles */
-            .spell-input {
-                background-color: #2a0606;
-                border: 2px solid #b91c1c;
-                color: white;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                outline: none;
-                transition: border-color 0.3s;
-                width: 100%;
-                font-family: "JetBrains Mono", monospace;
-            }
-            .spell-input:focus {
-                border-color: var(--accent-secondary);
-            }
-
-            select.spell-select {
-                appearance: none;
-                background-color: #2a0606;
-                border: 2px solid #b91c1c;
-                color: #fecaca;
-                padding: 0.5rem;
-                border-radius: 0.5rem;
-                font-weight: bold;
-                cursor: pointer;
-                outline: none;
-                font-family: "JetBrains Mono", monospace;
-                width: 100%;
-            }
-            select.spell-select:focus {
-                border-color: var(--accent-secondary);
-            }
-
-            .objective-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 4px 8px;
-                border-radius: 99px;
-                background: rgba(0, 0, 0, 0.5);
-                border: 1px solid #7f1d1d;
-                color: #fca5a5;
-                font-size: 0.75rem;
-                transition: all 0.3s;
-            }
-            .objective-badge.done {
-                background: rgba(168, 85, 247, 0.2);
-                border-color: #a855f7;
-                color: #d8b4fe;
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-red-600 text-white"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-red-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-rose-400"><i class="fa-solid fa-temperature-arrow-up"></i> <span id="engine-heat-label"></span> <span id="hud-heat"></span></div>
+                <div class="text-purple-400"><i class="fa-solid fa-wand-magic-sparkles"></i> <span id="spells-label"></span> <span id="hud-spells">0</span></div>
             </div>
+            <div class="text-red-300 code-font text-xs md:text-sm opacity-70">CORE-OS v19.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-red-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-rose-400">
-                        <i class="fa-solid fa-temperature-arrow-up"></i>
-                        <span class="lang-fa">حرارت موتور:</span
-                        ><span class="lang-en">Engine Heat:</span>
-                        <span id="hud-heat" class="text-yellow-400"
-                            ><span class="lang-fa">بحرانی 🚨</span
-                            ><span class="lang-en">CRITICAL 🚨</span></span
-                        >
-                    </div>
-                    <div class="text-purple-400">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span class="lang-fa">طلسم‌های اجرا شده:</span
-                        ><span class="lang-en">Spells Cast:</span>
-                        <span class="text-white" id="hud-spells">۰</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🧙‍♂️🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-red-500">
+                <h3 id="ferris-name" class="font-bold text-red-800 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-red-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-red-300 code-font text-sm opacity-70">
-                    CORE-OS v19.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🧙‍♂️🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-red-500"
-                >
-                    <h3 class="font-bold text-red-800 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-red-800 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-red-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-red-100 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: Unsafe -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-red-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۹: باز کردن موتور سفینه (Unsafe) ☢️
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 19: Opening the Engine (Unsafe) ☢️
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-rose-300">
-                                > برای دستکاری مستقیم حافظه و تغییر «اشاره‌گرهای
-                                خام»، کامپایلر به تو اجازه نمی‌دهد. او می‌گوید:
-                                «این کار خطرناک است!»
-                            </p>
-                            <p class="text-slate-300">
-                                > برای اینکه به کامپایلر بگویی «من خودم مسئولیت
-                                ایمنی را می‌پذیرم»، باید کدهایت را در یک بلوک
-                                ویژه قرار دهی.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                چه کلمه کلیدی‌ای نشان‌دهنده‌ی این بلوک است که
-                                بررسی‌های ایمنی را غیرفعال می‌کند؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-rose-300">
-                                > To directly manipulate memory and change "raw
-                                pointers", the compiler won't allow it. It says:
-                                "This is dangerous!"
-                            </p>
-                            <p class="text-slate-300">
-                                > To tell the compiler "I take full
-                                responsibility for safety," you must put your
-                                code in a special block.
-                            </p>
-                            <p class="text-yellow-300 mt-4 font-bold">
-                                Which keyword denotes this block that disables
-                                safety checks?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-pink-400">let mut</span> core_temp
-                            = <span class="text-orange-300">500</span>;<br />
-                            <span class="text-pink-400">let</span> raw_ptr =
-                            &mut core_temp
-                            <span class="text-pink-400">as *mut</span>
-                            i32;<br /><br />
-                            <span class="text-slate-400 text-sm"
-                                >// Tell the compiler we know what we are
-                                doing!</span
-                            ><br />
-                            <span
-                                id="slot1"
-                                class="code-slot text-purple-300"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            >
-                            {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;*raw_ptr =
-                            <span class="text-orange-300">100</span>;
-                            <span class="text-slate-400 text-sm"
-                                >// Force cool down!</span
-                            ><br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-red-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'danger')"
-                                >
-                                    danger
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'unsafe')"
-                                >
-                                    unsafe
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'force')"
-                                >
-                                    force
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 1, 'raw')"
-                                >
-                                    raw
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-red-700 hover:bg-red-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa"
-                                    >باز کردن درِ موتور 🔧</span
-                                ><span class="lang-en"
-                                    >Open Engine Door 🔧</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: macro_rules! -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-purple-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: کتاب طلسم‌ها (Macros)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: The Spellbook (Macros)</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                ماکروها کدهایی هستند که کدهای دیگر را می‌نویسند!
-                                آن‌ها قبل از اجرای برنامه، خودشان را کپی و پیست
-                                می‌کنند.
-                            </p>
-                            <p class="text-white font-bold">
-                                برای تعریف یک ماکروی سفارشی جدید (یک طلسم جدید)،
-                                از کدام ابزار زبان راست استفاده می‌کنیم؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                Macros are code that write other code! They copy
-                                and paste themselves before the program even
-                                runs.
-                            </p>
-                            <p class="text-white font-bold">
-                                To define a new custom macro (a new spell),
-                                which Rust tool do we use?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-slate-400 text-sm"
-                                >// Defining a custom macro</span
-                            ><br />
-                            <span
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >
-                            say_hello {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;() => {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
-                                class="text-blue-300"
-                                >println!</span
-                            >(<span class="text-yellow-300"
-                                >"Hello from the spell! ✨"</span
-                            >);<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;};<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-red-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="
-                                        selectOption(this, 2, 'def_macro!')
-                                    "
-                                >
-                                    def_macro!
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="
-                                        selectOption(this, 2, 'macro_rules!')
-                                    "
-                                >
-                                    macro_rules!
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="
-                                        selectOption(this, 2, 'create_spell!')
-                                    "
-                                >
-                                    create_spell!
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'new_macro')"
-                                >
-                                    new_macro
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">ثبت طلسم در کتاب 📖</span
-                                ><span class="lang-en"
-                                    >Inscribe Spell in Book 📖</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: Macro Parameters -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-purple-400 mb-2 font-bold">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: متغیرهای جادویی (Macro
-                                Parameters)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Magic Variables (Macro
-                                Parameters)</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            می‌خواهیم ماکرویی بسازیم که یک **دستور کامل** (مثل
-                            `println!("Hi")`) را بگیرد و تکرار کند. برای اینکه
-                            به ماکرو بگوییم ورودی ما یک دستور (Statement) است،
-                            چه کلمه‌ای را بعد از `$cmd:` می‌نویسیم؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            We want to build a macro that takes a **full
-                            command** (like `println!("Hi")`) and repeats it. To
-                            tell the macro our input is a Statement, what word
-                            do we write after `$cmd:`?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            macro_rules! repeat {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;($cmd:<span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >, $count:expr) => {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
-                                class="text-pink-400"
-                                >for</span
-                            >
-                            _ <span class="text-pink-400">in</span>
-                            <span class="text-orange-300">0</span>..$count {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$cmd;<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;};<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-red-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-xl px-5"
-                                    onclick="selectOption(this, 3, 'code')"
-                                >
-                                    code
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl px-5"
-                                    onclick="selectOption(this, 3, 'expr')"
-                                >
-                                    expr
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl px-5"
-                                    onclick="selectOption(this, 3, 'ident')"
-                                >
-                                    ident
-                                </div>
-                                <div
-                                    class="code-option code-font text-xl px-5"
-                                    onclick="selectOption(this, 3, 'stmt')"
-                                >
-                                    stmt
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa">آماده‌سازی ماکرو ⚡</span
-                                ><span class="lang-en">Prepare Macro ⚡</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Spell Caster Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-purple-400 mb-2 border-b border-red-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: اجرای طلسم repeat!</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: Casting the repeat!
-                                    Spell</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-red-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۹.۳</span
-                                ><span class="lang-en">Project 19.3</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-3 text-slate-300">
-                            موتور سفینه وضعیت بحرانی دارد! از ماکروی `repeat!`
-                            استفاده کن. برای تثبیت موتور، دقیقاً
-                            <strong>۳ بار خنک‌سازی</strong> و
-                            <strong>۵ بار تقویت سپر</strong> را با ماکرو اجرا
-                            کن!
-                        </div>
-                        <div class="lang-en text-sm mb-3 text-slate-300">
-                            The engine is critical! Use the `repeat!` macro. To
-                            stabilize the engine, run exactly
-                            <strong>3 cool downs</strong> and
-                            <strong>5 shield boosts</strong> using the macro!
-                        </div>
-
-                        <div class="flex flex-col gap-3 flex-grow">
-                            <!-- Objectives -->
-                            <div class="flex gap-2">
-                                <div class="objective-badge" id="obj-cool">
-                                    <i
-                                        class="fa-solid fa-temperature-arrow-down"
-                                    ></i>
-                                    <span class="lang-fa">۳ بار خنک‌سازی</span
-                                    ><span class="lang-en">Cool Down x3</span>
-                                </div>
-                                <div class="objective-badge" id="obj-shield">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                    <span class="lang-fa">۵ بار تقویت سپر</span
-                                    ><span class="lang-en"
-                                        >Boost Shield x5</span
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Console -->
-                            <div
-                                id="sim-terminal"
-                                class="terminal-block text-sm overflow-y-auto flex-grow flex flex-col"
-                                style="min-height: 120px; max-height: 180px"
-                            >
-                                <div class="text-rose-400 font-bold mb-2">
-                                    <span class="lang-fa"
-                                        >⚠️ هشدار: دمای هسته بیش از حد
-                                        مجاز!</span
-                                    >
-                                    <span class="lang-en"
-                                        >⚠️ WARNING: Core temp critical!</span
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Input Controls -->
-                            <div
-                                class="flex flex-col md:flex-row gap-2 items-center bg-black/40 p-2 rounded-lg border border-purple-900"
-                            >
-                                <span
-                                    class="text-purple-400 font-bold code-font"
-                                    >repeat!(</span
-                                >
-
-                                <select id="spell-cmd" class="spell-select">
-                                    <option value="cool_down()">
-                                        cool_down()
-                                    </option>
-                                    <option value="boost_shield()">
-                                        boost_shield()
-                                    </option>
-                                    <option value="vent_steam()">
-                                        vent_steam()
-                                    </option>
-                                </select>
-
-                                <span
-                                    class="text-purple-400 font-bold code-font"
-                                    >,
-                                </span>
-
-                                <input
-                                    type="number"
-                                    id="spell-count"
-                                    class="spell-input text-center w-16"
-                                    value="3"
-                                    min="1"
-                                    max="10"
-                                />
-
-                                <span
-                                    class="text-purple-400 font-bold code-font"
-                                    >);</span
-                                >
-
-                                <button
-                                    class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto md:ml-auto"
-                                    onclick="castSpell()"
-                                >
-                                    <i class="fa-solid fa-wand-sparkles"></i>
-                                    <span class="lang-fa">اجرا</span
-                                    ><span class="lang-en">Cast</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">🔮🚀✨</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa"
-                        >موتور تثبیت شد! شما یک جادوگر واقعی هستید!</span
-                    >
-                    <span class="lang-en"
-                        >Engine Stabilized! You are a true Wizard!</span
-                    >
-                </h2>
-                <p class="text-xl text-purple-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما ابزارهای پیشرفته‌ی Unsafe Rust و Macros را با
-                        موفقیت یاد گرفتید!</span
-                    >
-                    <span class="lang-en"
-                        >You successfully mastered advanced tools: Unsafe Rust
-                        and Macros!</span
-                    >
-                </p>
-                <button
-                    class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(168,85,247,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۹ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 19 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-red-100 code-font min-h-[400px] flex flex-col">
 
-            // Simulator State
-            let heatFixed = false;
-            let shieldFixed = false;
+                <!-- Mission 1: unsafe -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-red-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-pink-400">let mut</span> core_temp = <span class="text-orange-300">500</span>;<br>
+                        <span class="text-pink-400">let</span> raw_ptr = &mut core_temp <span class="text-pink-400">as *mut</span> i32;<br><br>
+                        <span class="text-slate-400 text-sm">// Tell the compiler we know what we are doing!</span><br>
+                        <span id="slot1" class="code-slot text-purple-300" onclick="clearSlot(1)">---</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;*raw_ptr = <span class="text-orange-300">100</span>;<br>
+                        }
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-red-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'danger')">danger</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'unsafe')">unsafe</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'force')">force</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 1, 'raw')">raw</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-red-700 hover:bg-red-600 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: macro_rules! -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-purple-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-slate-400 text-sm">// Defining a custom macro</span><br>
+                        <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> say_hello {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;() => {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Hello from the spell! ✨"</span>);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;};<br>
+                        }
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-red-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'def_macro!')">def_macro!</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'macro_rules!')">macro_rules!</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'create_spell!')">create_spell!</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'new_macro')">new_macro</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: stmt -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-purple-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        macro_rules! repeat {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;($cmd:<span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span>, $count:expr) => {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-pink-400">for</span> _ <span class="text-pink-400">in</span> <span class="text-orange-300">0</span>..$count {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$cmd;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;};<br>
+                        }
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-red-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-xl px-5" onclick="selectOption(this, 3, 'code')">code</div>
+                            <div class="code-option code-font text-xl px-5" onclick="selectOption(this, 3, 'expr')">expr</div>
+                            <div class="code-option code-font text-xl px-5" onclick="selectOption(this, 3, 'ident')">ident</div>
+                            <div class="code-option code-font text-xl px-5" onclick="selectOption(this, 3, 'stmt')">stmt</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Spell Caster Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-purple-400 mb-2 border-b border-red-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-red-900 px-2 py-1 rounded text-white">Project 19.3</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-3 text-slate-300"></div>
+                    <div class="flex flex-col gap-3 flex-grow">
+                        <div class="flex gap-2">
+                            <div class="objective-badge" id="obj-cool">
+                                <i class="fa-solid fa-temperature-arrow-down"></i>
+                                <span id="obj-cool-text"></span>
+                            </div>
+                            <div class="objective-badge" id="obj-shield">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span id="obj-shield-text"></span>
+                            </div>
+                        </div>
+                        <div id="sim-terminal" class="terminal-block text-sm overflow-y-auto flex-grow flex flex-col" style="min-height: 120px; max-height: 180px;">
+                            <div id="warning-msg" class="text-rose-400 font-bold mb-2"></div>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-2 items-center bg-black/40 p-2 rounded-lg border border-purple-900">
+                            <span class="text-purple-400 font-bold code-font">repeat!(</span>
+                            <select id="spell-cmd" class="spell-select">
+                                <option value="cool_down()"><span id="cool-down-opt"></span></option>
+                                <option value="boost_shield()"><span id="boost-shield-opt"></span></option>
+                                <option value="vent_steam()"><span id="vent-steam-opt"></span></option>
+                            </select>
+                            <span class="text-purple-400 font-bold code-font">, </span>
+                            <input type="number" id="spell-count" class="spell-input text-center w-16" value="3" min="1" max="10">
+                            <span class="text-purple-400 font-bold code-font">);</span>
+                            <button id="cast-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded font-bold w-full md:w-auto md:ml-auto" onclick="castSpell()">
+                                <i class="fa-solid fa-wand-sparkles"></i> <span id="cast-btn-text"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🔮🚀✨</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-purple-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(168,85,247,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                engineHeatLabel: "حرارت موتور:",
+                spellsLabel: "طلسم‌های اجرا شده:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                heatCritical: "بحرانی 🚨",
+                heatNormal: "عادی 🟢",
+                dialogues: [
                     "سلام! بالاخره رسیدیم به موتورخونه‌ی سفینه! اینجا خیلی گرم و خطرناکه. 🔥",
                     "برای کار کردن با قطعات اصلی موتور، باید از بخش‌های امن زبان راست خارج بشیم و از `unsafe` استفاده کنیم. این یعنی خودمون باید مراقب همه‌چیز باشیم!",
                     "همچنین اینجا یه کتاب جادویی پیدا کردم! 📖 باهاش می‌تونیم طلسم‌های (ماکروهای) خودمون رو بسازیم که کدهای تکراری رو برامون بنویسن.",
-                    "بیا اول موتور رو تعمیر کنیم و بعد چند تا طلسم جادویی بسازیم! 🚀✨",
+                    "بیا اول موتور رو تعمیر کنیم و بعد چند تا طلسم جادویی بسازیم! 🚀✨"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا بلوک unsafe رو باز کنیم.",
+                mission1Title: "فصل ۱۹: باز کردن موتور سفینه (Unsafe) ☢️",
+                mission1Text: `
+                    <p class="text-rose-300">> برای دستکاری مستقیم حافظه و تغییر «اشاره‌گرهای خام»، کامپایلر به تو اجازه نمی‌دهد. او می‌گوید: «این کار خطرناک است!»</p>
+                    <p class="text-slate-300">> برای اینکه به کامپایلر بگویی «من خودم مسئولیت ایمنی را می‌پذیرم»، باید کدهایت را در یک بلوک ویژه قرار دهی.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">چه کلمه کلیدی‌ای نشان‌دهنده‌ی این بلوک است که بررسی‌های ایمنی را غیرفعال می‌کند؟</p>
+                `,
+                puzzle1Btn: "باز کردن درِ موتور 🔧",
+                puzzle1Success: "> در موتورخانه باز شد! (مسئولیت با شماست)",
+                puzzle1Error: "خطا: برای باز کردن بلوک بدون بررسی ایمنی کامپایلر، از کلمه‌ی unsafe استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: کتاب طلسم‌ها (Macros)",
+                mission2Desc: "<p>ماکروها کدهایی هستند که کدهای دیگر را می‌نویسند! آن‌ها قبل از اجرای برنامه، خودشان را کپی و پیست می‌کنند.</p><p class='text-white font-bold'>برای تعریف یک ماکروی سفارشی جدید (یک طلسم جدید)، از کدام ابزار زبان راست استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "ثبت طلسم در کتاب 📖",
+                puzzle2Success: "> کتاب طلسم‌ها باز شد!",
+                puzzle2Error: "خطا: در زبان راست برای ساخت یک ماکرو (Macro) سفارشی از macro_rules! استفاده می‌شود.",
+                mission3Step: ">> مرحله ۲: متغیرهای جادویی (Macro Parameters)",
+                mission3Desc: "می‌خواهیم ماکرویی بسازیم که یک **دستور کامل** (مثل `println!(\"Hi\")`) را بگیرد و تکرار کند. برای اینکه به ماکرو بگوییم ورودی ما یک دستور (Statement) است، چه کلمه‌ای را بعد از `$cmd:` می‌نویسیم؟",
+                puzzle3Btn: "آماده‌سازی ماکرو ⚡",
+                puzzle3Success: "> نوع پارامتر با موفقیت تنظیم شد!",
+                puzzle3Error: "خطا: برای دریافت یک دستور کامل که با نقطه-ویرگول پایان می‌یابد، نوع پارامتر ماکرو باید stmt (مخفف statement) باشد.",
+                mission4Step: ">> مرحله نهایی: اجرای طلسم repeat!",
+                mission4Desc: "موتور سفینه وضعیت بحرانی دارد! از ماکروی `repeat!` استفاده کن. برای تثبیت موتور، دقیقاً <strong>۳ بار خنک‌سازی</strong> و <strong>۵ بار تقویت سپر</strong> را با ماکرو اجرا کن!",
+                objCool: "۳ بار خنک‌سازی",
+                objShield: "۵ بار تقویت سپر",
+                warningMsg: "⚠️ هشدار: دمای هسته بیش از حد مجاز!",
+                coolDown: "cool_down()",
+                boostShield: "boost_shield()",
+                ventSteam: "vent_steam()",
+                castBtn: "اجرا",
+                errorInvalidCount: "❌ خطا: تعداد نامعتبر!",
+                repeatLog: (cmd, count) => `> repeat!(${cmd}, ${count});`,
+                coolAction: "❄️ Cooling down engine...",
+                shieldAction: "🛡️ Shield boosted!",
+                ventAction: "💨 Venting steam...",
+                winTitle: "موتور تثبیت شد! شما یک جادوگر واقعی هستید!",
+                winMessage: "شما ابزارهای پیشرفته‌ی Unsafe Rust و Macros را با موفقیت یاد گرفتید!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                engineHeatLabel: "Engine Heat:",
+                spellsLabel: "Spells Cast:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                heatCritical: "CRITICAL 🚨",
+                heatNormal: "Normal 🟢",
+                dialogues: [
                     "Hi! We finally reached the ship's engine room! It's very hot and dangerous here. 🔥",
                     "To work with the core engine parts, we must leave Rust's safe zones and use `unsafe`. This means we are fully responsible for safety!",
                     "I also found a magic spellbook here! 📖 With it, we can create our own spells (Macros) that write repetitive code for us.",
-                    "Let's fix the engine first and then cast some magic spells! 🚀✨",
+                    "Let's fix the engine first and then cast some magic spells! 🚀✨"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-red-600 text-white";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    if (heatFixed) {
-                        document.getElementById("hud-heat").innerHTML =
-                            '<span class="lang-fa">عادی 🟢</span><span class="lang-en" style="display:none">Normal 🟢</span>';
-                    }
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-red-600 text-white";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-
-                    if (heatFixed) {
-                        document.getElementById("hud-heat").innerHTML =
-                            '<span class="lang-fa" style="display:none">عادی 🟢</span><span class="lang-en">Normal 🟢</span>';
-                    }
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below to open the unsafe block.",
+                mission1Title: "Chapter 19: Opening the Engine (Unsafe) ☢️",
+                mission1Text: `
+                    <p class="text-rose-300">> To directly manipulate memory and change "raw pointers", the compiler won't allow it. It says: "This is dangerous!"</p>
+                    <p class="text-slate-300">> To tell the compiler "I take full responsibility for safety," you must put your code in a special block.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Which keyword denotes this block that disables safety checks?</p>
+                `,
+                puzzle1Btn: "Open Engine Door 🔧",
+                puzzle1Success: "> Engine room unlocked! (Proceed with caution)",
+                puzzle1Error: "Error: To open a block without compiler safety checks, we use the 'unsafe' keyword.",
+                mission2Step: ">> Step 1: The Spellbook (Macros)",
+                mission2Desc: "<p>Macros are code that write other code! They copy and paste themselves before the program even runs.</p><p class='text-white font-bold'>To define a new custom macro (a new spell), which Rust tool do we use?</p>",
+                puzzle2Btn: "Inscribe Spell in Book 📖",
+                puzzle2Success: "> Spellbook opened!",
+                puzzle2Error: "Error: In Rust, we use 'macro_rules!' to create a custom Macro.",
+                mission3Step: ">> Step 2: Magic Variables (Macro Parameters)",
+                mission3Desc: "We want to build a macro that takes a **full command** (like `println!(\"Hi\")`) and repeats it. To tell the macro our input is a Statement, what word do we write after `$cmd:`?",
+                puzzle3Btn: "Prepare Macro ⚡",
+                puzzle3Success: "> Parameter type set successfully!",
+                puzzle3Error: "Error: To accept a full statement ending with a semicolon, the macro parameter type must be 'stmt'.",
+                mission4Step: ">> Final Step: Casting the repeat! Spell",
+                mission4Desc: "The engine is critical! Use the `repeat!` macro. To stabilize the engine, run exactly <strong>3 cool downs</strong> and <strong>5 shield boosts</strong> using the macro!",
+                objCool: "Cool Down x3",
+                objShield: "Boost Shield x5",
+                warningMsg: "⚠️ WARNING: Core temp critical!",
+                coolDown: "cool_down()",
+                boostShield: "boost_shield()",
+                ventSteam: "vent_steam()",
+                castBtn: "Cast",
+                errorInvalidCount: "❌ Error: Invalid count!",
+                repeatLog: (cmd, count) => `> repeat!(${cmd}, ${count});`,
+                coolAction: "❄️ Cooling down engine...",
+                shieldAction: "🛡️ Shield boosted!",
+                ventAction: "💨 Venting steam...",
+                winTitle: "Engine Stabilized! You are a true Wizard!",
+                winMessage: "You successfully mastered advanced tools: Unsafe Rust and Macros!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                engineHeatLabel: "Calor del motor:",
+                spellsLabel: "Hechizos lanzados:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                heatCritical: "CRÍTICO 🚨",
+                heatNormal: "Normal 🟢",
+                dialogues: [
+                    "¡Hola! ¡Finalmente llegamos a la sala de máquinas de la nave! Aquí hace mucho calor y es peligroso. 🔥",
+                    "Para trabajar con las partes centrales del motor, debemos salir de las zonas seguras de Rust y usar `unsafe`. ¡Esto significa que somos totalmente responsables de la seguridad!",
+                    "¡También encontré un libro de hechizos mágicos aquí! 📖 Con él, podemos crear nuestros propios hechizos (Macros) que escriben código repetitivo por nosotros.",
+                    "¡Primero arreglemos el motor y luego lancemos algunos hechizos mágicos! 🚀✨"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para abrir el bloque unsafe.",
+                mission1Title: "Capítulo 19: Abriendo el motor (Unsafe) ☢️",
+                mission1Text: `
+                    <p class="text-rose-300">> Para manipular directamente la memoria y cambiar \"punteros sin procesar\", el compilador no lo permite. ¡Dice: \"Esto es peligroso!\"</p>
+                    <p class="text-slate-300">> Para decirle al compilador \"Yo asumo toda la responsabilidad por la seguridad\", debes poner tu código en un bloque especial.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">¿Qué palabra clave denota este bloque que desactiva las comprobaciones de seguridad?</p>
+                `,
+                puzzle1Btn: "Abrir puerta del motor 🔧",
+                puzzle1Success: "> ¡Sala de máquinas desbloqueada! (Proceder con precaución)",
+                puzzle1Error: "Error: Para abrir un bloque sin comprobaciones de seguridad del compilador, usamos la palabra clave 'unsafe'.",
+                mission2Step: ">> Paso 1: El libro de hechizos (Macros)",
+                mission2Desc: "<p>¡Las macros son código que escribe otro código! Se copian y pegan a sí mismas antes de que el programa siquiera se ejecute.</p><p class='text-white font-bold'>Para definir una nueva macro personalizada (un nuevo hechizo), ¿qué herramienta de Rust usamos?</p>",
+                puzzle2Btn: "Inscribir hechizo en el libro 📖",
+                puzzle2Success: "> ¡Libro de hechizos abierto!",
+                puzzle2Error: "Error: En Rust, usamos 'macro_rules!' para crear una macro personalizada.",
+                mission3Step: ">> Paso 2: Variables mágicas (Parámetros de macro)",
+                mission3Desc: "Queremos construir una macro que tome un **comando completo** (como `println!(\"Hola\")`) y lo repita. Para decirle a la macro que nuestra entrada es una Declaración, ¿qué palabra escribimos después de `$cmd:`?",
+                puzzle3Btn: "Preparar macro ⚡",
+                puzzle3Success: "> ¡Tipo de parámetro configurado exitosamente!",
+                puzzle3Error: "Error: Para aceptar una declaración completa que termina con punto y coma, el tipo de parámetro de la macro debe ser 'stmt'.",
+                mission4Step: ">> Paso final: Lanzando el hechizo repeat!",
+                mission4Desc: "¡El motor está crítico! Usa la macro `repeat!`. Para estabilizar el motor, ejecuta exactamente <strong>3 enfriamientos</strong> y <strong>5 aumentos de escudo</strong> usando la macro.",
+                objCool: "Enfriamiento x3",
+                objShield: "Aumento de escudo x5",
+                warningMsg: "⚠️ ADVERTENCIA: ¡Temperatura del núcleo crítica!",
+                coolDown: "cool_down()",
+                boostShield: "boost_shield()",
+                ventSteam: "vent_steam()",
+                castBtn: "Lanzar",
+                errorInvalidCount: "❌ Error: ¡Cantidad inválida!",
+                repeatLog: (cmd, count) => `> repeat!(${cmd}, ${count});`,
+                coolAction: "❄️ Enfriando el motor...",
+                shieldAction: "🛡️ ¡Escudo aumentado!",
+                ventAction: "💨 Liberando vapor...",
+                winTitle: "¡Motor estabilizado! ¡Eres un verdadero mago!",
+                winMessage: "¡Dominaste exitosamente herramientas avanzadas: Unsafe Rust y Macros!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                engineHeatLabel: "Motorhitze:",
+                spellsLabel: "Gesprochene Zauber:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                heatCritical: "KRITISCH 🚨",
+                heatNormal: "Normal 🟢",
+                dialogues: [
+                    "Hallo! Wir haben endlich den Maschinenraum des Schiffs erreicht! Hier ist es sehr heiß und gefährlich. 🔥",
+                    "Um mit den Kernmotorteilen zu arbeiten, müssen wir die sicheren Zonen von Rust verlassen und `unsafe` verwenden. Das bedeutet, wir sind voll für die Sicherheit verantwortlich!",
+                    "Ich habe hier auch ein magisches Zauberbuch gefunden! 📖 Damit können wir unsere eigenen Zauber (Makros) erstellen, die sich wiederholenden Code für uns schreiben.",
+                    "Lass uns zuerst den Motor reparieren und dann ein paar magische Zauber wirken! 🚀✨"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um den unsafe-Block zu öffnen.",
+                mission1Title: "Kapitel 19: Öffnen des Motors (Unsafe) ☢️",
+                mission1Text: `
+                    <p class="text-rose-300">> Um Speicher direkt zu manipulieren und \"Rohzeiger\" zu ändern, erlaubt der Compiler dies nicht. Er sagt: \"Das ist gefährlich!\"</p>
+                    <p class="text-slate-300">> Um dem Compiler zu sagen: \"Ich übernehme die volle Verantwortung für die Sicherheit\", musst du deinen Code in einen speziellen Block setzen.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Welches Schlüsselwort kennzeichnet diesen Block, der Sicherheitsprüfungen deaktiviert?</p>
+                `,
+                puzzle1Btn: "Motortür öffnen 🔧",
+                puzzle1Success: "> Maschinenraum freigeschaltet! (Mit Vorsicht vorgehen)",
+                puzzle1Error: "Fehler: Um einen Block ohne Compiler-Sicherheitsprüfungen zu öffnen, verwenden wir das Schlüsselwort 'unsafe'.",
+                mission2Step: ">> Schritt 1: Das Zauberbuch (Makros)",
+                mission2Desc: "<p>Makros sind Code, der anderen Code schreibt! Sie kopieren und einfügen sich selbst, bevor das Programm überhaupt läuft.</p><p class='text-white font-bold'>Um ein neues benutzerdefiniertes Makro (einen neuen Zauber) zu definieren, welches Rust-Werkzeug verwenden wir?</p>",
+                puzzle2Btn: "Zauber ins Buch eintragen 📖",
+                puzzle2Success: "> Zauberbuch geöffnet!",
+                puzzle2Error: "Fehler: In Rust verwenden wir 'macro_rules!', um ein benutzerdefiniertes Makro zu erstellen.",
+                mission3Step: ">> Schritt 2: Magische Variablen (Makro-Parameter)",
+                mission3Desc: "Wir wollen ein Makro bauen, das einen **vollständigen Befehl** (wie `println!(\"Hallo\")`) nimmt und wiederholt. Um dem Makro mitzuteilen, dass unsere Eingabe eine Anweisung ist, welches Wort schreiben wir nach `$cmd:`?",
+                puzzle3Btn: "Makro vorbereiten ⚡",
+                puzzle3Success: "> Parametertyp erfolgreich eingestellt!",
+                puzzle3Error: "Fehler: Um eine vollständige Anweisung mit Semikolon am Ende zu akzeptieren, muss der Makro-Parametertyp 'stmt' sein.",
+                mission4Step: ">> Letzter Schritt: Den repeat!-Zauber wirken",
+                mission4Desc: "Der Motor ist kritisch! Verwende das `repeat!`-Makro. Um den Motor zu stabilisieren, führe genau <strong>3 Kühlungen</strong> und <strong>5 Schildverstärkungen</strong> mit dem Makro aus.",
+                objCool: "Kühlung x3",
+                objShield: "Schildverstärkung x5",
+                warningMsg: "⚠️ WARNUNG: Kerntemperatur kritisch!",
+                coolDown: "cool_down()",
+                boostShield: "boost_shield()",
+                ventSteam: "vent_steam()",
+                castBtn: "Wirken",
+                errorInvalidCount: "❌ Fehler: Ungültige Anzahl!",
+                repeatLog: (cmd, count) => `> repeat!(${cmd}, ${count});`,
+                coolAction: "❄️ Motor wird gekühlt...",
+                shieldAction: "🛡️ Schild verstärkt!",
+                ventAction: "💨 Dampf ablassen...",
+                winTitle: "Motor stabilisiert! Du bist ein wahrer Zauberer!",
+                winMessage: "Du hast erfolgreich fortgeschrittene Werkzeuge gemeistert: Unsafe Rust und Makros!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                engineHeatLabel: "Motorhitte:",
+                spellsLabel: "Uitgesproken spreuken:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                heatCritical: "KRITISCH 🚨",
+                heatNormal: "Normaal 🟢",
+                dialogues: [
+                    "Hallo! We hebben eindelijk de machinekamer van het schip bereikt! Het is hier erg heet en gevaarlijk. 🔥",
+                    "Om met de kernonderdelen van de motor te werken, moeten we de veilige zones van Rust verlaten en `unsafe` gebruiken. Dit betekent dat we volledig verantwoordelijk zijn voor de veiligheid!",
+                    "Ik heb hier ook een magisch spreukenboek gevonden! 📖 Hiermee kunnen we onze eigen spreuken (Macro's) maken die repetitieve code voor ons schrijven.",
+                    "Laten we eerst de motor repareren en dan wat magische spreuken uitspreken! 🚀✨"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om het unsafe-blok te openen.",
+                mission1Title: "Hoofdstuk 19: De motor openen (Unsafe) ☢️",
+                mission1Text: `
+                    <p class="text-rose-300">> Om geheugen direct te manipuleren en \"ruwe verwijzingen\" te wijzigen, staat de compiler dit niet toe. Hij zegt: \"Dit is gevaarlijk!\"</p>
+                    <p class="text-slate-300">> Om de compiler te vertellen \"Ik neem volledige verantwoordelijkheid voor de veiligheid\", moet je je code in een speciaal blok plaatsen.</p>
+                    <p class="text-yellow-300 mt-4 font-bold">Welk trefwoord duidt dit blok aan dat veiligheidscontroles uitschakelt?</p>
+                `,
+                puzzle1Btn: "Motordeur openen 🔧",
+                puzzle1Success: "> Machinekamer ontgrendeld! (Ga met voorzichtigheid te werk)",
+                puzzle1Error: "Fout: Om een blok zonder compiler-veiligheidscontroles te openen, gebruiken we het trefwoord 'unsafe'.",
+                mission2Step: ">> Stap 1: Het spreukenboek (Macro's)",
+                mission2Desc: "<p>Macro's zijn code die andere code schrijft! Ze kopiëren en plakken zichzelf voordat het programma zelfs maar draait.</p><p class='text-white font-bold'>Om een nieuwe aangepaste macro (een nieuwe spreuk) te definiëren, welke Rust-tool gebruiken we?</p>",
+                puzzle2Btn: "Spreuk in boek schrijven 📖",
+                puzzle2Success: "> Spreukenboek geopend!",
+                puzzle2Error: "Fout: In Rust gebruiken we 'macro_rules!' om een aangepaste macro te maken.",
+                mission3Step: ">> Stap 2: Magische variabelen (Macro-parameters)",
+                mission3Desc: "We willen een macro bouwen die een **volledig commando** (zoals `println!(\"Hallo\")`) neemt en herhaalt. Om de macro te vertellen dat onze invoer een Statement is, welk woord schrijven we na `$cmd:`?",
+                puzzle3Btn: "Macro voorbereiden ⚡",
+                puzzle3Success: "> Parametertype succesvol ingesteld!",
+                puzzle3Error: "Fout: Om een volledige statement te accepteren die eindigt met een puntkomma, moet het macro-parametertype 'stmt' zijn.",
+                mission4Step: ">> Laatste stap: De repeat!-spreuk uitspreken",
+                mission4Desc: "De motor is kritiek! Gebruik de `repeat!`-macro. Om de motor te stabiliseren, voer exact <strong>3 afkoelingen</strong> en <strong>5 schildversterkingen</strong> uit met de macro.",
+                objCool: "Afkoeling x3",
+                objShield: "Schildversterking x5",
+                warningMsg: "⚠️ WAARSCHUWING: Kerntemperatuur kritiek!",
+                coolDown: "cool_down()",
+                boostShield: "boost_shield()",
+                ventSteam: "vent_steam()",
+                castBtn: "Uitspreken",
+                errorInvalidCount: "❌ Fout: Ongeldig aantal!",
+                repeatLog: (cmd, count) => `> repeat!(${cmd}, ${count});`,
+                coolAction: "❄️ Motor afkoelen...",
+                shieldAction: "🛡️ Schild versterkt!",
+                ventAction: "💨 Stoom afblazen...",
+                winTitle: "Motor gestabiliseerd! Je bent een echte tovenaar!",
+                winMessage: "Je hebt geavanceerde tools succesvol onder de knie: Unsafe Rust en Macro's!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let heatFixed = false;
+        let shieldFixed = false;
+        let spellsCount = 0;
+
+        // DOM elements
+        const engineHeatLabelSpan = document.getElementById('engine-heat-label');
+        const spellsLabelSpan = document.getElementById('spells-label');
+        const hudHeatSpan = document.getElementById('hud-heat');
+        const hudSpellsSpan = document.getElementById('hud-spells');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-red-600 text-white' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
+            }
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
+                showDialog();
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
 
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            engineHeatLabelSpan.innerText = pack.engineHeatLabel;
+            spellsLabelSpan.innerText = pack.spellsLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            hudHeatSpan.innerHTML = heatFixed ? pack.heatNormal : pack.heatCritical;
+            hudHeatSpan.className = heatFixed ? 'text-emerald-400' : 'text-yellow-400';
+            hudSpellsSpan.innerText = formatNumber(spellsCount, currentLang);
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('obj-cool-text').innerHTML = pack.objCool;
+            document.getElementById('obj-shield-text').innerHTML = pack.objShield;
+            document.getElementById('warning-msg').innerHTML = pack.warningMsg;
+            document.getElementById('cool-down-opt').innerHTML = pack.coolDown;
+            document.getElementById('boost-shield-opt').innerHTML = pack.boostShield;
+            document.getElementById('vent-steam-opt').innerHTML = pack.ventSteam;
+            document.getElementById('cast-btn-text').innerHTML = pack.castBtn;
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
                 } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا بلوک unsafe رو باز کنیم."
-                            : "Let's go! Look at the monitor below to open the unsafe block.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
+                    dialogTextP.innerHTML = pack.afterDialog;
                 }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
             }
+        }
 
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-red-600 text-white";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            if (missionNum === 4) {
+                // Reset spell caster state
+                heatFixed = false;
+                shieldFixed = false;
+                spellsCount = 0;
+                hudSpellsSpan.innerText = formatNumber(spellsCount, currentLang);
+                hudHeatSpan.innerHTML = languagePack[currentLang].heatCritical;
+                hudHeatSpan.className = 'text-yellow-400';
+                document.getElementById('obj-cool').classList.remove('done');
+                document.getElementById('obj-shield').classList.remove('done');
+                document.getElementById('sim-terminal').innerHTML = `<div id="warning-msg" class="text-rose-400 font-bold mb-2">${languagePack[currentLang].warningMsg}</div>`;
+                document.getElementById('spell-count').value = '3';
+                document.getElementById('spell-cmd').value = 'cool_down()';
             }
+        }
 
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
 
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
 
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
 
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'unsafe') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
                 runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
             }
+        }
 
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'macro_rules!') {
+                document.getElementById('puzzle2-feedback').className = "text-purple-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
             }
+        }
 
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'stmt') {
+                document.getElementById('puzzle3-feedback').className = "text-purple-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
 
-                if (slotText === "unsafe") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> در موتورخانه باز شد! (مسئولیت با شماست)"
-                            : "> Engine room unlocked! (Proceed with caution)";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: برای باز کردن بلوک بدون بررسی ایمنی کامپایلر، از کلمه‌ی unsafe استفاده می‌کنیم.",
-                        "Error: To open a block without compiler safety checks, we use the 'unsafe' keyword.",
-                    );
+        // Spell Caster Simulator
+        function appendToTerminal(htmlContent) {
+            const term = document.getElementById('sim-terminal');
+            const div = document.createElement('div');
+            div.className = "mb-1 border-b border-rose-900/30 pb-1 code-font";
+            div.innerHTML = htmlContent;
+            term.appendChild(div);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function castSpell() {
+            const pack = languagePack[currentLang];
+            const cmd = document.getElementById('spell-cmd').value;
+            const countVal = document.getElementById('spell-count').value;
+            const count = parseInt(countVal);
+            if (isNaN(count) || count < 1) {
+                appendToTerminal(`<span class="text-red-400">${pack.errorInvalidCount}</span>`);
+                return;
+            }
+            appendToTerminal(`<span class="text-purple-400">${pack.repeatLog(cmd === 'cool_down()' ? pack.coolDown : (cmd === 'boost_shield()' ? pack.boostShield : pack.ventSteam), count)}</span>`);
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    if (cmd === 'cool_down()') {
+                        appendToTerminal(`<span class="text-cyan-400">${pack.coolAction}</span>`);
+                    } else if (cmd === 'boost_shield()') {
+                        appendToTerminal(`<span class="text-emerald-400">${pack.shieldAction}</span>`);
+                    } else {
+                        appendToTerminal(`<span class="text-slate-400">${pack.ventAction}</span>`);
+                    }
+                }, i * 200 + 100);
+            }
+            setTimeout(() => {
+                spellsCount++;
+                hudSpellsSpan.innerText = formatNumber(spellsCount, currentLang);
+                if (cmd === 'cool_down()' && count === 3) {
+                    heatFixed = true;
+                    document.getElementById('obj-cool').classList.add('done');
+                    hudHeatSpan.innerHTML = pack.heatNormal;
+                    hudHeatSpan.className = 'text-emerald-400';
                 }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "macro_rules!") {
-                    feedback.className =
-                        "text-purple-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> کتاب طلسم‌ها باز شد!"
-                            : "> Spellbook opened!";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: در زبان راست برای ساخت یک ماکرو (Macro) سفارشی از macro_rules! استفاده می‌شود.",
-                        "Error: In Rust, we use 'macro_rules!' to create a custom Macro.",
-                    );
+                if (cmd === 'boost_shield()' && count === 5) {
+                    shieldFixed = true;
+                    document.getElementById('obj-shield').classList.add('done');
                 }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "stmt") {
-                    feedback.className =
-                        "text-purple-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> نوع پارامتر با موفقیت تنظیم شد!"
-                            : "> Parameter type set successfully!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: برای دریافت یک دستور کامل که با نقطه-ویرگول پایان می‌یابد، نوع پارامتر ماکرو باید stmt (مخفف statement) باشد.",
-                        "Error: To accept a full statement ending with a semicolon, the macro parameter type must be 'stmt'.",
-                    );
-                }
-            }
-
-            // --- Spell Caster Simulator ---
-            function appendToTerminal(htmlContent) {
-                const term = document.getElementById("sim-terminal");
-                const div = document.createElement("div");
-                div.className =
-                    "mb-1 border-b border-rose-900/30 pb-1 code-font";
-                div.innerHTML = htmlContent;
-                term.appendChild(div);
-
-                // Scroll to bottom
-                term.scrollTop = term.scrollHeight;
-            }
-
-            function castSpell() {
-                let cmd = document.getElementById("spell-cmd").value;
-                let countStr = document.getElementById("spell-count").value;
-                let count = parseInt(countStr);
-
-                if (isNaN(count) || count < 1) {
-                    appendToTerminal(
-                        `<span class="text-red-400">❌ Error: Invalid count!</span>`,
-                    );
-                    return;
-                }
-
-                appendToTerminal(
-                    `<span class="text-purple-400">> repeat!(${cmd}, ${count});</span>`,
-                );
-
-                // Simulate Macro Expansion
-                for (let i = 0; i < count; i++) {
-                    setTimeout(
-                        () => {
-                            if (cmd === "cool_down()") {
-                                appendToTerminal(
-                                    `<span class="text-cyan-400">❄️ Cooling down engine...</span>`,
-                                );
-                            } else if (cmd === "boost_shield()") {
-                                appendToTerminal(
-                                    `<span class="text-emerald-400">🛡️ Shield boosted!</span>`,
-                                );
-                            } else {
-                                appendToTerminal(
-                                    `<span class="text-slate-400">💨 Venting steam...</span>`,
-                                );
-                            }
-                        },
-                        i * 200 + 100,
-                    );
-                }
-
-                setTimeout(
-                    () => {
-                        if (cmd === "cool_down()" && count === 3) {
-                            heatFixed = true;
-                            document
-                                .getElementById("obj-cool")
-                                .classList.add("done");
-                            const heatEl = document.getElementById("hud-heat");
-                            heatEl.className = "text-emerald-400";
-                            setLang(currentLang); // Update to "Normal"
-                        }
-                        if (cmd === "boost_shield()" && count === 5) {
-                            shieldFixed = true;
-                            document
-                                .getElementById("obj-shield")
-                                .classList.add("done");
-                        }
-
-                        let spells =
-                            parseInt(
-                                document.getElementById("hud-spells").innerText,
-                            ) + 1;
-                        document.getElementById("hud-spells").innerText =
-                            currentLang === "fa"
-                                ? spells.toLocaleString("fa-IR")
-                                : spells;
-
-                        checkWin();
-                    },
-                    count * 200 + 300,
-                );
-            }
-
-            function checkWin() {
                 if (heatFixed && shieldFixed) {
                     setTimeout(() => {
                         triggerConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
+                        document.getElementById('success-screen').classList.remove('hidden');
                     }, 1000);
                 }
-            }
+            }, count * 200 + 300);
+        }
 
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#ef4444",
-                "#a855f7",
-                "#d946ef",
-                "#f97316",
-                "#ffffff",
-            ]; // Red, Purple, Fuchsia, Orange
+        function goToNextChapter() {
+            window.location.href = 'chapter-20.html';
+        }
 
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#ef4444", "#a855f7", "#d946ef", "#f97316", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
                 }
             }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
 
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
-                showDialog();
-            }, 500);
-        </script>
-    </body>
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>

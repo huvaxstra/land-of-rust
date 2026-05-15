@@ -1,1373 +1,996 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" id="html-root">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Land of Rust: Chapter 18</title>
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Fonts -->
-        <link
-            href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
-        <!-- FontAwesome -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Land of Rust: Chapter 18</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --crt-bg: #1e1b4b;
+            --accent-primary: #eab308;
+            --accent-secondary: #f59e0b;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(234, 179, 8, 0.1) 2px, transparent 40px), radial-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            color: white;
+            overflow-x: hidden;
+        }
+        html[dir="rtl"] body { font-family: 'Vazirmatn', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Nunito', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace !important; }
+        /* Force LTR for code blocks and simulator */
+        .terminal-block, .code-slot, .code-option, .code-font, pre, code, .cmd-input, .quick-btn, #term-output, #sim-terminal, .objective-badge {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        .dashboard {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 4px solid var(--accent-primary);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(234, 179, 8, 0.4), inset 0 0 20px rgba(0,0,0,0.7);
+        }
+        .screen-crt {
+            background-color: var(--crt-bg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            border: 4px solid #b45309;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .screen-crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(234, 179, 8, 0.03) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(245, 158, 11, 0.02), rgba(234, 179, 8, 0.02));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .dialog-box {
+            background: rgba(254, 252, 232, 0.95);
+            color: #422006;
+            border-radius: 15px;
+            border: 3px solid var(--accent-primary);
+            position: relative;
+        }
+        html[dir="rtl"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; right: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(254, 252, 232, 0.95) transparent transparent transparent;
+        }
+        html[dir="ltr"] .dialog-box::after {
+            content: ''; position: absolute; bottom: -15px; left: 40px;
+            border-width: 15px 15px 0; border-style: solid; border-color: rgba(254, 252, 232, 0.95) transparent transparent transparent;
+        }
+        .ferris-avatar {
+            width: 90px; height: 90px;
+            background: #fef9c3; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; border: 4px solid var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .code-slot {
+            display: inline-block; min-width: 60px; height: 30px;
+            border-bottom: 3px dashed var(--accent-secondary); margin: 0 5px;
+            vertical-align: middle; text-align: center;
+            color: var(--accent-secondary); background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px; cursor: pointer; transition: all 0.3s;
+        }
+        .code-slot.filled { border: 2px solid var(--accent-primary); background: rgba(234, 179, 8, 0.2); color: #fde047; }
+        .code-option {
+            background: #1e1b4b; border: 2px solid #4c1d95;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; user-select: none; color: #e2e8f0;
+        }
+        .code-option:hover { background: #312e81; transform: scale(1.05); }
+        .code-option.selected { background: var(--accent-primary); border-color: #fef08a; color: #422006; font-weight: bold; }
+        .glitch { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); background-color: #7f1d1d; }
+            20% { transform: skew(-10deg); }
+            40% { transform: skew(10deg); }
+            60% { transform: skew(-5deg); background-color: #991b1b; }
+            80% { transform: skew(5deg); }
+            100% { transform: skew(0deg); background-color: var(--crt-bg); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .terminal-block {
+            background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+        .cmd-input {
+            background-color: #0f172a; border: 2px solid #b45309;
+            color: white; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            outline: none; transition: border-color 0.3s; width: 100%;
+        }
+        .cmd-input:focus { border-color: #f59e0b; }
+        .quick-btn {
+            background: #1e1b4b; border: 1px solid #4c1d95; border-radius: 6px;
+            padding: 4px 8px; cursor: pointer; transition: all 0.2s; color: #a78bfa;
+            font-size: 0.75rem;
+        }
+        .quick-btn:hover { background: #2e1065; color: white; border-color: #8b5cf6; }
+        .objective-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 8px; border-radius: 99px; background: rgba(0,0,0,0.5);
+            border: 1px solid #475569; color: #94a3b8; font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+        .objective-badge.done {
+            background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399;
+        }
+        @media (max-width: 640px) {
+            .dashboard { padding: 1rem !important; }
+            .ferris-avatar { width: 60px; height: 60px; font-size: 1.8rem; }
+            .dialog-box { padding: 0.75rem !important; }
+            .code-slot { min-width: 50px; font-size: 0.9rem; }
+            .code-option { padding: 4px 10px; font-size: 0.9rem; }
+            .cmd-input { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20">
 
-        <style>
-            :root {
-                --bg-color: #0f172a; /* Slate 900 */
-                --crt-bg: #1e1b4b; /* Indigo 950 */
-                --accent-primary: #eab308; /* Yellow 500 */
-                --accent-secondary: #f59e0b; /* Amber 500 */
-            }
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50"></canvas>
 
-            body {
-                background-color: var(--bg-color);
-                background-image:
-                    radial-gradient(
-                        rgba(234, 179, 8, 0.1) 2px,
-                        transparent 40px
-                    ),
-                    radial-gradient(
-                        rgba(245, 158, 11, 0.05) 1px,
-                        transparent 30px
-                    );
-                background-size:
-                    550px 550px,
-                    350px 350px;
-                color: white;
-                overflow-x: hidden;
-                transition: all 0.3s ease;
-            }
+    <div class="dashboard w-full max-w-4xl p-4 md:p-8 relative" id="main-dashboard">
 
-            html[dir="rtl"] body {
-                font-family: "Vazirmatn", sans-serif;
-            }
-            html[dir="ltr"] body {
-                font-family: "Nunito", sans-serif;
-            }
-            .code-font {
-                font-family: "JetBrains Mono", monospace !important;
-            }
+        <!-- Dynamic Language Bar -->
+        <div class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg gap-1" id="language-bar" dir="ltr"></div>
 
-            /* Spaceship Dashboard UI - Treasure Hunt Edition */
-            .dashboard {
-                background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-                border: 4px solid var(--accent-primary);
-                border-radius: 20px;
-                box-shadow:
-                    0 0 30px rgba(234, 179, 8, 0.4),
-                    inset 0 0 20px rgba(0, 0, 0, 0.7);
-            }
-
-            /* CRT Screen Effect */
-            .screen-crt {
-                background-color: var(--crt-bg);
-                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-                border: 4px solid #b45309; /* Amber 600 */
-                border-radius: 12px;
-                position: relative;
-                overflow: hidden;
-                transition: background-color 0.5s;
-            }
-            .screen-crt::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                background:
-                    linear-gradient(
-                        rgba(234, 179, 8, 0.03) 50%,
-                        rgba(0, 0, 0, 0.25) 50%
-                    ),
-                    linear-gradient(
-                        90deg,
-                        rgba(255, 255, 255, 0.02),
-                        rgba(245, 158, 11, 0.02),
-                        rgba(234, 179, 8, 0.02)
-                    );
-                z-index: 2;
-                background-size:
-                    100% 2px,
-                    3px 100%;
-                pointer-events: none;
-            }
-
-            /* Dialog Box */
-            .dialog-box {
-                background: rgba(254, 252, 232, 0.95); /* Yellow 50 */
-                color: #422006; /* Orange 950 */
-                border-radius: 15px;
-                border: 3px solid var(--accent-primary);
-                position: relative;
-            }
-            html[dir="rtl"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                right: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(254, 252, 232, 0.95) transparent transparent
-                    transparent;
-            }
-            html[dir="ltr"] .dialog-box::after {
-                content: "";
-                position: absolute;
-                bottom: -15px;
-                left: 40px;
-                border-width: 15px 15px 0;
-                border-style: solid;
-                border-color: rgba(254, 252, 232, 0.95) transparent transparent
-                    transparent;
-            }
-
-            .ferris-avatar {
-                width: 90px;
-                height: 90px;
-                background: #fef9c3;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                border: 4px solid var(--accent-primary);
-                animation: float 3s ease-in-out infinite;
-            }
-
-            @keyframes float {
-                0% {
-                    transform: translateY(0px);
-                }
-                50% {
-                    transform: translateY(-10px);
-                }
-                100% {
-                    transform: translateY(0px);
-                }
-            }
-
-            /* Interactive Elements */
-            .code-slot {
-                display: inline-block;
-                min-width: 60px;
-                height: 30px;
-                border-bottom: 3px dashed var(--accent-secondary);
-                margin: 0 5px;
-                vertical-align: middle;
-                text-align: center;
-                color: var(--accent-secondary);
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .code-slot.filled {
-                border: 2px solid var(--accent-primary);
-                background: rgba(234, 179, 8, 0.2);
-                color: #fde047;
-            }
-
-            .code-option {
-                background: #1e1b4b;
-                border: 2px solid #4c1d95;
-                padding: 8px 15px;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                user-select: none;
-                color: #e2e8f0;
-            }
-            .code-option:hover {
-                background: #312e81;
-                transform: scale(1.05);
-            }
-            .code-option.selected {
-                background: var(--accent-primary);
-                border-color: #fef08a;
-                color: #422006;
-                font-weight: bold;
-            }
-
-            /* Animations */
-            .glitch {
-                animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-                    both;
-            }
-            @keyframes glitch-skew {
-                0% {
-                    transform: skew(0deg);
-                    background-color: #7f1d1d;
-                }
-                20% {
-                    transform: skew(-10deg);
-                }
-                40% {
-                    transform: skew(10deg);
-                }
-                60% {
-                    transform: skew(-5deg);
-                    background-color: #991b1b;
-                }
-                80% {
-                    transform: skew(5deg);
-                }
-                100% {
-                    transform: skew(0deg);
-                    background-color: var(--crt-bg);
-                }
-            }
-            .fade-in {
-                animation: fadeIn 0.5s ease-in forwards;
-            }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .pop-in {
-                animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)
-                    forwards;
-            }
-            @keyframes popIn {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-
-            .lang-fa {
-                display: block;
-            }
-            .lang-en {
-                display: none;
-            }
-            html[dir="ltr"] .lang-fa {
-                display: none;
-            }
-            html[dir="ltr"] .lang-en {
-                display: block;
-            }
-
-            .terminal-block {
-                background: rgba(0, 0, 0, 0.6);
-                border-radius: 8px;
-                padding: 12px;
-                border: 1px solid rgba(234, 179, 8, 0.3);
-            }
-
-            /* RPG Parser Simulator Styles */
-            .cmd-input {
-                background-color: #0f172a;
-                border: 2px solid #b45309;
-                color: white;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                outline: none;
-                transition: border-color 0.3s;
-                width: 100%;
-            }
-            .cmd-input:focus {
-                border-color: #f59e0b;
-            }
-
-            .quick-btn {
-                background: #1e1b4b;
-                border: 1px solid #4c1d95;
-                border-radius: 6px;
-                padding: 4px 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                color: #a78bfa;
-                font-size: 0.75rem;
-            }
-            .quick-btn:hover {
-                background: #2e1065;
-                color: white;
-                border-color: #8b5cf6;
-            }
-
-            .objective-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 4px 8px;
-                border-radius: 99px;
-                background: rgba(0, 0, 0, 0.5);
-                border: 1px solid #475569;
-                color: #94a3b8;
-                font-size: 0.75rem;
-                transition: all 0.3s;
-            }
-            .objective-badge.done {
-                background: rgba(16, 185, 129, 0.2);
-                border-color: #10b981;
-                color: #34d399;
-            }
-        </style>
-    </head>
-    <body
-        class="min-h-screen flex items-center justify-center p-2 md:p-4 pb-20"
-    >
-        <canvas
-            id="confetti"
-            class="fixed inset-0 pointer-events-none z-50"
-        ></canvas>
-
-        <div
-            class="dashboard w-full max-w-4xl p-4 md:p-8 relative"
-            id="main-dashboard"
-        >
-            <!-- Language Toggle -->
-            <div
-                class="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-slate-800 rounded-full p-1 border border-slate-600 flex shadow-lg"
-                dir="ltr"
-            >
-                <button
-                    onclick="setLang('en')"
-                    id="btn-en"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white"
-                >
-                    English
-                </button>
-                <button
-                    onclick="setLang('fa')"
-                    id="btn-fa"
-                    class="px-4 py-1 rounded-full text-sm font-bold transition-colors bg-yellow-500 text-yellow-950"
-                >
-                    فارسی
-                </button>
+        <!-- HUD -->
+        <div class="flex justify-between items-center mb-6 border-b border-yellow-900 pb-4 mt-2">
+            <div class="flex gap-4 font-bold text-sm md:text-base" id="hud-stats">
+                <div class="text-yellow-400"><i class="fa-solid fa-map-location-dot"></i> <span id="zone-label"></span> <span id="hud-zone" class="text-white"></span></div>
+                <div class="text-emerald-400"><i class="fa-solid fa-gem"></i> <span id="treasures-label"></span> <span id="hud-treasures">0</span></div>
             </div>
+            <div class="text-yellow-300 code-font text-xs md:text-sm opacity-70">MATCH-OS v18.0</div>
+        </div>
 
-            <!-- Top HUD -->
-            <div
-                class="flex justify-between items-center mb-6 border-b border-yellow-900 pb-4 mt-2"
-            >
-                <div
-                    class="flex gap-4 font-bold text-sm md:text-base"
-                    id="hud-stats"
-                >
-                    <div class="text-yellow-400">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                        <span class="lang-fa">منطقه:</span
-                        ><span class="lang-en">Zone:</span>
-                        <span class="text-white" id="hud-zone"
-                            ><span class="lang-fa">نامشخص</span
-                            ><span class="lang-en">Unknown</span></span
-                        >
-                    </div>
-                    <div class="text-emerald-400">
-                        <i class="fa-solid fa-gem"></i>
-                        <span class="lang-fa">گنج‌ها:</span
-                        ><span class="lang-en">Treasures:</span>
-                        <span class="text-white" id="hud-treasures">۰</span>
-                    </div>
+        <!-- Dialog Box -->
+        <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
+            <div class="ferris-avatar shadow-lg z-10 shrink-0">🗺️🦀</div>
+            <div class="dialog-box p-4 md:p-5 shadow-xl w-full border-yellow-500">
+                <h3 id="ferris-name" class="font-bold text-yellow-700 mb-2"></h3>
+                <p id="dialog-text" class="text-base md:text-lg leading-relaxed min-h-[70px] font-bold text-yellow-950"></p>
+                <div class="mt-3 flex justify-end">
+                    <button id="next-dialog-btn" class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden" onclick="nextDialog()">
+                        <span id="next-btn-text"></span> <i id="next-icon" class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-yellow-300 code-font text-sm opacity-70">
-                    MATCH-OS v18.0
-                </div>
-            </div>
-
-            <!-- Story Section -->
-            <div class="flex flex-col md:flex-row items-end gap-4 mb-8">
-                <div class="ferris-avatar shadow-lg z-10 shrink-0">🗺️🦀</div>
-
-                <div
-                    class="dialog-box p-4 md:p-5 shadow-xl w-full border-yellow-500"
-                >
-                    <h3 class="font-bold text-yellow-700 mb-2 lang-fa">
-                        فریس خرچنگ:
-                    </h3>
-                    <h3 class="font-bold text-yellow-700 mb-2 lang-en">
-                        Ferris the Crab:
-                    </h3>
-
-                    <p
-                        id="dialog-text"
-                        class="text-lg leading-relaxed min-h-[60px] font-bold text-yellow-950"
-                    ></p>
-
-                    <div class="mt-3 flex justify-end">
-                        <button
-                            id="next-dialog-btn"
-                            class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold transition text-sm hidden"
-                            onclick="nextDialog()"
-                        >
-                            <span class="lang-fa"
-                                >بعدی
-                                <i class="fa-solid fa-chevron-left ml-1"></i
-                            ></span>
-                            <span class="lang-en"
-                                >Next
-                                <i class="fa-solid fa-chevron-right ml-1"></i
-                            ></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Screen -->
-            <div id="game-area" class="hidden fade-in">
-                <div
-                    id="crt-monitor"
-                    class="screen-crt p-4 md:p-6 font-mono text-amber-100 code-font min-h-[400px] flex flex-col"
-                >
-                    <!-- Mission 1: Destructuring -->
-                    <div id="mission-1" class="mission-view flex-grow">
-                        <div
-                            class="text-center mb-4 border-b border-amber-900 pb-2"
-                        >
-                            <h2 class="text-xl font-bold text-white lang-fa">
-                                فصل ۱۸: نقشه‌های پیچیده‌ی گنج (تخریب الگوها) 🗺️
-                            </h2>
-                            <h2 class="text-xl font-bold text-white lang-en">
-                                Chapter 18: Complex Treasure Maps
-                                (Destructuring) 🗺️
-                            </h2>
-                        </div>
-
-                        <div class="lang-fa leading-relaxed space-y-3">
-                            <p class="text-amber-300">
-                                > گنج درون یک صندوقچه و آن صندوقچه داخل یک
-                                خزانه‌ی بزرگ قفل شده است! باز کردن تک‌تک آن‌ها
-                                خیلی زمان‌بر است.
-                            </p>
-                            <p class="text-slate-300">
-                                > با قدرت جادویی **الگویابی (Pattern
-                                Matching)**، می‌توانیم ساختارها را با یک حرکت
-                                بشکنیم و گنج را مستقیم بیرون بکشیم. به این کار
-                                **تخریب (Destructuring)** می‌گویند.
-                            </p>
-                            <p class="text-emerald-300 mt-4 font-bold">
-                                برای اینکه فیلد `name` را نگه داریم ولی بقیه‌ی
-                                فیلدهای Struct را نادیده بگیریم، از کدام علامت
-                                در الگو استفاده می‌کنیم؟
-                            </p>
-                        </div>
-
-                        <div class="lang-en leading-relaxed space-y-3">
-                            <p class="text-amber-300">
-                                > The treasure is inside a chest, which is
-                                inside a locked vault! Opening them one by one
-                                takes too long.
-                            </p>
-                            <p class="text-slate-300">
-                                > With the magic of **Pattern Matching**, we can
-                                smash the structures in one move and extract the
-                                treasure directly. This is called
-                                **Destructuring**.
-                            </p>
-                            <p class="text-emerald-300 mt-4 font-bold">
-                                To keep the `name` field but ignore the rest of
-                                the Struct's fields, which symbol do we use in
-                                the pattern?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block mt-4 text-emerald-300 text-lg"
-                        >
-                            <span class="text-pink-400">let</span> person =
-                            Person { name: String::from(<span
-                                class="text-yellow-300"
-                                >"فریس"</span
-                            >), age: <span class="text-orange-300">5</span>,
-                            role:
-                            <span class="text-yellow-300">"Hero"</span>
-                            };<br /><br />
-                            <span class="text-slate-400 text-sm"
-                                >// Extract 'name', ignore the rest!</span
-                            ><br />
-                            <span class="text-pink-400">let</span> Person {
-                            name,
-                            <span
-                                id="slot1"
-                                class="code-slot text-amber-400"
-                                onclick="clearSlot(1)"
-                                >---</span
-                            >
-                            } = person;<br />
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Hero is: {}"</span
-                            >, name);
-                        </div>
-
-                        <div
-                            id="puzzle1-feedback"
-                            class="text-rose-400 h-6 mt-2 mb-2 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-amber-900 pt-3">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 1, '_')"
-                                >
-                                    _
-                                </div>
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 1, '..')"
-                                >
-                                    ..
-                                </div>
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 1, '*')"
-                                >
-                                    *
-                                </div>
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 1, '...')"
-                                >
-                                    ...
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle1-btn"
-                                class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle1()"
-                                disabled
-                            >
-                                <span class="lang-fa">شکستن جعبه 📦</span
-                                ><span class="lang-en">Break the Box 📦</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 2: Match Guard -->
-                    <div id="mission-2" class="mission-view hidden flex-grow">
-                        <div class="text-emerald-400 mb-2">
-                            <span class="lang-fa"
-                                >>> مرحله ۱: نگهبانان گنج (Match Guards)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 1: Treasure Guards (Match Guards)</span
-                            >
-                        </div>
-
-                        <div
-                            class="lang-fa text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                گاهی الگو به تنهایی کافی نیست. می‌خواهیم بگوییم
-                                «اگر الگو جور بود **و** این شرط خاص هم برقرار
-                                بود».
-                            </p>
-                            <p class="text-white font-bold">
-                                برای اضافه کردن یک شرط به بازوی `match`، از کدام
-                                کلمه کلیدی بلافاصله بعد از الگو استفاده می‌کنیم؟
-                            </p>
-                        </div>
-                        <div
-                            class="lang-en text-sm text-slate-300 mb-4 space-y-2"
-                        >
-                            <p>
-                                Sometimes a pattern isn't enough. We want to say
-                                "if the pattern matches **AND** this specific
-                                condition is true".
-                            </p>
-                            <p class="text-white font-bold">
-                                To add a condition to a `match` arm, which
-                                keyword do we use immediately after the pattern?
-                            </p>
-                        </div>
-
-                        <div
-                            class="terminal-block text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">match</span> coins {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;Some(x)
-                            <span
-                                id="slot2"
-                                class="code-slot"
-                                onclick="clearSlot(2)"
-                                >---</span
-                            >
-                            x > <span class="text-orange-300">50</span> =>
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Big Treasure!"</span
-                            >),<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;Some(x) =>
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Small loot."</span
-                            >),<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;None =>
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Empty box."</span
-                            >),<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle2-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-amber-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'when')"
-                                >
-                                    when
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'where')"
-                                >
-                                    where
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'and')"
-                                >
-                                    and
-                                </div>
-                                <div
-                                    class="code-option code-font text-lg"
-                                    onclick="selectOption(this, 2, 'if')"
-                                >
-                                    if
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle2-btn"
-                                class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle2()"
-                                disabled
-                            >
-                                <span class="lang-fa">اعمال شرط نگهبان 🛡️</span
-                                ><span class="lang-en"
-                                    >Apply Guard Condition 🛡️</span
-                                >
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 3: @ Binding -->
-                    <div id="mission-3" class="mission-view hidden flex-grow">
-                        <div class="text-emerald-400 mb-2 font-bold">
-                            <span class="lang-fa"
-                                >>> مرحله ۲: گرفتن و نگه داشتن (@ Binding)</span
-                            >
-                            <span class="lang-en"
-                                >>> Step 2: Catch and Hold (@ Binding)</span
-                            >
-                        </div>
-
-                        <p class="lang-fa text-sm text-slate-300 mb-4">
-                            می‌خواهیم بررسی کنیم که آیا تعداد سکه‌ها در یک بازه
-                            (مثلاً ۱ تا ۱۰) است، و **همزمان** مقدار دقیق آن را
-                            در یک متغیر ذخیره کنیم! برای چسباندن (Bind) متغیر به
-                            یک الگو، از چه علامتی استفاده می‌کنیم؟
-                        </p>
-                        <p class="lang-en text-sm text-slate-300 mb-4">
-                            We want to check if the coin count is in a range
-                            (like 1 to 10), and **simultaneously** save its
-                            exact value in a variable! Which symbol do we use to
-                            Bind a variable to a pattern?
-                        </p>
-
-                        <div
-                            class="terminal-block text-base md:text-lg mb-4 text-emerald-300"
-                        >
-                            <span class="text-pink-400">match</span> coins {<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;num
-                            <span
-                                id="slot3"
-                                class="code-slot"
-                                onclick="clearSlot(3)"
-                                >---</span
-                            >
-                            <span class="text-orange-300">1</span>..=<span
-                                class="text-orange-300"
-                                >10</span
-                            >
-                            => <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Got {} coins!"</span
-                            >, num),<br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;_ =>
-                            <span class="text-blue-300">println!</span>(<span
-                                class="text-yellow-300"
-                                >"Out of range!"</span
-                            >),<br />
-                            }
-                        </div>
-
-                        <div
-                            id="puzzle3-feedback"
-                            class="text-rose-400 h-6 mb-4 text-sm font-bold"
-                        ></div>
-
-                        <div class="border-t border-amber-900 pt-3">
-                            <div class="flex flex-wrap gap-4 justify-center">
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 3, '=')"
-                                >
-                                    =
-                                </div>
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 3, '@')"
-                                >
-                                    @
-                                </div>
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 3, '&')"
-                                >
-                                    &amp;
-                                </div>
-                                <div
-                                    class="code-option code-font text-2xl px-5"
-                                    onclick="selectOption(this, 3, '$')"
-                                >
-                                    $
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button
-                                id="run-puzzle3-btn"
-                                class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition"
-                                onclick="checkPuzzle3()"
-                                disabled
-                            >
-                                <span class="lang-fa">گرفتن مقدار 🧲</span
-                                ><span class="lang-en">Catch the Value 🧲</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mission 4: Text Adventure Parser Simulator -->
-                    <div
-                        id="mission-4"
-                        class="mission-view hidden flex-grow flex flex-col"
-                    >
-                        <div
-                            class="text-emerald-400 mb-2 border-b border-amber-800 pb-2 flex justify-between items-center"
-                        >
-                            <div>
-                                <span class="lang-fa"
-                                    >>> مرحله نهایی: مفسر دستورات بازی
-                                    متنی</span
-                                >
-                                <span class="lang-en"
-                                    >>> Final Step: Text Game Command
-                                    Parser</span
-                                >
-                            </div>
-                            <div
-                                class="text-xs bg-amber-900 px-2 py-1 rounded text-white"
-                            >
-                                <span class="lang-fa">پروژه ۱۸.۳</span
-                                ><span class="lang-en">Project 18.3</span>
-                            </div>
-                        </div>
-
-                        <div class="lang-fa text-sm mb-2 text-slate-300">
-                            برنامه‌ی ما دستورات متنی را تجزیه کرده و با `match`
-                            پیشرفته اجرا می‌کند! برای پیروزی،
-                            <strong>یک حرکت</strong> انجام بده و یک
-                            <strong>حمله با قدرت بیش از ۳۰</strong> ثبت کن!
-                        </div>
-                        <div class="lang-en text-sm mb-2 text-slate-300">
-                            Our program parses text commands and runs them using
-                            advanced `match`! To win, make
-                            <strong>one move</strong> and register an
-                            <strong>attack with power > 30</strong>!
-                        </div>
-
-                        <div class="flex flex-col gap-3 flex-grow">
-                            <!-- Objectives -->
-                            <div class="flex gap-2">
-                                <div class="objective-badge" id="obj-move">
-                                    <i class="fa-solid fa-person-walking"></i>
-                                    <span class="lang-fa">حرکت کردن (/go)</span
-                                    ><span class="lang-en">Move (/go)</span>
-                                </div>
-                                <div class="objective-badge" id="obj-attack">
-                                    <i
-                                        class="fa-solid fa-fire-flame-curved"
-                                    ></i>
-                                    <span class="lang-fa">حمله قوی (>30)</span
-                                    ><span class="lang-en"
-                                        >Strong Attack (>30)</span
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Console -->
-                            <div
-                                id="sim-terminal"
-                                class="terminal-block text-sm overflow-y-auto flex-grow flex flex-col"
-                                style="min-height: 120px; max-height: 180px"
-                            >
-                                <div class="text-amber-400 font-bold mb-2">
-                                    <span class="lang-fa"
-                                        >🎮 به بازی متنی فریس خوش آمدی!</span
-                                    >
-                                    <span class="lang-en"
-                                        >🎮 Welcome to Ferris's Text
-                                        Adventure!</span
-                                    >
-                                </div>
-                                <!-- Output goes here -->
-                                <div id="term-output"></div>
-                            </div>
-
-                            <!-- Input Controls -->
-                            <div
-                                class="flex flex-col gap-2 bg-black/40 p-2 rounded-lg border border-amber-900"
-                            >
-                                <!-- Quick Buttons -->
-                                <div class="flex gap-2 flex-wrap">
-                                    <button
-                                        class="quick-btn code-font"
-                                        onclick="fillCommand('/go north')"
-                                    >
-                                        /go north
-                                    </button>
-                                    <button
-                                        class="quick-btn code-font"
-                                        onclick="
-                                            fillCommand('/attack slime 10')
-                                        "
-                                    >
-                                        /attack slime 10
-                                    </button>
-                                    <button
-                                        class="quick-btn code-font"
-                                        onclick="
-                                            fillCommand('/attack dragon 50')
-                                        "
-                                    >
-                                        /attack dragon 50
-                                    </button>
-                                </div>
-
-                                <div class="flex gap-2">
-                                    <span class="text-amber-500 font-bold mt-2"
-                                        >></span
-                                    >
-                                    <input
-                                        type="text"
-                                        id="cmd-input"
-                                        class="cmd-input code-font"
-                                        placeholder="Type command here..."
-                                        onkeypress="handleEnter(event)"
-                                    />
-                                    <button
-                                        class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-4 py-2 rounded font-bold"
-                                        onclick="parseCommandBtn()"
-                                    >
-                                        <span class="lang-fa">ارسال</span
-                                        ><span class="lang-en">Send</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Success overlay -->
-            <div
-                id="success-screen"
-                class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in"
-            >
-                <div class="text-7xl mb-4 animate-bounce">🗝️🐉🎉</div>
-                <h2 class="text-4xl font-bold text-white mb-2 text-center px-4">
-                    <span class="lang-fa">گنجینه‌ی الگوها کشف شد!</span>
-                    <span class="lang-en">Pattern Treasure Discovered!</span>
-                </h2>
-                <p class="text-xl text-amber-400 mb-6 text-center px-4">
-                    <span class="lang-fa"
-                        >شما ابزارهای پیشرفته‌ی Pattern Matching مثل
-                        Destructuring و Match Guards را استاد شدید!</span
-                    >
-                    <span class="lang-en"
-                        >You mastered advanced Pattern Matching tools like
-                        Destructuring and Match Guards!</span
-                    >
-                </p>
-                <button
-                    class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-3 rounded-xl font-bold text-lg shadow-[0_0_15px_rgba(245,158,11,0.6)]"
-                    onclick="location.reload()"
-                >
-                    <span class="lang-fa">پایان فصل ۱۸ - دوباره بازی کن</span>
-                    <span class="lang-en">End of Chapter 18 - Play Again</span>
-                </button>
             </div>
         </div>
 
-        <script>
-            // --- Game State & Logic ---
-            let currentLang = "fa";
-            let currentStep = 0;
-            let currentDialogIndex = 0;
-            let typeInterval;
+        <!-- Game Area -->
+        <div id="game-area" class="hidden fade-in">
+            <div id="crt-monitor" class="screen-crt p-4 md:p-6 font-mono text-amber-100 code-font min-h-[400px] flex flex-col">
 
-            // RPG Parser State
-            let hasMoved = false;
-            let hasStrongAttack = false;
+                <!-- Mission 1: Destructuring (..) -->
+                <div id="mission-1" class="mission-view flex-grow">
+                    <div class="text-center mb-4 border-b border-amber-900 pb-2">
+                        <h2 id="mission1-title" class="text-lg md:text-xl font-bold text-white"></h2>
+                    </div>
+                    <div id="mission1-text" class="leading-relaxed space-y-3 text-sm md:text-base"></div>
+                    <div class="terminal-block mt-4 text-emerald-300 text-base md:text-lg">
+                        <span class="text-pink-400">let</span> person = Person { name: String::from(<span class="text-yellow-300">"Ferris"</span>), age: <span class="text-orange-300">5</span>, role: <span class="text-yellow-300">"Hero"</span> };<br><br>
+                        <span class="text-slate-400 text-sm">// Extract 'name', ignore the rest!</span><br>
+                        <span class="text-pink-400">let</span> Person { name, <span id="slot1" class="code-slot text-amber-400" onclick="clearSlot(1)">---</span> } = person;<br>
+                        <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Hero is: {}"</span>, name);
+                    </div>
+                    <div id="puzzle1-feedback" class="text-rose-400 h-6 mt-2 mb-2 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-amber-900 pt-3">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 1, '_')">_</div>
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 1, '..')">..</div>
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 1, '*')">*</div>
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 1, '...')">...</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle1-btn" class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle1()" disabled>
+                            <span id="puzzle1-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
 
-            // --- Dialog Data ---
-            const dialogs = {
-                fa: [
+                <!-- Mission 2: Match Guard (if) -->
+                <div id="mission-2" class="mission-view hidden flex-grow">
+                    <div id="mission2-step" class="text-emerald-400 mb-2 text-sm md:text-base"></div>
+                    <div id="mission2-desc" class="text-sm md:text-base text-slate-300 mb-4 space-y-2"></div>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">match</span> coins {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;Some(x) <span id="slot2" class="code-slot" onclick="clearSlot(2)">---</span> x > <span class="text-orange-300">50</span> => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Big Treasure!"</span>),<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;Some(x) => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Small loot."</span>),<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;None => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Empty box."</span>),<br>
+                        }
+                    </div>
+                    <div id="puzzle2-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-amber-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'when')">when</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'where')">where</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'and')">and</div>
+                            <div class="code-option code-font text-lg" onclick="selectOption(this, 2, 'if')">if</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle2-btn" class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle2()" disabled>
+                            <span id="puzzle2-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 3: @ binding -->
+                <div id="mission-3" class="mission-view hidden flex-grow">
+                    <div id="mission3-step" class="text-emerald-400 mb-2 font-bold text-sm md:text-base"></div>
+                    <p id="mission3-desc" class="text-sm md:text-base text-slate-300 mb-4"></p>
+                    <div class="terminal-block text-base md:text-lg mb-4 text-emerald-300">
+                        <span class="text-pink-400">match</span> coins {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;num <span id="slot3" class="code-slot" onclick="clearSlot(3)">---</span> <span class="text-orange-300">1</span>..=<span class="text-orange-300">10</span> => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Got {} coins!"</span>, num),<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;_ => <span class="text-blue-300">println!</span>(<span class="text-yellow-300">"Out of range!"</span>),<br>
+                        }
+                    </div>
+                    <div id="puzzle3-feedback" class="text-rose-400 h-6 mb-4 text-xs md:text-sm font-bold"></div>
+                    <div class="border-t border-amber-900 pt-3">
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 3, '=')">=</div>
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 3, '@')">@</div>
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 3, '&')">&amp;</div>
+                            <div class="code-option code-font text-2xl px-5" onclick="selectOption(this, 3, '$')">$</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button id="run-puzzle3-btn" class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-2 rounded font-bold opacity-50 cursor-not-allowed transition" onclick="checkPuzzle3()" disabled>
+                            <span id="puzzle3-btn-text"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mission 4: Command Parser Simulator -->
+                <div id="mission-4" class="mission-view hidden flex-grow flex flex-col">
+                    <div class="text-emerald-400 mb-2 border-b border-amber-800 pb-2 flex justify-between items-center">
+                        <span id="mission4-step"></span>
+                        <div class="text-xs bg-amber-900 px-2 py-1 rounded text-white">Project 18.3</div>
+                    </div>
+                    <div id="mission4-desc" class="text-sm mb-2 text-slate-300"></div>
+                    <div class="flex flex-col gap-3 flex-grow">
+                        <div class="flex gap-2">
+                            <div class="objective-badge" id="obj-move">
+                                <i class="fa-solid fa-person-walking"></i>
+                                <span id="obj-move-text"></span>
+                            </div>
+                            <div class="objective-badge" id="obj-attack">
+                                <i class="fa-solid fa-fire-flame-curved"></i>
+                                <span id="obj-attack-text"></span>
+                            </div>
+                        </div>
+                        <div id="sim-terminal" class="terminal-block text-sm overflow-y-auto flex-grow flex flex-col" style="min-height: 120px; max-height: 180px;">
+                            <div id="welcome-msg" class="text-amber-400 font-bold mb-2"></div>
+                            <div id="term-output"></div>
+                        </div>
+                        <div class="flex flex-col gap-2 bg-black/40 p-2 rounded-lg border border-amber-900">
+                            <div class="flex gap-2 flex-wrap">
+                                <button class="quick-btn code-font" onclick="fillCommand('/go north')">/go north</button>
+                                <button class="quick-btn code-font" onclick="fillCommand('/attack slime 10')">/attack slime 10</button>
+                                <button class="quick-btn code-font" onclick="fillCommand('/attack dragon 50')">/attack dragon 50</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-amber-500 font-bold mt-2">></span>
+                                <input type="text" id="cmd-input" class="cmd-input code-font" onkeypress="handleEnter(event)">
+                                <button id="send-btn" class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-4 py-2 rounded font-bold" onclick="parseCommandBtn()">
+                                    <span id="send-btn-text"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen" class="hidden absolute inset-0 bg-slate-900/95 backdrop-blur-md rounded-[16px] z-40 flex flex-col items-center justify-center fade-in p-4">
+            <div class="text-6xl md:text-7xl mb-4 animate-bounce">🗝️🐉🎉</div>
+            <h2 id="success-title" class="text-2xl md:text-4xl font-bold text-white mb-2 text-center px-4"></h2>
+            <p id="success-message" class="text-base md:text-xl text-amber-400 mb-6 text-center px-4"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="bg-amber-600 hover:bg-amber-500 text-yellow-950 px-6 py-3 rounded-xl font-bold text-base md:text-lg shadow-[0_0_15px_rgba(245,158,11,0.6)]" onclick="location.reload()">
+                    <i class="fa-solid fa-rotate-right ml-2"></i> <span id="restart-btn-text"></span>
+                </button>
+                <button id="next-chapter-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-base md:text-lg" onclick="goToNextChapter()">
+                    <i class="fa-solid fa-arrow-right ml-2"></i> <span id="next-chapter-text"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // LANGUAGE PACK (5 languages)
+        // --------------------------------------------------------------
+        const languagePack = {
+            fa: {
+                name: "فارسی",
+                zoneLabel: "منطقه:",
+                treasuresLabel: "گنج‌ها:",
+                ferrisName: "فریس خرچنگ:",
+                nextButton: "بعدی",
+                nextIcon: "fa-chevron-left",
+                dialogues: [
                     "سلام کارآگاه! من یه نقشه‌ی گنج پیدا کردم. 🗺️",
                     "اما گنج توی یه جعبه‌ست، اون جعبه تو یه صندوقچه‌ست، و اون هم توی یه خزانه‌ی بزرگه!",
                     "اگه بخوایم یکی یکی بازشون کنیم خیلی طول می‌کشه. ما یه قدرت جادویی به اسم «الگویابی پیشرفته» داریم. 🪄",
-                    "با این قدرت می‌تونیم مثل یه قیچی جادویی، جعبه‌ها رو بشکافیم و مستقیم به اطلاعاتی که می‌خوایم برسیم! بزن بریم گنج رو پیدا کنیم! 💎",
+                    "با این قدرت می‌تونیم مثل یه قیچی جادویی، جعبه‌ها رو بشکافیم و مستقیم به اطلاعاتی که می‌خوایم برسیم! بزن بریم گنج رو پیدا کنیم! 💎"
                 ],
-                en: [
+                afterDialog: "بزن بریم! به مانیتور پایین نگاه کن تا اولین قفل رو بشکنیم.",
+                mission1Title: "فصل ۱۸: نقشه‌های پیچیده‌ی گنج (تخریب الگوها) 🗺️",
+                mission1Text: `
+                    <p class="text-amber-300">> گنج درون یک صندوقچه و آن صندوقچه داخل یک خزانه‌ی بزرگ قفل شده است! باز کردن تک‌تک آن‌ها خیلی زمان‌بر است.</p>
+                    <p class="text-slate-300">> با قدرت جادویی **الگویابی (Pattern Matching)**، می‌توانیم ساختارها را با یک حرکت بشکنیم و گنج را مستقیم بیرون بکشیم. به این کار **تخریب (Destructuring)** می‌گویند.</p>
+                    <p class="text-emerald-300 mt-4 font-bold">برای اینکه فیلد `name` را نگه داریم ولی بقیه‌ی فیلدهای Struct را نادیده بگیریم، از کدام علامت در الگو استفاده می‌کنیم؟</p>
+                `,
+                puzzle1Btn: "شکستن جعبه 📦",
+                puzzle1Success: "> بقیه فیلدها با موفقیت نادیده گرفته شدند!",
+                puzzle1Error: "خطا: برای نادیده گرفتن بقیه‌ی فیلدهای یک ساختار از نماد .. استفاده می‌کنیم.",
+                mission2Step: ">> مرحله ۱: نگهبانان گنج (Match Guards)",
+                mission2Desc: "<p>گاهی الگو به تنهایی کافی نیست. می‌خواهیم بگوییم «اگر الگو جور بود **و** این شرط خاص هم برقرار بود».</p><p class='text-white font-bold'>برای اضافه کردن یک شرط به بازوی `match`، از کدام کلمه کلیدی بلافاصله بعد از الگو استفاده می‌کنیم؟</p>",
+                puzzle2Btn: "اعمال شرط نگهبان 🛡️",
+                puzzle2Success: "> شرط نگهبان (Match Guard) فعال شد!",
+                puzzle2Error: "خطا: در زبان راست برای اضافه کردن شرط به الگو از کلمه‌ی if (معروف به Match Guard) استفاده می‌شود.",
+                mission3Step: ">> مرحله ۲: گرفتن و نگه داشتن (@ Binding)",
+                mission3Desc: "می‌خواهیم بررسی کنیم که آیا تعداد سکه‌ها در یک بازه (مثلاً ۱ تا ۱۰) است، و **همزمان** مقدار دقیق آن را در یک متغیر ذخیره کنیم! برای چسباندن (Bind) متغیر به یک الگو، از چه علامتی استفاده می‌کنیم؟",
+                puzzle3Btn: "گرفتن مقدار 🧲",
+                puzzle3Success: "> متغیر با موفقیت به الگو Bind شد!",
+                puzzle3Error: "خطا: برای چسباندن (Bind) یک نام به یک الگو در حال تست کردن، از نماد @ استفاده می‌شود.",
+                mission4Step: ">> مرحله نهایی: مفسر دستورات بازی متنی",
+                mission4Desc: "برنامه‌ی ما دستورات متنی را تجزیه کرده و با `match` پیشرفته اجرا می‌کند! برای پیروزی، <strong>یک حرکت</strong> انجام بده و یک <strong>حمله با قدرت بیش از ۳۰</strong> ثبت کن!",
+                objMove: "حرکت کردن (/go)",
+                objAttack: "حمله قوی (>30)",
+                welcomeMsg: "🎮 به بازی متنی فریس خوش آمدی!",
+                unknownCmd: "❌ دستور ناشناخته. (فرمت: /go [dir] یا /attack [target] [power])",
+                moveMsg: (dir) => `🚀 فریس به سمت <span class="text-white">${dir}</span> حرکت کرد.`,
+                weakAttackMsg: (target, power) => `⚔️ حمله به <span class="text-white">${target}</span> با قدرت <span class="text-yellow-400">${power}</span>. (هنوز زنده است!)`,
+                strongAttackMsg: (target, power) => `💥 حمله‌ی ویرانگر! <span class="text-white">${target}</span> با قدرت <span class="text-rose-400">${power}</span> پودر شد!`,
+                quitMsg: "👋 خداحافظ!",
+                winTitle: "گنجینه‌ی الگوها کشف شد!",
+                winMessage: "شما ابزارهای پیشرفته‌ی Pattern Matching مثل Destructuring و Match Guards را استاد شدید!",
+                restartBtn: "بازی مجدد",
+                nextChapterBtn: "درس بعدی"
+            },
+            en: {
+                name: "English",
+                zoneLabel: "Zone:",
+                treasuresLabel: "Treasures:",
+                ferrisName: "Ferris the Crab:",
+                nextButton: "Next",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
                     "Hi Detective! I found a treasure map. 🗺️",
                     "But the treasure is inside a box, which is in a chest, which is in a giant vault!",
                     "Opening them one by one takes forever. We have a magical power called 'Advanced Pattern Matching'. 🪄",
-                    "With this power, we can use magic scissors to cut through the boxes and get exactly what we want! Let's find the treasure! 💎",
+                    "With this power, we can use magic scissors to cut through the boxes and get exactly what we want! Let's find the treasure! 💎"
                 ],
-            };
-
-            function setLang(lang) {
-                currentLang = lang;
-                const htmlRoot = document.getElementById("html-root");
-                const btnEn = document.getElementById("btn-en");
-                const btnFa = document.getElementById("btn-fa");
-
-                if (lang === "fa") {
-                    htmlRoot.setAttribute("dir", "rtl");
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-yellow-500 text-yellow-950";
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-                } else {
-                    htmlRoot.setAttribute("dir", "ltr");
-                    btnEn.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors bg-yellow-500 text-yellow-950";
-                    btnFa.className =
-                        "px-4 py-1 rounded-full text-sm font-bold transition-colors text-slate-300 hover:text-white";
-                }
-
-                if (currentStep === 0) {
-                    clearTimeout(typeInterval);
-                    document.getElementById("dialog-text").innerHTML =
-                        dialogs[currentLang][currentDialogIndex];
-                }
+                afterDialog: "Let's go! Look at the monitor below to pick our first lock.",
+                mission1Title: "Chapter 18: Complex Treasure Maps (Destructuring) 🗺️",
+                mission1Text: `
+                    <p class="text-amber-300">> The treasure is inside a chest, which is inside a locked vault! Opening them one by one takes too long.</p>
+                    <p class="text-slate-300">> With the magic of **Pattern Matching**, we can smash the structures in one move and extract the treasure directly. This is called **Destructuring**.</p>
+                    <p class="text-emerald-300 mt-4 font-bold">To keep the `name` field but ignore the rest of the Struct's fields, which symbol do we use in the pattern?</p>
+                `,
+                puzzle1Btn: "Break the Box 📦",
+                puzzle1Success: "> Rest of the fields successfully ignored!",
+                puzzle1Error: "Error: To ignore the rest of the fields in a struct, we use the .. symbol.",
+                mission2Step: ">> Step 1: Treasure Guards (Match Guards)",
+                mission2Desc: "<p>Sometimes a pattern isn't enough. We want to say 'if the pattern matches **AND** this specific condition is true'.</p><p class='text-white font-bold'>To add a condition to a `match` arm, which keyword do we use immediately after the pattern?</p>",
+                puzzle2Btn: "Apply Guard Condition 🛡️",
+                puzzle2Success: "> Match Guard successfully activated!",
+                puzzle2Error: "Error: In Rust, we use 'if' (Match Guard) to add a condition to a pattern.",
+                mission3Step: ">> Step 2: Catch and Hold (@ Binding)",
+                mission3Desc: "We want to check if the coin count is in a range (like 1 to 10), and **simultaneously** save its exact value in a variable! Which symbol do we use to Bind a variable to a pattern?",
+                puzzle3Btn: "Catch the Value 🧲",
+                puzzle3Success: "> Variable successfully bound to the pattern!",
+                puzzle3Error: "Error: To bind a name to a pattern while testing it, we use the @ symbol.",
+                mission4Step: ">> Final Step: Text Game Command Parser",
+                mission4Desc: "Our program parses text commands and runs them using advanced `match`! To win, make <strong>one move</strong> and register an <strong>attack with power > 30</strong>!",
+                objMove: "Move (/go)",
+                objAttack: "Strong Attack (>30)",
+                welcomeMsg: "🎮 Welcome to Ferris's Text Adventure!",
+                unknownCmd: "❌ Unknown command. (Format: /go [dir] or /attack [target] [power])",
+                moveMsg: (dir) => `🚀 Ferris moved towards <span class="text-white">${dir}</span>.`,
+                weakAttackMsg: (target, power) => `⚔️ Attacked <span class="text-white">${target}</span> with <span class="text-yellow-400">${power}</span> power. (Still alive!)`,
+                strongAttackMsg: (target, power) => `💥 Devastating attack! <span class="text-white">${target}</span> obliterated with <span class="text-rose-400">${power}</span> power!`,
+                quitMsg: "👋 Goodbye!",
+                winTitle: "Pattern Treasure Discovered!",
+                winMessage: "You mastered advanced Pattern Matching tools like Destructuring and Match Guards!",
+                restartBtn: "Play Again",
+                nextChapterBtn: "Next Lesson"
+            },
+            es: {
+                name: "Español",
+                zoneLabel: "Zona:",
+                treasuresLabel: "Tesoros:",
+                ferrisName: "Ferris el Cangrejo:",
+                nextButton: "Siguiente",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "¡Hola detective! Encontré un mapa del tesoro. 🗺️",
+                    "Pero el tesoro está dentro de una caja, que está en un cofre, ¡que está en una bóveda gigante!",
+                    "Abrirlos uno por uno lleva una eternidad. Tenemos un poder mágico llamado 'Emparejamiento de patrones avanzado'. 🪄",
+                    "¡Con este poder, podemos usar tijeras mágicas para cortar las cajas y obtener exactamente lo que queremos! ¡Encontremos el tesoro! 💎"
+                ],
+                afterDialog: "¡Vamos! Mira el monitor a continuación para elegir nuestra primera cerradura.",
+                mission1Title: "Capítulo 18: Mapas de tesoro complejos (Desestructuración) 🗺️",
+                mission1Text: `
+                    <p class="text-amber-300">> El tesoro está dentro de un cofre, ¡que está dentro de una bóveda cerrada! Abrirlos uno por uno lleva demasiado tiempo.</p>
+                    <p class="text-slate-300">> Con la magia del **Emparejamiento de patrones**, podemos romper las estructuras en un movimiento y extraer el tesoro directamente. ¡Esto se llama **Desestructuración**!</p>
+                    <p class="text-emerald-300 mt-4 font-bold">Para mantener el campo `name` pero ignorar el resto de los campos del Struct, ¿qué símbolo usamos en el patrón?</p>
+                `,
+                puzzle1Btn: "Romper la caja 📦",
+                puzzle1Success: "> ¡Resto de los campos ignorados exitosamente!",
+                puzzle1Error: "Error: Para ignorar el resto de los campos en un struct, usamos el símbolo ..",
+                mission2Step: ">> Paso 1: Guardianes del tesoro (Match Guards)",
+                mission2Desc: "<p>A veces un patrón no es suficiente. Queremos decir 'si el patrón coincide **Y** esta condición específica es verdadera'.</p><p class='text-white font-bold'>Para agregar una condición a un brazo de `match`, ¿qué palabra clave usamos inmediatamente después del patrón?</p>",
+                puzzle2Btn: "Aplicar condición de guardia 🛡️",
+                puzzle2Success: "> ¡Guardia de Match activada exitosamente!",
+                puzzle2Error: "Error: En Rust, usamos 'if' (Match Guard) para agregar una condición a un patrón.",
+                mission3Step: ">> Paso 2: Atrapar y sostener (@ Binding)",
+                mission3Desc: "Queremos verificar si la cantidad de monedas está en un rango (como 1 a 10), ¡y **simultáneamente** guardar su valor exacto en una variable! ¿Qué símbolo usamos para vincular una variable a un patrón?",
+                puzzle3Btn: "Atrapar el valor 🧲",
+                puzzle3Success: "> ¡Variable vinculada exitosamente al patrón!",
+                puzzle3Error: "Error: Para vincular un nombre a un patrón mientras se prueba, usamos el símbolo @.",
+                mission4Step: ">> Paso final: Analizador de comandos de juego de texto",
+                mission4Desc: "¡Nuestro programa analiza comandos de texto y los ejecuta usando `match` avanzado! ¡Para ganar, haz <strong>un movimiento</strong> y registra un <strong>ataque con poder > 30</strong>!",
+                objMove: "Moverse (/go)",
+                objAttack: "Ataque fuerte (>30)",
+                welcomeMsg: "🎮 ¡Bienvenido a la aventura de texto de Ferris!",
+                unknownCmd: "❌ Comando desconocido. (Formato: /go [dir] o /attack [target] [power])",
+                moveMsg: (dir) => `🚀 Ferris se movió hacia <span class="text-white">${dir}</span>.`,
+                weakAttackMsg: (target, power) => `⚔️ Atacó a <span class="text-white">${target}</span> con poder <span class="text-yellow-400">${power}</span>. (¡Todavía vivo!)`,
+                strongAttackMsg: (target, power) => `💥 ¡Ataque devastador! <span class="text-white">${target}</span> aniquilado con poder <span class="text-rose-400">${power}</span>!`,
+                quitMsg: "👋 ¡Adiós!",
+                winTitle: "¡Tesoro de patrones descubierto!",
+                winMessage: "¡Dominaste herramientas avanzadas de emparejamiento de patrones como Desestructuración y Match Guards!",
+                restartBtn: "Jugar de nuevo",
+                nextChapterBtn: "Siguiente lección"
+            },
+            de: {
+                name: "Deutsch",
+                zoneLabel: "Zone:",
+                treasuresLabel: "Schätze:",
+                ferrisName: "Ferris die Krabbe:",
+                nextButton: "Weiter",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo Detektiv! Ich habe eine Schatzkarte gefunden. 🗺️",
+                    "Aber der Schatz ist in einer Kiste, die in einer Truhe ist, die in einem riesigen Tresor ist!",
+                    "Sie einzeln zu öffnen dauert ewig. Wir haben eine magische Kraft namens 'Fortgeschrittenes Pattern Matching'. 🪄",
+                    "Mit dieser Kraft können wir magische Scheren verwenden, um die Kisten zu durchschneiden und genau das zu bekommen, was wir wollen! Lasst uns den Schatz finden! 💎"
+                ],
+                afterDialog: "Los geht's! Schau auf den Monitor unten, um unser erstes Schloss zu knacken.",
+                mission1Title: "Kapitel 18: Komplexe Schatzkarten (Destrukturierung) 🗺️",
+                mission1Text: `
+                    <p class="text-amber-300">> Der Schatz ist in einer Kiste, die in einer Truhe ist, die in einem riesigen Tresor ist! Sie einzeln zu öffnen dauert zu lange.</p>
+                    <p class="text-slate-300">> Mit der Magie des **Pattern Matching** können wir die Strukturen in einem Zug zertrümmern und den Schatz direkt extrahieren. Dies nennt man **Destrukturierung**.</p>
+                    <p class="text-emerald-300 mt-4 font-bold">Um das Feld `name` zu behalten, aber den Rest der Struct-Felder zu ignorieren, welches Symbol verwenden wir im Pattern?</p>
+                `,
+                puzzle1Btn: "Kiste zerbrechen 📦",
+                puzzle1Success: "> Rest der Felder erfolgreich ignoriert!",
+                puzzle1Error: "Fehler: Um den Rest der Felder in einer Struktur zu ignorieren, verwenden wir das Symbol ..",
+                mission2Step: ">> Schritt 1: Schatzwächter (Match Guards)",
+                mission2Desc: "<p>Manchmal reicht ein Muster nicht aus. Wir wollen sagen: 'Wenn das Muster passt **UND** diese spezifische Bedingung wahr ist'.</p><p class='text-white font-bold'>Um einem `match`-Arm eine Bedingung hinzuzufügen, welches Schlüsselwort verwenden wir direkt nach dem Muster?</p>",
+                puzzle2Btn: "Wächterbedingung anwenden 🛡️",
+                puzzle2Success: "> Match Guard erfolgreich aktiviert!",
+                puzzle2Error: "Fehler: In Rust verwenden wir 'if' (Match Guard), um einem Muster eine Bedingung hinzuzufügen.",
+                mission3Step: ">> Schritt 2: Fangen und Halten (@ Binding)",
+                mission3Desc: "Wir wollen prüfen, ob die Münzanzahl in einem Bereich liegt (wie 1 bis 10), und **gleichzeitig** ihren genauen Wert in einer Variable speichern! Welches Symbol verwenden wir, um eine Variable an ein Muster zu binden?",
+                puzzle3Btn: "Wert fangen 🧲",
+                puzzle3Success: "> Variable erfolgreich an das Muster gebunden!",
+                puzzle3Error: "Fehler: Um einen Namen an ein zu testendes Muster zu binden, verwenden wir das @-Symbol.",
+                mission4Step: ">> Letzter Schritt: Textspiel-Befehlsanalysator",
+                mission4Desc: "Unser Programm analysiert Textbefehle und führt sie mit erweitertem `match` aus! Um zu gewinnen, führe <strong>eine Bewegung</strong> aus und registriere einen <strong>Angriff mit Stärke > 30</strong>!",
+                objMove: "Bewegen (/go)",
+                objAttack: "Starker Angriff (>30)",
+                welcomeMsg: "🎮 Willkommen zu Ferris' Textadventure!",
+                unknownCmd: "❌ Unbekannter Befehl. (Format: /go [Richtung] oder /attack [Ziel] [Stärke])",
+                moveMsg: (dir) => `🚀 Ferris bewegte sich in Richtung <span class="text-white">${dir}</span>.`,
+                weakAttackMsg: (target, power) => `⚔️ Griff <span class="text-white">${target}</span> mit Stärke <span class="text-yellow-400">${power}</span> an. (Noch am Leben!)`,
+                strongAttackMsg: (target, power) => `💥 Verheerender Angriff! <span class="text-white">${target}</span> mit Stärke <span class="text-rose-400">${power}</span> vernichtet!`,
+                quitMsg: "👋 Auf Wiedersehen!",
+                winTitle: "Musterschatz entdeckt!",
+                winMessage: "Du hast fortgeschrittene Pattern-Matching-Tools wie Destrukturierung und Match Guards gemeistert!",
+                restartBtn: "Nochmal spielen",
+                nextChapterBtn: "Nächste Lektion"
+            },
+            nl: {
+                name: "Nederlands",
+                zoneLabel: "Zone:",
+                treasuresLabel: "Schatten:",
+                ferrisName: "Ferris de Krab:",
+                nextButton: "Volgende",
+                nextIcon: "fa-chevron-right",
+                dialogues: [
+                    "Hallo detective! Ik heb een schatkaart gevonden. 🗺️",
+                    "Maar de schat zit in een doos, die in een kist zit, die in een gigantische kluis zit!",
+                    "Ze één voor één openen duurt een eeuwigheid. We hebben een magische kracht genaamd 'Geavanceerd Patroonherkenning'. 🪄",
+                    "Met deze kracht kunnen we magische scharen gebruiken om door de dozen te snijden en precies te krijgen wat we willen! Laten we de schat vinden! 💎"
+                ],
+                afterDialog: "Laten we gaan! Kijk naar de monitor hieronder om ons eerste slot te openen.",
+                mission1Title: "Hoofdstuk 18: Complexe schatkaarten (Destructurering) 🗺️",
+                mission1Text: `
+                    <p class="text-amber-300">> De schat zit in een kist, die in een kluis zit! Ze één voor één openen duurt te lang.</p>
+                    <p class="text-slate-300">> Met de magie van **Patroonherkenning** kunnen we de structuren in één klap verpletteren en de schat direct extraheren. Dit heet **Destructurering**.</p>
+                    <p class="text-emerald-300 mt-4 font-bold">Om het veld `name` te behouden maar de rest van de Struct-velden te negeren, welk symbool gebruiken we in het patroon?</p>
+                `,
+                puzzle1Btn: "Doos breken 📦",
+                puzzle1Success: "> Rest van de velden succesvol genegeerd!",
+                puzzle1Error: "Fout: Om de rest van de velden in een struct te negeren, gebruiken we het symbool ..",
+                mission2Step: ">> Stap 1: Schatbewakers (Match Guards)",
+                mission2Desc: "<p>Soms is een patroon niet genoeg. We willen zeggen: 'als het patroon past **EN** deze specifieke voorwaarde waar is'.</p><p class='text-white font-bold'>Om een voorwaarde toe te voegen aan een `match`-arm, welk trefwoord gebruiken we direct na het patroon?</p>",
+                puzzle2Btn: "Bewaakvoorwaarde toepassen 🛡️",
+                puzzle2Success: "> Match Guard succesvol geactiveerd!",
+                puzzle2Error: "Fout: In Rust gebruiken we 'if' (Match Guard) om een voorwaarde aan een patroon toe te voegen.",
+                mission3Step: ">> Stap 2: Vangen en vasthouden (@ Binding)",
+                mission3Desc: "We willen controleren of het aantal munten in een bereik ligt (zoals 1 tot 10), en **tegelijkertijd** de exacte waarde opslaan in een variabele! Welk symbool gebruiken we om een variabele aan een patroon te binden?",
+                puzzle3Btn: "Waarde vangen 🧲",
+                puzzle3Success: "> Variabele succesvol aan het patroon gebonden!",
+                puzzle3Error: "Fout: Om een naam te binden aan een patroon terwijl we het testen, gebruiken we het @-symbool.",
+                mission4Step: ">> Laatste stap: Tekstspel-commandoparser",
+                mission4Desc: "Ons programma parseert tekstcommando's en voert ze uit met geavanceerde `match`! Om te winnen, maak <strong>één beweging</strong> en registreer een <strong>aanval met kracht > 30</strong>!",
+                objMove: "Bewegen (/go)",
+                objAttack: "Sterke aanval (>30)",
+                welcomeMsg: "🎮 Welkom bij Ferris' tekstavontuur!",
+                unknownCmd: "❌ Onbekend commando. (Formaat: /go [richting] of /attack [doel] [kracht])",
+                moveMsg: (dir) => `🚀 Ferris bewoog naar <span class="text-white">${dir}</span>.`,
+                weakAttackMsg: (target, power) => `⚔️ Viel <span class="text-white">${target}</span> aan met kracht <span class="text-yellow-400">${power}</span>. (Nog in leven!)`,
+                strongAttackMsg: (target, power) => `💥 Verwoestende aanval! <span class="text-white">${target}</span> vernietigd met kracht <span class="text-rose-400">${power}</span>!`,
+                quitMsg: "👋 Tot ziens!",
+                winTitle: "Patterschat ontdekt!",
+                winMessage: "Je hebt geavanceerde patroonherkenningstools zoals Destructurering en Match Guards onder de knie!",
+                restartBtn: "Opnieuw spelen",
+                nextChapterBtn: "Volgende les"
             }
+        };
 
-            function typeWriter(text, i, cb) {
-                const el = document.getElementById("dialog-text");
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
+        // Helper functions
+        function formatNumber(num, lang) {
+            const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+            const westernDigits = '0123456789';
+            let str = num.toString();
+            if (lang !== 'fa') return str.replace(/[۰-۹]/g, d => westernDigits[persianDigits.indexOf(d)]);
+            else return str.replace(/[0-9]/g, d => persianDigits[parseInt(d)]);
+        }
+
+        // Game state
+        let currentLang = 'fa';
+        let currentStep = 0;
+        let currentDialogIndex = 0;
+        let typeInterval = null;
+        let isTyping = false;
+        let currentTypingText = '';
+        let puzzle1Completed = false, puzzle2Completed = false, puzzle3Completed = false;
+        let hasMoved = false;
+        let hasStrongAttack = false;
+        let treasures = 0;
+
+        // DOM elements
+        const zoneLabelSpan = document.getElementById('zone-label');
+        const treasuresLabelSpan = document.getElementById('treasures-label');
+        const hudZoneSpan = document.getElementById('hud-zone');
+        const hudTreasuresSpan = document.getElementById('hud-treasures');
+        const ferrisNameH3 = document.getElementById('ferris-name');
+        const nextDialogBtn = document.getElementById('next-dialog-btn');
+        const nextBtnSpan = document.getElementById('next-btn-text');
+        const nextIcon = document.getElementById('next-icon');
+        const dialogTextP = document.getElementById('dialog-text');
+        const gameAreaDiv = document.getElementById('game-area');
+
+        // Build language bar dynamically
+        function buildLanguageButtons() {
+            const bar = document.getElementById('language-bar');
+            bar.innerHTML = '';
+            for (const [code, data] of Object.entries(languagePack)) {
+                const btn = document.createElement('button');
+                btn.innerText = data.name;
+                btn.className = `px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors ${currentLang === code ? 'bg-yellow-500 text-yellow-950' : 'text-slate-300 hover:text-white'}`;
+                btn.onclick = () => setLang(code);
+                bar.appendChild(btn);
+            }
+        }
+
+        function stopTyping() {
+            if (typeInterval) { clearTimeout(typeInterval); typeInterval = null; }
+            isTyping = false;
+        }
+
+        function startTyping(text, callback) {
+            stopTyping();
+            dialogTextP.innerHTML = '';
+            isTyping = true;
+            currentTypingText = text;
+            let i = 0;
+            function typeNext() {
+                if (i < text.length && isTyping) {
+                    dialogTextP.innerHTML += text.charAt(i);
                     i++;
-                    typeInterval = setTimeout(function () {
-                        typeWriter(text, i, cb);
-                    }, 30);
-                } else {
-                    cb();
+                    typeInterval = setTimeout(typeNext, 35);
+                } else if (i >= text.length) {
+                    isTyping = false;
+                    if (callback) callback();
                 }
             }
+            typeNext();
+        }
 
-            function showDialog() {
-                const text = dialogs[currentLang][currentDialogIndex];
-                const el = document.getElementById("dialog-text");
-                const nextBtn = document.getElementById("next-dialog-btn");
-
-                el.innerHTML = "";
-                nextBtn.classList.add("hidden");
-
-                typeWriter(text, 0, () => {
-                    nextBtn.classList.remove("hidden");
-                });
+        function showDialog() {
+            const pack = languagePack[currentLang];
+            const text = pack.dialogues[currentDialogIndex];
+            nextDialogBtn.classList.add('hidden');
+            if (currentDialogIndex === 0) {
+                document.getElementById('main-dashboard').classList.add('shake');
+                setTimeout(() => document.getElementById('main-dashboard').classList.remove('shake'), 500);
             }
+            startTyping(text, () => {
+                nextDialogBtn.classList.remove('hidden');
+            });
+        }
 
-            function nextDialog() {
-                clearTimeout(typeInterval);
-                currentDialogIndex++;
-
-                if (currentDialogIndex < dialogs[currentLang].length) {
-                    showDialog();
-                } else {
-                    currentStep = 1;
-                    document
-                        .getElementById("next-dialog-btn")
-                        .classList.add("hidden");
-                    document.getElementById("dialog-text").innerHTML =
-                        currentLang === "fa"
-                            ? "بزن بریم! به مانیتور پایین نگاه کن تا اولین قفل رو بشکنیم."
-                            : "Let's go! Look at the monitor below to pick our first lock.";
-
-                    document
-                        .getElementById("game-area")
-                        .classList.remove("hidden");
-                    startMission(1);
-                }
+        function nextDialog() {
+            if (isTyping) {
+                stopTyping();
+                dialogTextP.innerHTML = currentTypingText;
+                isTyping = false;
+                nextDialogBtn.classList.remove('hidden');
+                return;
             }
-
-            function startMission(missionNum) {
-                document
-                    .querySelectorAll(".mission-view")
-                    .forEach((el) => el.classList.add("hidden"));
-                document
-                    .getElementById("mission-" + missionNum)
-                    .classList.remove("hidden");
-            }
-
-            // --- Puzzle System ---
-            function selectOption(element, puzzleNum, word) {
-                element.parentElement
-                    .querySelectorAll(".code-option")
-                    .forEach((el) => el.classList.remove("selected"));
-                element.classList.add("selected");
-
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = word;
-                slot.classList.add("filled");
-                runBtn.disabled = false;
-                runBtn.classList.remove("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-            }
-
-            function clearSlot(puzzleNum) {
-                const slot = document.getElementById("slot" + puzzleNum);
-                const runBtn = document.getElementById(
-                    "run-puzzle" + puzzleNum + "-btn",
-                );
-
-                slot.innerText = "---";
-                slot.classList.remove("filled");
-                runBtn.disabled = true;
-                runBtn.classList.add("opacity-50", "cursor-not-allowed");
-                document.getElementById(
-                    "puzzle" + puzzleNum + "-feedback",
-                ).innerText = "";
-                document
-                    .querySelectorAll(`#mission-${puzzleNum} .code-option`)
-                    .forEach((el) => el.classList.remove("selected"));
-            }
-
-            function triggerError(puzzleNum, msgFa, msgEn) {
-                const crt = document.getElementById("crt-monitor");
-                const feedback = document.getElementById(
-                    `puzzle${puzzleNum}-feedback`,
-                );
-                crt.classList.add("glitch");
-                setTimeout(() => crt.classList.remove("glitch"), 300);
-                feedback.innerText = currentLang === "fa" ? msgFa : msgEn;
-            }
-
-            function checkPuzzle1() {
-                const slotText = document.getElementById("slot1").innerText;
-                const feedback = document.getElementById("puzzle1-feedback");
-
-                if (slotText === "..") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-2 mt-2 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> بقیه فیلدها با موفقیت نادیده گرفته شدند!"
-                            : "> Rest of the fields successfully ignored!";
-                    setTimeout(() => startMission(2), 1500);
-                } else {
-                    triggerError(
-                        1,
-                        "خطا: برای نادیده گرفتن بقیه‌ی فیلدهای یک ساختار از نماد .. استفاده می‌کنیم.",
-                        "Error: To ignore the rest of the fields in a struct, we use the .. symbol.",
-                    );
-                }
-            }
-
-            function checkPuzzle2() {
-                const slotText = document.getElementById("slot2").innerText;
-                const feedback = document.getElementById("puzzle2-feedback");
-
-                if (slotText === "if") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> شرط نگهبان (Match Guard) فعال شد!"
-                            : "> Match Guard successfully activated!";
-                    setTimeout(() => startMission(3), 1500);
-                } else {
-                    triggerError(
-                        2,
-                        "خطا: در زبان راست برای اضافه کردن شرط به الگو از کلمه‌ی if (معروف به Match Guard) استفاده می‌شود.",
-                        "Error: In Rust, we use 'if' (Match Guard) to add a condition to a pattern.",
-                    );
-                }
-            }
-
-            function checkPuzzle3() {
-                const slotText = document.getElementById("slot3").innerText;
-                const feedback = document.getElementById("puzzle3-feedback");
-
-                if (slotText === "@") {
-                    feedback.className =
-                        "text-emerald-400 h-6 mb-4 text-sm font-bold";
-                    feedback.innerText =
-                        currentLang === "fa"
-                            ? "> متغیر با موفقیت به الگو Bind شد!"
-                            : "> Variable successfully bound to the pattern!";
-                    setTimeout(() => startMission(4), 1500);
-                } else {
-                    triggerError(
-                        3,
-                        "خطا: برای چسباندن (Bind) یک نام به یک الگو در حال تست کردن، از نماد @ استفاده می‌شود.",
-                        "Error: To bind a name to a pattern while testing it, we use the @ symbol.",
-                    );
-                }
-            }
-
-            // --- RPG Parser Simulator ---
-            function fillCommand(cmd) {
-                document.getElementById("cmd-input").value = cmd;
-            }
-
-            function handleEnter(e) {
-                if (e.key === "Enter") {
-                    parseCommandBtn();
-                }
-            }
-
-            function appendToTerminal(htmlContent) {
-                const term = document.getElementById("term-output");
-                const div = document.createElement("div");
-                div.className = "mb-1 border-b border-indigo-900/30 pb-1";
-                div.innerHTML = htmlContent;
-                term.appendChild(div);
-
-                // Scroll to bottom
-                const container = document.getElementById("sim-terminal");
-                container.scrollTop = container.scrollHeight;
-            }
-
-            function parseCommandBtn() {
-                const inputEl = document.getElementById("cmd-input");
-                const input = inputEl.value.trim();
-                inputEl.value = "";
-
-                if (!input) return;
-
-                appendToTerminal(
-                    `<span class="text-amber-500">> ${input}</span>`,
-                );
-
-                const parts = input.split(/\s+/);
-
-                // Replicating Rust logic from chapter:
-                if (parts[0] === "/go" && parts.length >= 2) {
-                    // Command::Go { direction }
-                    const direction = parts[1];
-
-                    hasMoved = true;
-                    document.getElementById("obj-move").classList.add("done");
-                    document.getElementById("hud-zone").innerHTML =
-                        `<span class="text-emerald-400">${direction}</span>`;
-
-                    let msgFa = `🚀 فریس به سمت <span class="text-white">${direction}</span> حرکت کرد.`;
-                    let msgEn = `🚀 Ferris moved towards <span class="text-white">${direction}</span>.`;
-                    appendToTerminal(
-                        `<span class="text-emerald-300">${currentLang === "fa" ? msgFa : msgEn}</span>`,
-                    );
-                } else if (parts[0] === "/attack" && parts.length >= 3) {
-                    // Command::Attack { target, power }
-                    const target = parts[1];
-                    let power = parseInt(parts[2]);
-                    if (isNaN(power)) power = 10; // Default if not a number
-
-                    // Match Guard logic!
-                    if (power > 30) {
-                        hasStrongAttack = true;
-                        document
-                            .getElementById("obj-attack")
-                            .classList.add("done");
-
-                        let msgFa = `💥 حمله‌ی ویرانگر! <span class="text-white">${target}</span> با قدرت <span class="text-rose-400">${power}</span> پودر شد!`;
-                        let msgEn = `💥 Devastating attack! <span class="text-white">${target}</span> obliterated with <span class="text-rose-400">${power}</span> power!`;
-                        appendToTerminal(
-                            `<span class="text-rose-400 font-bold">${currentLang === "fa" ? msgFa : msgEn}</span>`,
-                        );
-
-                        // Increment treasure!
-                        let treasures =
-                            parseInt(
-                                document.getElementById("hud-treasures")
-                                    .innerText,
-                            ) + 1;
-                        document.getElementById("hud-treasures").innerText =
-                            currentLang === "fa"
-                                ? treasures.toLocaleString("fa-IR")
-                                : treasures;
-                    } else {
-                        let msgFa = `⚔️ حمله به <span class="text-white">${target}</span> با قدرت <span class="text-yellow-400">${power}</span>. (هنوز زنده است!)`;
-                        let msgEn = `⚔️ Attacked <span class="text-white">${target}</span> with <span class="text-yellow-400">${power}</span> power. (Still alive!)`;
-                        appendToTerminal(
-                            `<span class="text-yellow-300">${currentLang === "fa" ? msgFa : msgEn}</span>`,
-                        );
-                    }
-                } else if (parts[0] === "/quit") {
-                    let msgFa = `👋 خداحافظ!`;
-                    let msgEn = `👋 Goodbye!`;
-                    appendToTerminal(
-                        `<span class="text-slate-400">${currentLang === "fa" ? msgFa : msgEn}</span>`,
-                    );
-                } else {
-                    let msgFa = `❌ دستور ناشناخته. (فرمت: /go [dir] یا /attack [target] [power])`;
-                    let msgEn = `❌ Unknown command. (Format: /go [dir] or /attack [target] [power])`;
-                    appendToTerminal(
-                        `<span class="text-rose-400">${currentLang === "fa" ? msgFa : msgEn}</span>`,
-                    );
-                }
-
-                checkWin();
-            }
-
-            function checkWin() {
-                if (hasMoved && hasStrongAttack) {
-                    setTimeout(() => {
-                        triggerConfetti();
-                        document
-                            .getElementById("success-screen")
-                            .classList.remove("hidden");
-                    }, 1000);
-                }
-            }
-
-            // --- Confetti System ---
-            let W = window.innerWidth;
-            let H = window.innerHeight;
-            const canvas = document.getElementById("confetti");
-            const context = canvas.getContext("2d");
-            const maxConfettis = 100;
-            const particles = [];
-            const possibleColors = [
-                "#eab308",
-                "#f59e0b",
-                "#fde047",
-                "#b45309",
-                "#ffffff",
-            ]; // Golds and Ambers
-
-            function randomFromTo(from, to) {
-                return Math.floor(Math.random() * (to - from + 1) + from);
-            }
-
-            function confettiParticle() {
-                this.x = Math.random() * W;
-                this.y = Math.random() * H - H;
-                this.r = randomFromTo(11, 25);
-                this.d = Math.random() * maxConfettis + 11;
-                this.color =
-                    possibleColors[
-                        Math.floor(Math.random() * possibleColors.length)
-                    ];
-                this.tilt = Math.floor(Math.random() * 33) - 11;
-                this.tiltAngleIncremental = Math.random() * 0.07 + 0.05;
-                this.tiltAngle = 0;
-
-                this.draw = function () {
-                    context.beginPath();
-                    context.lineWidth = this.r / 2;
-                    context.strokeStyle = this.color;
-                    context.moveTo(this.x + this.tilt + this.r / 3, this.y);
-                    context.lineTo(
-                        this.x + this.tilt,
-                        this.y + this.tilt + this.r / 5,
-                    );
-                    return context.stroke();
-                };
-            }
-
-            let animationId = null;
-            function Draw() {
-                animationId = requestAnimationFrame(Draw);
-                context.clearRect(0, 0, W, H);
-                for (let i = 0; i < maxConfettis; i++) particles[i].draw();
-
-                let particle = {};
-                for (let i = 0; i < maxConfettis; i++) {
-                    particle = particles[i];
-                    particle.tiltAngle += particle.tiltAngleIncremental;
-                    particle.y +=
-                        (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
-                    particle.tilt = Math.sin(particle.tiltAngle - i / 3) * 15;
-
-                    if (
-                        particle.x > W + 30 ||
-                        particle.x < -30 ||
-                        particle.y > H
-                    ) {
-                        particle.x = Math.random() * W;
-                        particle.y = -30;
-                        particle.tilt = Math.floor(Math.random() * 10) - 20;
-                    }
-                }
-            }
-
-            window.addEventListener(
-                "resize",
-                function () {
-                    W = window.innerWidth;
-                    H = window.innerHeight;
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                },
-                false,
-            );
-
-            function triggerConfetti() {
-                canvas.width = W;
-                canvas.height = H;
-                particles.length = 0;
-                for (let i = 0; i < maxConfettis; i++)
-                    particles.push(new confettiParticle());
-                if (!animationId) Draw();
-            }
-
-            // Initialize Game
-            setTimeout(() => {
-                setLang("fa"); // Start in Persian
+            currentDialogIndex++;
+            const pack = languagePack[currentLang];
+            if (currentDialogIndex < pack.dialogues.length) {
                 showDialog();
-            }, 500);
-        </script>
-    </body>
+            } else {
+                currentStep = 1;
+                nextDialogBtn.classList.add('hidden');
+                dialogTextP.innerHTML = pack.afterDialog;
+                gameAreaDiv.classList.remove('hidden');
+                startMission(1);
+            }
+        }
+
+        function updateAllTexts() {
+            const pack = languagePack[currentLang];
+            if (!pack) return;
+
+            zoneLabelSpan.innerText = pack.zoneLabel;
+            treasuresLabelSpan.innerText = pack.treasuresLabel;
+            ferrisNameH3.innerText = pack.ferrisName;
+            nextBtnSpan.innerText = pack.nextButton;
+            nextIcon.className = `fa-solid ${pack.nextIcon} ml-1`;
+
+            hudTreasuresSpan.innerText = formatNumber(treasures, currentLang);
+            if (!hasMoved) {
+                hudZoneSpan.innerHTML = currentLang === 'fa' ? "نامشخص" : (currentLang === 'en' ? "Unknown" : (currentLang === 'es' ? "Desconocido" : (currentLang === 'de' ? "Unbekannt" : "Onbekend")));
+            }
+
+            // Mission 1
+            document.getElementById('mission1-title').innerHTML = pack.mission1Title;
+            document.getElementById('mission1-text').innerHTML = pack.mission1Text;
+            document.getElementById('puzzle1-btn-text').innerHTML = pack.puzzle1Btn;
+
+            // Mission 2
+            document.getElementById('mission2-step').innerHTML = pack.mission2Step;
+            document.getElementById('mission2-desc').innerHTML = pack.mission2Desc;
+            document.getElementById('puzzle2-btn-text').innerHTML = pack.puzzle2Btn;
+
+            // Mission 3
+            document.getElementById('mission3-step').innerHTML = pack.mission3Step;
+            document.getElementById('mission3-desc').innerHTML = pack.mission3Desc;
+            document.getElementById('puzzle3-btn-text').innerHTML = pack.puzzle3Btn;
+
+            // Mission 4
+            document.getElementById('mission4-step').innerHTML = pack.mission4Step;
+            document.getElementById('mission4-desc').innerHTML = pack.mission4Desc;
+            document.getElementById('obj-move-text').innerHTML = pack.objMove;
+            document.getElementById('obj-attack-text').innerHTML = pack.objAttack;
+            document.getElementById('welcome-msg').innerHTML = pack.welcomeMsg;
+            document.getElementById('send-btn-text').innerHTML = currentLang === 'fa' ? "ارسال" : (currentLang === 'en' ? "Send" : (currentLang === 'es' ? "Enviar" : (currentLang === 'de' ? "Senden" : "Verzenden")));
+            document.getElementById('cmd-input').placeholder = currentLang === 'fa' ? "دستور را تایپ کن..." : (currentLang === 'en' ? "Type command here..." : (currentLang === 'es' ? "Escribe comando aquí..." : (currentLang === 'de' ? "Befehl eingeben..." : "Typ commando hier...")));
+
+            // Success screen
+            document.getElementById('success-title').innerHTML = pack.winTitle;
+            document.getElementById('success-message').innerHTML = pack.winMessage;
+            document.getElementById('restart-btn-text').innerHTML = pack.restartBtn;
+            document.getElementById('next-chapter-text').innerHTML = pack.nextChapterBtn;
+
+            if (currentStep === 0) {
+                if (currentDialogIndex < pack.dialogues.length) {
+                    const currentDialog = pack.dialogues[currentDialogIndex];
+                    if (isTyping) {
+                        startTyping(currentDialog, () => nextDialogBtn.classList.remove('hidden'));
+                    } else {
+                        dialogTextP.innerHTML = currentDialog;
+                        nextDialogBtn.classList.remove('hidden');
+                    }
+                } else {
+                    dialogTextP.innerHTML = pack.afterDialog;
+                }
+            } else {
+                dialogTextP.innerHTML = pack.afterDialog;
+            }
+        }
+
+        function setLang(lang) {
+            if (!languagePack[lang]) return;
+            currentLang = lang;
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            const btns = document.querySelectorAll('#language-bar button');
+            btns.forEach(btn => {
+                const btnLang = Object.keys(languagePack).find(k => languagePack[k].name === btn.innerText);
+                if (btnLang === lang) {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors bg-yellow-500 text-yellow-950";
+                } else {
+                    btn.className = "px-3 md:px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors text-slate-300 hover:text-white";
+                }
+            });
+            updateAllTexts();
+        }
+
+        function startMission(missionNum) {
+            document.querySelectorAll('.mission-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('mission-' + missionNum).classList.remove('hidden');
+            if (missionNum === 4) {
+                // Reset parser state
+                hasMoved = false;
+                hasStrongAttack = false;
+                treasures = 0;
+                hudTreasuresSpan.innerText = formatNumber(treasures, currentLang);
+                document.getElementById('obj-move').classList.remove('done');
+                document.getElementById('obj-attack').classList.remove('done');
+                hudZoneSpan.innerHTML = currentLang === 'fa' ? "نامشخص" : (currentLang === 'en' ? "Unknown" : (currentLang === 'es' ? "Desconocido" : (currentLang === 'de' ? "Unbekannt" : "Onbekend")));
+                const term = document.getElementById('term-output');
+                term.innerHTML = '';
+                document.getElementById('cmd-input').value = '';
+            }
+        }
+
+        // Puzzle handlers
+        function selectOption(element, puzzleNum, word) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            element.parentElement.querySelectorAll('.code-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = word;
+            slot.classList.add('filled');
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+        }
+
+        function clearSlot(puzzleNum) {
+            if ((puzzleNum === 1 && puzzle1Completed) || (puzzleNum === 2 && puzzle2Completed) || (puzzleNum === 3 && puzzle3Completed)) return;
+            const slot = document.getElementById('slot' + puzzleNum);
+            const runBtn = document.getElementById('run-puzzle' + puzzleNum + '-btn');
+            slot.innerText = "---";
+            slot.classList.remove('filled');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('puzzle' + puzzleNum + '-feedback').innerText = "";
+            document.querySelectorAll(`#mission-${puzzleNum} .code-option`).forEach(el => el.classList.remove('selected'));
+        }
+
+        function triggerError(puzzleNum, msg) {
+            const crt = document.getElementById('crt-monitor');
+            const feedback = document.getElementById(`puzzle${puzzleNum}-feedback`);
+            crt.classList.add('glitch');
+            setTimeout(() => crt.classList.remove('glitch'), 300);
+            feedback.innerText = msg;
+        }
+
+        function checkPuzzle1() {
+            if (puzzle1Completed) return;
+            const slotText = document.getElementById('slot1').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === '..') {
+                document.getElementById('puzzle1-feedback').className = "text-emerald-400 h-6 mb-2 mt-2 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle1-feedback').innerText = pack.puzzle1Success;
+                puzzle1Completed = true;
+                const runBtn = document.getElementById('run-puzzle1-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(2), 1500);
+            } else {
+                triggerError(1, pack.puzzle1Error);
+            }
+        }
+
+        function checkPuzzle2() {
+            if (puzzle2Completed) return;
+            const slotText = document.getElementById('slot2').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === 'if') {
+                document.getElementById('puzzle2-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle2-feedback').innerText = pack.puzzle2Success;
+                puzzle2Completed = true;
+                const runBtn = document.getElementById('run-puzzle2-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(3), 1500);
+            } else {
+                triggerError(2, pack.puzzle2Error);
+            }
+        }
+
+        function checkPuzzle3() {
+            if (puzzle3Completed) return;
+            const slotText = document.getElementById('slot3').innerText;
+            const pack = languagePack[currentLang];
+            if (slotText === '@') {
+                document.getElementById('puzzle3-feedback').className = "text-emerald-400 h-6 mb-4 text-xs md:text-sm font-bold";
+                document.getElementById('puzzle3-feedback').innerText = pack.puzzle3Success;
+                puzzle3Completed = true;
+                const runBtn = document.getElementById('run-puzzle3-btn');
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                setTimeout(() => startMission(4), 1500);
+            } else {
+                triggerError(3, pack.puzzle3Error);
+            }
+        }
+
+        // Command Parser Simulator
+        function fillCommand(cmd) {
+            document.getElementById('cmd-input').value = cmd;
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') parseCommandBtn();
+        }
+
+        function appendToTerminal(htmlContent) {
+            const term = document.getElementById('term-output');
+            const div = document.createElement('div');
+            div.className = "mb-1 border-b border-indigo-900/30 pb-1";
+            div.innerHTML = htmlContent;
+            term.appendChild(div);
+            const container = document.getElementById('sim-terminal');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function parseCommandBtn() {
+            const pack = languagePack[currentLang];
+            const inputEl = document.getElementById('cmd-input');
+            const input = inputEl.value.trim();
+            inputEl.value = '';
+            if (!input) return;
+            appendToTerminal(`<span class="text-amber-500">> ${input}</span>`);
+            const parts = input.split(/\s+/);
+            if (parts[0] === "/go" && parts.length >= 2) {
+                const direction = parts[1];
+                hasMoved = true;
+                document.getElementById('obj-move').classList.add('done');
+                hudZoneSpan.innerHTML = `<span class="text-emerald-400">${direction}</span>`;
+                appendToTerminal(`<span class="text-emerald-300">${pack.moveMsg(direction)}</span>`);
+            }
+            else if (parts[0] === "/attack" && parts.length >= 3) {
+                const target = parts[1];
+                let power = parseInt(parts[2]);
+                if (isNaN(power)) power = 10;
+                if (power > 30) {
+                    hasStrongAttack = true;
+                    document.getElementById('obj-attack').classList.add('done');
+                    treasures++;
+                    hudTreasuresSpan.innerText = formatNumber(treasures, currentLang);
+                    appendToTerminal(`<span class="text-rose-400 font-bold">${pack.strongAttackMsg(target, power)}</span>`);
+                } else {
+                    appendToTerminal(`<span class="text-yellow-300">${pack.weakAttackMsg(target, power)}</span>`);
+                }
+            }
+            else if (parts[0] === "/quit") {
+                appendToTerminal(`<span class="text-slate-400">${pack.quitMsg}</span>`);
+            }
+            else {
+                appendToTerminal(`<span class="text-rose-400">${pack.unknownCmd}</span>`);
+            }
+            if (hasMoved && hasStrongAttack) {
+                setTimeout(() => {
+                    triggerConfetti();
+                    document.getElementById('success-screen').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        function goToNextChapter() {
+            window.location.href = 'chapter-19.html';
+        }
+
+        // --- Confetti System (unchanged) ---
+        let W = window.innerWidth, H = window.innerHeight;
+        const canvas = document.getElementById('confetti');
+        const context = canvas.getContext('2d');
+        const maxConfettis = 100;
+        const particles = [];
+        const possibleColors = ["#eab308", "#f59e0b", "#fde047", "#b45309", "#ffffff"];
+        function randomFromTo(from, to) { return Math.floor(Math.random() * (to - from + 1) + from); }
+        function confettiParticle() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H - H;
+            this.r = randomFromTo(11, 25);
+            this.d = Math.random() * maxConfettis + 11;
+            this.color = possibleColors[Math.floor(Math.random() * possibleColors.length)];
+            this.tilt = Math.floor(Math.random() * 33) - 11;
+            this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+            this.tiltAngle = 0;
+            this.draw = function() {
+                context.beginPath();
+                context.lineWidth = this.r / 2;
+                context.strokeStyle = this.color;
+                context.moveTo(this.x + this.tilt + this.r / 3, this.y);
+                context.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 5);
+                return context.stroke();
+            };
+        }
+        let animationId = null;
+        function Draw() {
+            animationId = requestAnimationFrame(Draw);
+            context.clearRect(0, 0, W, H);
+            for (let i = 0; i < maxConfettis; i++) particles[i].draw();
+            for (let i = 0; i < maxConfettis; i++) {
+                const p = particles[i];
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+                if (p.x > W + 30 || p.x < -30 || p.y > H) {
+                    p.x = Math.random() * W;
+                    p.y = -30;
+                    p.tilt = Math.floor(Math.random() * 10) - 20;
+                }
+            }
+        }
+        window.addEventListener('resize', () => {
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W; canvas.height = H;
+        });
+        function triggerConfetti() {
+            canvas.width = W; canvas.height = H;
+            particles.length = 0;
+            for (let i = 0; i < maxConfettis; i++) particles.push(new confettiParticle());
+            if (!animationId) Draw();
+        }
+
+        // Initialization
+        buildLanguageButtons();
+        setTimeout(() => {
+            setLang('fa');
+            showDialog();
+        }, 500);
+    </script>
+</body>
 </html>
