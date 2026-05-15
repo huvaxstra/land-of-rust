@@ -2,11 +2,11 @@
 
 > A gentle, story-driven introduction to Rust programming for children (ages 9+) and absolute beginners.
 
-[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/0.0/)
 [![Rust Edition](https://img.shields.io/badge/rust-2024%2B-blue)](https://doc.rust-lang.org/edition-guide/)
 [![Rust Version](https://img.shields.io/badge/rust-1.85%2B-blue)](https://www.rust-lang.org/)
 [![Status: Ready for Sponsorship](https://img.shields.io/badge/status-ready%20for%20sponsorship-brightgreen)](#)
-[![Chapters English](https://img.shields.io/badge/chapters%20(English)-12%2F20-blue)](#)
+[![Chapters English](https://img.shields.io/badge/chapters%20(English)-20%2F20-blue)](#)
 [![Chapters Persian](https://img.shields.io/badge/chapters%20(Persian)-20%2F20-brightgreen)](#)
 
 ---
@@ -15,8 +15,8 @@
 
 - ✅ **Complete Persian translation** of all 20 chapters (beginners to advanced) with full illustration prompts.
 - ✅ **English chapters 1–12** fully rewritten based on Rust Edu community feedback (beginners & intermediate).
-- ✅ **English chapters 13–20 (advanced)** – planned for Q3 2026 (dependent on sponsorship).
-- ✅ **Bilingual interactive web demo** (MVP) – live at [https://huvaxstra.github.io/land-of-rust/](https://huvaxstra.github.io/land-of-rust/).
+- ✅ **English chapters 13–20 (advanced)** – completed.
+- ✅ **Bilingual interactive web demo in 5 Lnaguage** (MVP) – live at [https://huvaxstra.github.io/land-of-rust/](https://huvaxstra.github.io/land-of-rust/) 
 - ✅ **Sponsorship call open** – help us illustrate, translate, and build advanced features.
 
 ---
@@ -25,7 +25,7 @@
 
 [**🎮 Play & Learn: The Land of Rust – Interactive Demo**](https://huvaxstra.github.io/land-of-rust/)
 
-> A working MVP of the interactive version (bilingual, 20 chapters).  
+> A working MVP of the interactive version (bilingual(in 5 Lnaguage), 20 chapters).  
 > Code editor and live Rust execution are currently **not** implemented – this is a static demonstration of the book’s content.  
 > With sponsorship, we will upgrade it to a full interactive platform with WASM.
 
@@ -66,8 +66,8 @@ No prior coding experience required – just curiosity, a computer, and a willin
 |-------|----------|---------|---------|
 | Beginner | 1–4 | ✅ Complete | ✅ Complete |
 | Intermediate | 5–12 | ✅ Complete | ✅ Complete |
-| Advanced | 13–20 | 📝 Planned (Q3 2026) | ✅ Complete |
-| Appendices & Bonus | – | 📝 Planned | ✅ Complete |
+| Advanced | 13–20 | ✅ Complete | ✅ Complete |
+| Appendices & Bonus | – | ✅ Complete | ✅ Complete |
 
 👉 Full detailed outline: [OUTLINE.md](./OUTLINE.md)
 
@@ -76,7 +76,7 @@ No prior coding experience required – just curiosity, a computer, and a willin
 ## 🚀 Getting Started
 
 1. **Install Rust** – follow the guided setup in Chapter 1.
-2. **Choose your language** – read the English version (1–12) or the full Persian version.
+2. **Choose your language** – read the English version (now is full version) or the full Persian version.
 3. **Follow Ferris** – type every example, solve exercises, build projects.
 4. **Ask for help** – check the Teacher’s Guide or join Rust communities.
 
@@ -118,7 +118,7 @@ If you or your organization would like to support this project, please email: **
 
 ## 🔍 For Rust Edu Reviewers
 
-- 📂 **English chapters 1–12** are fully rewritten based on your feedback.
+- 📂 **English chapters 20** are fully rewritten based on your feedback.
 - 🎯 Focus areas addressed: metaphors, pacing, project complexity.
 - 📝 Improvements: parent sidebars, complexity normalization, “computer wizard” framing.
 - 💬 Feedback via GitHub Issues or email.
@@ -129,7 +129,7 @@ If you or your organization would like to support this project, please email: **
 
 | Content Type | License | Notes |
 |--------------|---------|-------|
-| Book text, illustrations descriptions, teacher guide | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) | Share & adapt with attribution |
+| Book text, illustrations descriptions, teacher guide | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/0.0/) | Share & adapt with attribution |
 | Code examples within chapters | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Public domain – use freely |
 | Rust logo / Ferris crab | Trademark of Rust Foundation | Used with respect; not covered by CC license |
 
